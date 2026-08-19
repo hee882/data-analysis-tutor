@@ -179,27 +179,51 @@ def gen_viz_sns():
         'check': lambda x: "sns.scatterplot" in x and x_col in x and y_col in x
     }
 
-def generate_exam_cycle():
-    easy_factories = [gen_easy_read, gen_easy_head, gen_easy_info, gen_easy_isnull, gen_easy_fillna, gen_easy_drop, gen_easy_filter]
-    viz_factories = [gen_viz_bar, gen_viz_scatter, gen_viz_hist]
-    hard_factories = [gen_hard_merge, gen_hard_pivot, gen_hard_str, gen_hard_dt, gen_numpy_array, gen_ml_split, gen_ml_rf, gen_viz_sns]
+
+def _get_factories():
+    easy_factories = [
+        gen_easy_read, gen_easy_head, gen_easy_info, gen_easy_isnull, 
+        gen_easy_fillna, gen_easy_drop, gen_easy_filter,
+        gen_viz_bar, gen_viz_scatter, gen_viz_hist
+    ]
+    hard_factories = [
+        gen_hard_merge, gen_hard_pivot, gen_hard_str, gen_hard_dt,
+        gen_numpy_array, gen_ml_split, gen_ml_rf, gen_viz_sns
+    ]
+    return easy_factories, hard_factories
+
+def generate_exam_quizzes():
+    easy_factories, hard_factories = _get_factories()
     
-    # 총 20문제 생성 (기초 14, 시각화 3, 심화 3)
-    quizzes = [random.choice(easy_factories)() for _ in range(14)] + \
-              [random.choice(viz_factories)() for _ in range(3)] + \
-              [random.choice(hard_factories)() for _ in range(3)]
+    # 16 Easy (Day1~Day4 level), 4 Hard (Advanced concepts)
+    quizzes = [random.choice(easy_factories)() for _ in range(16)] +               [random.choice(hard_factories)() for _ in range(4)]
               
-    # 모든 문제에 대해 보기 셔플 세팅
     for q in quizzes:
         q['type'] = 'radio'
         choices = [q['expected']] + random.sample(q['wrongs'], 3)
         random.shuffle(choices)
         q['choices'] = choices
 
-    # 2문제를 무작위로 뽑아 주관식(text)으로 변환
+    # 2??? ??? ???(text) ??
     text_indices = random.sample(range(20), 2)
     for idx in text_indices:
         quizzes[idx]['type'] = 'text'
         
     return quizzes
 
+def generate_single_quiz():
+    easy_factories, hard_factories = _get_factories()
+    all_factories = easy_factories + hard_factories
+    
+    q = random.choice(all_factories)()
+    
+    # 10% ??? ???, 90% ??? ???
+    if random.random() < 0.1:
+        q['type'] = 'text'
+    else:
+        q['type'] = 'radio'
+        choices = [q['expected']] + random.sample(q['wrongs'], 3)
+        random.shuffle(choices)
+        q['choices'] = choices
+        
+    return q

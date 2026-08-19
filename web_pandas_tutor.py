@@ -7,7 +7,7 @@ from datetime import datetime
 from src.style import get_custom_css
 from src.db import load_leaderboard, save_score
 from src.timer import inject_timer, remove_timer
-from src.questions import generate_exam_cycle
+from src.questions import generate_exam_quizzes, generate_single_quiz
 
 st.set_page_config(page_title="Data Analysis Tutor", layout="wide", initial_sidebar_state="collapsed")
 st.markdown(get_custom_css(), unsafe_allow_html=True)
@@ -26,97 +26,84 @@ tabs = st.tabs(["📚 학습 모드 (Study)", "🎯 실전 모의고사 (Exam)",
 
 with tabs[0]:
     remove_timer()
-    st.info("💡 **학습 모드:** 보기를 클릭하거나 코드를 직접 입력하세요. (최대 3회 재시도 가능)")
+    st.info("?? **???? ?? ??:** ???? ???? ???????. ??? ????? ??? ?? ?????. (?? 3? ??? ??)")
     
-    if 's_quizzes' not in st.session_state:
-        st.session_state.s_quizzes = generate_exam_cycle()
-        st.session_state.s_idx = 0
+    if 's_total_solved' not in st.session_state:
+        st.session_state.s_total_solved = 0
+        st.session_state.s_total_correct = 0
+        st.session_state.s_current_q = generate_single_quiz()
         st.session_state.s_attempts = 0
         st.session_state.s_show_exp = False
         st.session_state.s_correct = False
-        st.session_state.s_finished = False
 
-    if st.session_state.s_finished:
-        st.success("🎉 학습 사이클을 완주했습니다!")
-        if st.button("새로운 문제 셋으로 학습 다시 시작", key="btn_study_reset"):
-            st.session_state.s_quizzes = generate_exam_cycle()
-            st.session_state.s_idx = 0
+    acc = (st.session_state.s_total_correct / st.session_state.s_total_solved * 100) if st.session_state.s_total_solved > 0 else 0
+    
+    # ?? ???
+    colA, colB = st.columns(2)
+    with colA:
+        st.markdown(f"<div style='background:rgba(255,255,255,0.4); padding:1rem; border-radius:12px; border:1px solid rgba(255,255,255,0.5);'><strong style='font-size:1.2rem; color:#3b82f6;'>? ?? ?? ?</strong><br><span style='font-size:1.8rem; font-weight:800;'>{st.session_state.s_total_solved}</span> ?</div>", unsafe_allow_html=True)
+    with colB:
+        st.markdown(f"<div style='background:rgba(255,255,255,0.4); padding:1rem; border-radius:12px; border:1px solid rgba(255,255,255,0.5);'><strong style='font-size:1.2rem; color:#10b981;'>?? ? ?? ???</strong><br><span style='font-size:1.8rem; font-weight:800;'>{acc:.1f}</span> %</div>", unsafe_allow_html=True)
+    st.write("")
+    
+    q = st.session_state.s_current_q
+    
+    with st.container(border=True):
+        st.subheader(f"Q. {q['topic']} " + ("(??? ??)" if q['type'] == 'text' else "(??? ???)"))
+        st.write(q['question'])
+        
+        if q['type'] == 'radio':
+            user_ans = st.radio("?? ??", options=q['choices'], label_visibility="hidden", key=f"s_ans_endless", index=None)
+        else:
+            user_ans = st.text_input("?? ????? ??? ?????", placeholder="??? ?????", label_visibility="hidden", key=f"s_ans_endless")
+
+    if not st.session_state.s_show_exp:
+        if st.button("?? ? ??", type="primary", key="btn_study_submit"):
+            if not user_ans:
+                st.warning("??? ????? ??? ??? ???.")
+            else:
+                if q['type'] == 'radio':
+                    is_correct = (user_ans == q['expected'])
+                else:
+                    is_correct = q['check'](user_ans)
+
+                if is_correct:
+                    st.session_state.s_correct = True
+                    st.session_state.s_show_exp = True
+                    st.session_state.s_total_solved += 1
+                    if st.session_state.s_attempts == 0:
+                        st.session_state.s_total_correct += 1
+                else:
+                    st.session_state.s_attempts += 1
+                    if st.session_state.s_attempts >= 3:
+                        st.session_state.s_correct = False
+                        st.session_state.s_show_exp = True
+                        st.session_state.s_total_solved += 1
+                st.rerun()
+        
+        if st.session_state.s_attempts > 0 and not st.session_state.s_show_exp:
+            st.error(f"? ?????. ?? ??? ???. (?? ??: {3 - st.session_state.s_attempts}?)")
+    else:
+        if st.session_state.s_correct:
+            st.success("? ?????!")
+        else:
+            st.error("? 3? ???? ?? ??? ?????.")
+            
+        with st.expander("?? ? ?? ??", expanded=True):
+            st.code(q['expected'], language='python')
+            st.markdown(q['explanation'])
+            
+        if st.button("?? ?? ??? ?? ?? (Endless)", type="primary", key="btn_study_next"):
+            st.session_state.s_current_q = generate_single_quiz()
             st.session_state.s_attempts = 0
             st.session_state.s_show_exp = False
             st.session_state.s_correct = False
-            st.session_state.s_finished = False
             st.rerun()
-    else:
-        s_idx = st.session_state.s_idx
-        q = st.session_state.s_quizzes[s_idx]
-        
-        col1, col2 = st.columns([8, 2])
-        with col1:
-            st.progress((s_idx) / 20)
-        with col2:
-            if st.button("🔄 섞기", key="btn_study_shuffle"):
-                st.session_state.s_quizzes = generate_exam_cycle()
-                st.session_state.s_idx = 0
-                st.session_state.s_attempts = 0
-                st.session_state.s_show_exp = False
-                st.session_state.s_correct = False
-                st.rerun()
-        
-        with st.container(border=True):
-            st.subheader(f"Question {s_idx+1:02d}. {q['topic']} " + ("(주관식 ⌨️)" if q['type'] == 'text' else "(객관식 🖱️)"))
-            st.write(q['question'])
-            
-            if q['type'] == 'radio':
-                user_ans = st.radio("보기 선택", options=q['choices'], label_visibility="hidden", key=f"s_ans_{s_idx}", index=None)
-            else:
-                user_ans = st.text_input("직접 타이핑하여 코드를 완성하세요", placeholder="코드를 입력하세요", label_visibility="hidden", key=f"s_ans_{s_idx}")
-
-        if not st.session_state.s_show_exp:
-            if st.button("제출 및 채점", type="primary", key="btn_study_submit"):
-                if not user_ans:
-                    st.warning("답안을 입력하거나 보기를 선택해 주세요.")
-                else:
-                    if q['type'] == 'radio':
-                        is_correct = (user_ans == q['expected'])
-                    else:
-                        is_correct = q['check'](user_ans)
-
-                    if is_correct:
-                        st.session_state.s_correct = True
-                        st.session_state.s_show_exp = True
-                    else:
-                        st.session_state.s_attempts += 1
-                        if st.session_state.s_attempts >= 3:
-                            st.session_state.s_correct = False
-                            st.session_state.s_show_exp = True
-                    st.rerun()
-            
-            if st.session_state.s_attempts > 0 and not st.session_state.s_show_exp:
-                st.error(f"❌ 오답입니다. 다시 시도해 보세요. (남은 기회: {3 - st.session_state.s_attempts}번)")
-        else:
-            if st.session_state.s_correct:
-                st.success("✅ 정답입니다!")
-            else:
-                st.error("❌ 3회 오답으로 인해 해설이 공개됩니다.")
-                
-            with st.expander("해설 및 모범 답안", expanded=True):
-                st.code(q['expected'], language='python')
-                st.markdown(q['explanation'])
-                
-            if st.button("다음 문항으로 이동", type="primary", key="btn_study_next"):
-                if s_idx + 1 >= 20:
-                    st.session_state.s_finished = True
-                else:
-                    st.session_state.s_idx += 1
-                    st.session_state.s_attempts = 0
-                    st.session_state.s_show_exp = False
-                    st.session_state.s_correct = False
-                st.rerun()
 
 with tabs[1]:
     if 'exam_state' not in st.session_state:
         st.session_state.exam_state = 'landing'
-        st.session_state.e_quizzes = generate_exam_cycle()
+        st.session_state.e_quizzes = generate_exam_quizzes()
         st.session_state.e_score = 0
         st.session_state.e_user_answers = []
         st.session_state.exam_name = ""
@@ -143,7 +130,7 @@ with tabs[1]:
             if st.button("▶️ 모의고사 응시 시작", type="primary"):
                 if candidate_name.strip():
                     st.session_state.exam_name = candidate_name.strip()
-                    st.session_state.e_quizzes = generate_exam_cycle()
+                    st.session_state.e_quizzes = generate_exam_quizzes()
                     st.session_state.exam_start_time = time.time()
                     st.session_state.exam_state = 'running'
                     st.rerun()
