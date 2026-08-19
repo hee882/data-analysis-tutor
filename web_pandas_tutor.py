@@ -10,30 +10,13 @@ from src.timer import inject_timer, remove_timer
 from src.questions import generate_exam_quizzes, generate_single_quiz
 
 st.set_page_config(page_title="Data Science & ML Bootcamp", layout="wide", initial_sidebar_state="collapsed")
-st.markdown(get_custom_css(), unsafe_allow_html=True)
 
-# 플러그인 전략 선택기 (Sidebar)
-with st.sidebar:
-    st.markdown("### ⚙️ 학습 모드 설정")
-    selected_mode = st.radio(
-        "출제 범위 선택",
-        options=["bootcamp_day1_4", "comprehensive"],
-        format_func=lambda x: "🎓 Day 1~4 시험 대비" if x == "bootcamp_day1_4" else "🔥 종합 마스터 (전범위)",
-        key="strategy_selector"
-    )
-    if selected_mode == "bootcamp_day1_4":
-        st.caption("부트캠프 진도에 맞춘 핵심 모드")
-    else:
-        st.caption("데이터 분석 전 분야 딥다이브")
+if 'current_strategy' not in st.session_state:
+    st.session_state.current_strategy = "bootcamp_day1_4"
 
-    if 'current_strategy' not in st.session_state or st.session_state.current_strategy != selected_mode:
-        st.session_state.current_strategy = selected_mode
-        # 전략이 바뀌면 문제 초기화
-        st.session_state.s_current_q = generate_single_quiz(selected_mode)
-        st.session_state.exam_state = 'landing'
-        st.session_state.e_quizzes = generate_exam_quizzes(selected_mode)
+st.markdown(get_custom_css(st.session_state.current_strategy), unsafe_allow_html=True)
 
-# 메인 페이지 헤더 (중앙 정렬 로고 + 제목 + 부제)
+# 메인 페이지 헤더
 st.markdown(f'''
 <div class="custom-header">
     <div class="header-top-row">
@@ -43,6 +26,26 @@ st.markdown(f'''
     <div class="header-subtitle">Python, Pandas, Scikit-learn을 활용한 데이터 분석 및 머신러닝 실전 훈련</div>
 </div>
 ''', unsafe_allow_html=True)
+
+# 상단 글로벌 모드 스위처
+selected_mode = st.radio(
+    "글로벌 모드 스위처",
+    options=["bootcamp_day1_4", "comprehensive"],
+    format_func=lambda x: "🎓 Day 1~4 기초" if x == "bootcamp_day1_4" else "🔥 종합 마스터",
+    horizontal=True,
+    label_visibility="collapsed",
+    key="global_mode_switcher"
+)
+
+if st.session_state.current_strategy != selected_mode:
+    st.session_state.current_strategy = selected_mode
+    # 전략이 바뀌면 진행 상태 초기화
+    st.session_state.s_current_q = generate_single_quiz(selected_mode)
+    st.session_state.s_total_solved = 0
+    st.session_state.s_total_correct = 0
+    st.session_state.exam_state = 'landing'
+    st.session_state.e_quizzes = generate_exam_quizzes(selected_mode)
+    st.rerun()
 
 tabs = st.tabs(["📚 학습", "🚨 모의고사", "🏆 랭킹"])
 
@@ -59,7 +62,6 @@ with tabs[0]:
 
     acc = (st.session_state.s_total_correct / st.session_state.s_total_solved * 100) if st.session_state.s_total_solved > 0 else 0
     
-    # 상단 HUD (우측 뱃지)
     st.markdown(f'''
     <div class="hud-container">
         <div class="hud-badge">✅ 누적 완료: <span>{st.session_state.s_total_solved}</span> 개</div>
@@ -235,23 +237,18 @@ with tabs[2]:
     remove_timer()
     st.markdown("<h3 style='text-align: center; margin-bottom: 0.5rem;'>🏆 명예의 전당</h3>", unsafe_allow_html=True)
     
-    # 리더보드 모드 스위처
-    lb_mode = st.radio("리더보드 카테고리", ["bootcamp_day1_4", "comprehensive"], 
-                       format_func=lambda x: "🎓 Day 1~4 (기초)" if x == "bootcamp_day1_4" else "🔥 종합 마스터", 
-                       horizontal=True, label_visibility="collapsed")
-    
     lb = load_leaderboard()
     
-    # 파싱 및 필터링
     filtered_lb = []
     for row in lb:
         raw_name = row['name']
         if "###" in raw_name:
             parsed_name, strategy = raw_name.split("###", 1)
         else:
-            parsed_name, strategy = raw_name, "bootcamp_day1_4" # 레거시 데이터 기본값
+            parsed_name, strategy = raw_name, "bootcamp_day1_4"
             
-        if strategy == lb_mode:
+        # 리더보드도 글로벌 모드 스위치에 따라 자동 필터링됨
+        if strategy == st.session_state.current_strategy:
             row['display_name'] = parsed_name
             filtered_lb.append(row)
             

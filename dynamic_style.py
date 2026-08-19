@@ -1,4 +1,9 @@
-def get_custom_css(mode="bootcamp_day1_4"):
+import os
+
+repo_path = r'C:\Users\user\Desktop\HDAT-DA\data-analysis-tutor'
+style_path = os.path.join(repo_path, 'src', 'style.py')
+
+content = '''def get_custom_css(mode="bootcamp_day1_4"):
     # 모드에 따른 배경색/분위기 전환
     if mode == "comprehensive":
         # 종합 마스터 모드: 좀 더 다크/퍼플/오렌지 계열의 딥한(Deep) 느낌
@@ -218,3 +223,6 @@ div[data-testid="stTextInput"] input:focus {{ background: #ffffff !important; bo
 }}
 </style>
 """
+'''
+with open(style_path, 'w', encoding='utf-8') as f:
+    f.write(content)
