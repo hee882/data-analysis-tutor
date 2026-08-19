@@ -86,7 +86,7 @@ div[role="radiogroup"] > label {
 div[role="radiogroup"] > label:hover { 
     background: rgba(255, 255, 255, 0.95) !important; 
     border-color: #cbd5e1 !important; 
-    transform: translateY(-3px) !important; 
+    transform: scale(1.015) !important; 
     box-shadow: 0 8px 20px rgba(0,0,0,0.08) !important;
 }
 /* 선택되었을 때 효과 (파란색 테두리 + 강력한 강조 그림자) */
@@ -94,7 +94,7 @@ div[role="radiogroup"] > label[data-checked="true"] {
     border-color: #3b82f6 !important; 
     background: #ffffff !important; 
     box-shadow: 0 0 0 2px #3b82f6, 0 8px 20px rgba(59, 130, 246, 0.15) !important; 
-    transform: translateY(-2px) !important;
+    transform: scale(1.01) !important;
 }
 div[role="radiogroup"] > label > div:first-child { display: none !important; } /* 기존 동그라미 제거 */
 div[role="radiogroup"] > label > div:nth-child(2) {
