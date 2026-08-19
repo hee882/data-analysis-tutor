@@ -15,130 +15,218 @@ st.set_page_config(page_title="Data Analysis Tutor", layout="wide")
 
 st.markdown('''
 <style>
+/* 1. 최상급 폰트 설정 (Pretendard 기반) */
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css');
 
-html, body, [class*="css"], .stMarkdown, .stText, p, li, h1, h2, h3, h4, h5, h6, label, div {
+html, body, [class*="css"], .stMarkdown, .stText, p, li, h1, h2, h3, h4, h5, h6, label, div, input, button {
     font-family: 'Pretendard Variable', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif !important;
-    letter-spacing: -0.015em;
+    letter-spacing: -0.02em !important;
 }
-.stApp { background-color: #f8fafc; }
-header {visibility: hidden !important;}
-footer {visibility: hidden !important;}
-#MainMenu {visibility: hidden !important;}
 
-html, body {
-    overflow-y: scroll !important;
+/* 2. 전역 배경 및 기본 텍스트 톤 조율 (눈이 편안한 SaaS 스타일) */
+.stApp { 
+    background-color: #f8fafc; /* 매우 옅은 쿨그레이 */
 }
+p, li, span, label {
+    color: #475569 !important; /* 부드러운 슬레이트 그레이 */
+    line-height: 1.6 !important;
+}
+h1, h2, h3, h4, h5, strong {
+    color: #0f172a !important; /* 거의 검은색에 가까운 네이비 */
+    letter-spacing: -0.03em !important;
+}
+
+/* 3. Streamlit 기본 요소 강제 숨김 */
+header, footer, #MainMenu { visibility: hidden !important; }
+h1 { display: none; } /* 기존 거대 타이틀 숨김 */
+
+/* 4. 메인 컨테이너 규격 최적화 */
 .block-container { 
-    padding-top: 1rem !important; 
-    padding-bottom: 2rem !important; 
-    max-width: 1200px !important; 
-    width: 70% !important;
+    padding-top: 2rem !important; 
+    padding-bottom: 4rem !important; 
+    max-width: 1000px !important; /* 너무 넓지 않은 최적의 리딩 너비 */
+    width: 85% !important;
     margin: 0 auto !important;
     min-height: 85vh !important;
 }
-[data-baseweb="tab-panel"] {
-    min-height: 60vh !important;
-}
 
+/* 5. 커스텀 헤더 (모던 앱 내비게이션 바 형태) */
 .custom-header {
-    background-color: #ffffff;
-    padding: 1rem 2rem;
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    background-color: transparent;
+    padding: 1rem 0 2rem 0;
     margin-bottom: 2rem;
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    border-bottom: 2px solid #3b82f6;
+    align-items: flex-end;
+    border-bottom: 1px solid #e2e8f0;
 }
-.custom-header h2 { margin: 0 !important; font-size: 1.4rem !important; font-weight: 800 !important; color: #0f172a !important; }
-.custom-header span { font-size: 0.9rem; font-weight: 600; color: #64748b; background-color: #f1f5f9; padding: 0.4rem 0.8rem; border-radius: 20px; }
-.custom-footer { text-align: center; padding-top: 2rem; margin-top: 3rem; border-top: 1px solid #e2e8f0; color: #94a3b8; font-size: 0.85rem; }
-h1 { display: none; }
+.custom-header h2 { 
+    margin: 0 !important; 
+    font-size: 1.6rem !important; 
+    font-weight: 800 !important; 
+}
+.custom-header span { 
+    font-size: 0.85rem; 
+    font-weight: 600; 
+    color: #3b82f6; 
+    background-color: #eff6ff; 
+    padding: 0.3rem 0.8rem; 
+    border-radius: 99px; 
+}
 
-[data-baseweb="tab-list"] { gap: 2rem; margin-bottom: 1.5rem; }
-[data-baseweb="tab"] { font-size: 1.1rem !important; font-weight: 600 !important; color: #64748b !important; }
-[aria-selected="true"] { color: #2563eb !important; }
+/* 6. 탭(Tab) 메뉴 UI 고급화 */
+[data-baseweb="tab-list"] {
+    gap: 2rem;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid #f1f5f9;
+}
+[data-baseweb="tab"] {
+    font-size: 1.05rem !important;
+    font-weight: 600 !important;
+    color: #94a3b8 !important;
+    padding-bottom: 0.8rem !important;
+    padding-top: 0 !important;
+    transition: color 0.2s ease;
+}
+[aria-selected="true"] {
+    color: #0f172a !important;
+    border-bottom: 3px solid #0f172a !important;
+}
 
+/* 7. 메인 카드(문제 박스 등) 디자인 */
 [data-testid="stVerticalBlockBorderWrapper"], .exam-card {
     background-color: #ffffff;
     border-radius: 16px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -1px rgba(0, 0, 0, 0.02) !important;
+    box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.04) !important;
     border: 1px solid #e2e8f0 !important;
-    padding: 2.5rem 2rem;
-    margin-bottom: 2rem;
+    padding: 2.5rem !important;
+    margin-bottom: 2.5rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+[data-testid="stVerticalBlockBorderWrapper"]:hover {
+    box-shadow: 0 10px 30px -4px rgba(15, 23, 42, 0.08) !important;
 }
 
-h3 { font-size: 1.3rem !important; font-weight: 700 !important; color: #1e293b !important; margin-bottom: 1.2rem !important; }
-p { font-size: 1.05rem !important; color: #334155 !important; line-height: 1.7 !important; }
-.stCaption { font-size: 0.95rem !important; color: #64748b !important; font-weight: 500; }
-.stRadio label span { font-size: 1.05rem !important; color: #1e293b !important; }
+/* 8. 입력창(Input) 포커스 및 호버 개선 (Streamlit 기본 붉은색 제거) */
+div[data-baseweb="input"] {
+    border-radius: 10px !important;
+    border: 1px solid #cbd5e1 !important;
+    background-color: #f8fafc !important;
+    transition: all 0.2s ease !important;
+}
+div[data-baseweb="input"]:focus-within {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+    background-color: #ffffff !important;
+}
+input {
+    color: #0f172a !important;
+    font-weight: 500 !important;
+    font-size: 1.05rem !important;
+}
 
+/* 9. 버튼(Button) 프리미엄 액션 스타일 */
 .stButton > button {
-    background-color: #2563eb !important;
-    color: white !important;
+    background-color: #0f172a !important; /* Primary를 고급스러운 다크 네이비로 */
+    color: #ffffff !important;
     border: none !important;
     border-radius: 10px !important;
     padding: 0.6rem 1.5rem !important;
     font-size: 1.05rem !important;
     font-weight: 600 !important;
-    transition: all 0.2s ease !important;
     width: 100%;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
-.stButton > button:hover { background-color: #1d4ed8 !important; transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.2) !important; }
-.stButton > button:active { transform: translateY(0); }
+.stButton > button:hover {
+    background-color: #1e293b !important;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px -4px rgba(15, 23, 42, 0.25) !important;
+}
+.stButton > button:active {
+    transform: translateY(0);
+    box-shadow: none !important;
+}
+/* Secondary 버튼 (일반 버튼) 톤다운 */
+[data-testid="stButton"] button:not(:disabled) {
+    background-color: #f1f5f9 !important;
+    color: #334155 !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: none !important;
+}
+[data-testid="stButton"] button:not(:disabled):hover {
+    background-color: #e2e8f0 !important;
+    border-color: #cbd5e1 !important;
+}
+/* Primary 버튼 속성 복구 */
+[data-testid="stButton"] button[kind="primary"] {
+    background-color: #3b82f6 !important;
+    color: white !important;
+    border: none !important;
+}
+[data-testid="stButton"] button[kind="primary"]:hover {
+    background-color: #2563eb !important;
+    box-shadow: 0 8px 16px -4px rgba(59, 130, 246, 0.3) !important;
+}
 
-[data-testid="stExpander"] { border-radius: 12px; border: 1px solid #e2e8f0; background-color: #f1f5f9; }
-[data-testid="stExpander"] p { color: #475569 !important; }
-code { font-family: 'JetBrains Mono', 'D2Coding', monospace !important; font-size: 0.95rem !important; color: #0ea5e9 !important; background-color: #f1f5f9 !important; padding: 0.2rem 0.4rem !important; border-radius: 6px !important; }
+/* 10. 프로그레스 바(Progress Bar) */
+.stProgress > div > div > div > div {
+    background-color: #3b82f6 !important;
+    border-radius: 99px !important;
+}
 
-.report-correct { border-left: 5px solid #22c55e !important; padding-left: 1rem; margin-bottom: 1rem; }
-.report-wrong { border-left: 5px solid #ef4444 !important; padding-left: 1rem; margin-bottom: 1rem; }
+/* 11. 알림 박스 (Success, Error, Info) 플랫 디자인 */
+[data-testid="stAlert"] {
+    border-radius: 12px;
+    border: none !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02) !important;
+}
+
+/* 12. 코드 블록 스타일링 */
+code {
+    font-family: 'JetBrains Mono', 'D2Coding', monospace !important;
+    font-size: 0.95rem !important;
+    color: #0284c7 !important;
+    background-color: #f0f9ff !important;
+    padding: 0.2rem 0.4rem !important;
+    border-radius: 6px !important;
+    border: 1px solid #e0f2fe;
+}
+
+/* 13. 성적표 리포트 스타일 */
+.report-correct { 
+    border-left: 4px solid #10b981 !important; 
+    background-color: #f0fdf4;
+    padding: 1.2rem; 
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 1rem; 
+}
+.report-wrong { 
+    border-left: 4px solid #ef4444 !important; 
+    background-color: #fef2f2;
+    padding: 1.2rem; 
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 1rem; 
+}
 
 /* ==========================================
-   모바일 최적화 (iPhone 12 등 소형 기기 대응)
+   모바일 최적화 (iPhone 대응)
    ========================================== */
 @media screen and (max-width: 768px) {
-    /* 레이아웃 풀사이즈로 확장 및 패딩 축소 */
     .block-container { 
         width: 100% !important; 
-        padding: 0.5rem !important;
+        padding: 1rem !important;
     }
-    /* 헤더 세로 정렬 및 여백 축소 */
     .custom-header {
         flex-direction: column;
         align-items: flex-start;
         gap: 0.8rem;
-        padding: 1rem;
+        padding-bottom: 1rem;
     }
-    .custom-header h2 { font-size: 1.15rem !important; }
-    
-    /* 문제 카드 내부 여백 대폭 축소 */
-    [data-testid="stVerticalBlockBorderWrapper"], .exam-card {
-        padding: 1.2rem 1rem !important;
+    [data-testid="stVerticalBlockBorderWrapper"] {
+        padding: 1.5rem 1rem !important;
     }
-    
-    /* 랜딩 페이지 스탯 박스 세로 정렬 */
-    .landing-box h3 { font-size: 1.5rem !important; }
-    .landing-box .stats {
-        flex-direction: column;
-        gap: 0.8rem !important;
-        margin: 1rem 0 !important;
-    }
-    .landing-box .stat-item {
-        padding: 1rem;
-        min-width: auto;
-    }
-    
-    /* 폰트 사이즈 전체적 다운스케일링 */
-    h3 { font-size: 1.1rem !important; }
-    p, .stRadio label span, code { font-size: 0.95rem !important; }
-    .stButton > button { font-size: 0.95rem !important; padding: 0.5rem 1rem !important; }
-    
-    /* 탭 간격 좁히기 */
-    [data-baseweb="tab-list"] { gap: 0.5rem !important; }
-    [data-baseweb="tab"] { font-size: 0.9rem !important; padding: 0 0.5rem !important; }
+    [data-baseweb="tab-list"] { gap: 1rem !important; }
+    [data-baseweb="tab"] { font-size: 0.95rem !important; }
 }
 </style>
 ''', unsafe_allow_html=True)
@@ -239,18 +327,220 @@ def save_score(name, score):
 def inject_timer(time_limit_sec, start_timestamp):
     html_code = f"""
     <style>
-        #live-exam-timer {{
-            position: fixed; bottom: 30px; right: 30px; background-color: #1e293b; color: #f8fafc; 
-            padding: 12px 24px; border-radius: 12px; font-family: 'JetBrains Mono', monospace; 
-            font-size: 1.4rem; font-weight: 800; z-index: 999999; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 2px solid #3b82f6; transition: all 0.3s ease;
-        }}
-        @media screen and (max-width: 768px) {{
-            #live-exam-timer {{
-                bottom: 15px; right: 15px; padding: 8px 16px; font-size: 1.05rem; border-width: 1px;
-            }}
-        }}
-    </style>
+/* 1. 최상급 폰트 설정 (Pretendard 기반) */
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css');
+
+html, body, [class*="css"], .stMarkdown, .stText, p, li, h1, h2, h3, h4, h5, h6, label, div, input, button {
+    font-family: 'Pretendard Variable', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif !important;
+    letter-spacing: -0.02em !important;
+}
+
+/* 2. 전역 배경 및 기본 텍스트 톤 조율 (눈이 편안한 SaaS 스타일) */
+.stApp { 
+    background-color: #f8fafc; /* 매우 옅은 쿨그레이 */
+}
+p, li, span, label {
+    color: #475569 !important; /* 부드러운 슬레이트 그레이 */
+    line-height: 1.6 !important;
+}
+h1, h2, h3, h4, h5, strong {
+    color: #0f172a !important; /* 거의 검은색에 가까운 네이비 */
+    letter-spacing: -0.03em !important;
+}
+
+/* 3. Streamlit 기본 요소 강제 숨김 */
+header, footer, #MainMenu { visibility: hidden !important; }
+h1 { display: none; } /* 기존 거대 타이틀 숨김 */
+
+/* 4. 메인 컨테이너 규격 최적화 */
+.block-container { 
+    padding-top: 2rem !important; 
+    padding-bottom: 4rem !important; 
+    max-width: 1000px !important; /* 너무 넓지 않은 최적의 리딩 너비 */
+    width: 85% !important;
+    margin: 0 auto !important;
+    min-height: 85vh !important;
+}
+
+/* 5. 커스텀 헤더 (모던 앱 내비게이션 바 형태) */
+.custom-header {
+    background-color: transparent;
+    padding: 1rem 0 2rem 0;
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: 1px solid #e2e8f0;
+}
+.custom-header h2 { 
+    margin: 0 !important; 
+    font-size: 1.6rem !important; 
+    font-weight: 800 !important; 
+}
+.custom-header span { 
+    font-size: 0.85rem; 
+    font-weight: 600; 
+    color: #3b82f6; 
+    background-color: #eff6ff; 
+    padding: 0.3rem 0.8rem; 
+    border-radius: 99px; 
+}
+
+/* 6. 탭(Tab) 메뉴 UI 고급화 */
+[data-baseweb="tab-list"] {
+    gap: 2rem;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid #f1f5f9;
+}
+[data-baseweb="tab"] {
+    font-size: 1.05rem !important;
+    font-weight: 600 !important;
+    color: #94a3b8 !important;
+    padding-bottom: 0.8rem !important;
+    padding-top: 0 !important;
+    transition: color 0.2s ease;
+}
+[aria-selected="true"] {
+    color: #0f172a !important;
+    border-bottom: 3px solid #0f172a !important;
+}
+
+/* 7. 메인 카드(문제 박스 등) 디자인 */
+[data-testid="stVerticalBlockBorderWrapper"], .exam-card {
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.04) !important;
+    border: 1px solid #e2e8f0 !important;
+    padding: 2.5rem !important;
+    margin-bottom: 2.5rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+[data-testid="stVerticalBlockBorderWrapper"]:hover {
+    box-shadow: 0 10px 30px -4px rgba(15, 23, 42, 0.08) !important;
+}
+
+/* 8. 입력창(Input) 포커스 및 호버 개선 (Streamlit 기본 붉은색 제거) */
+div[data-baseweb="input"] {
+    border-radius: 10px !important;
+    border: 1px solid #cbd5e1 !important;
+    background-color: #f8fafc !important;
+    transition: all 0.2s ease !important;
+}
+div[data-baseweb="input"]:focus-within {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+    background-color: #ffffff !important;
+}
+input {
+    color: #0f172a !important;
+    font-weight: 500 !important;
+    font-size: 1.05rem !important;
+}
+
+/* 9. 버튼(Button) 프리미엄 액션 스타일 */
+.stButton > button {
+    background-color: #0f172a !important; /* Primary를 고급스러운 다크 네이비로 */
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 10px !important;
+    padding: 0.6rem 1.5rem !important;
+    font-size: 1.05rem !important;
+    font-weight: 600 !important;
+    width: 100%;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+.stButton > button:hover {
+    background-color: #1e293b !important;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px -4px rgba(15, 23, 42, 0.25) !important;
+}
+.stButton > button:active {
+    transform: translateY(0);
+    box-shadow: none !important;
+}
+/* Secondary 버튼 (일반 버튼) 톤다운 */
+[data-testid="stButton"] button:not(:disabled) {
+    background-color: #f1f5f9 !important;
+    color: #334155 !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: none !important;
+}
+[data-testid="stButton"] button:not(:disabled):hover {
+    background-color: #e2e8f0 !important;
+    border-color: #cbd5e1 !important;
+}
+/* Primary 버튼 속성 복구 */
+[data-testid="stButton"] button[kind="primary"] {
+    background-color: #3b82f6 !important;
+    color: white !important;
+    border: none !important;
+}
+[data-testid="stButton"] button[kind="primary"]:hover {
+    background-color: #2563eb !important;
+    box-shadow: 0 8px 16px -4px rgba(59, 130, 246, 0.3) !important;
+}
+
+/* 10. 프로그레스 바(Progress Bar) */
+.stProgress > div > div > div > div {
+    background-color: #3b82f6 !important;
+    border-radius: 99px !important;
+}
+
+/* 11. 알림 박스 (Success, Error, Info) 플랫 디자인 */
+[data-testid="stAlert"] {
+    border-radius: 12px;
+    border: none !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02) !important;
+}
+
+/* 12. 코드 블록 스타일링 */
+code {
+    font-family: 'JetBrains Mono', 'D2Coding', monospace !important;
+    font-size: 0.95rem !important;
+    color: #0284c7 !important;
+    background-color: #f0f9ff !important;
+    padding: 0.2rem 0.4rem !important;
+    border-radius: 6px !important;
+    border: 1px solid #e0f2fe;
+}
+
+/* 13. 성적표 리포트 스타일 */
+.report-correct { 
+    border-left: 4px solid #10b981 !important; 
+    background-color: #f0fdf4;
+    padding: 1.2rem; 
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 1rem; 
+}
+.report-wrong { 
+    border-left: 4px solid #ef4444 !important; 
+    background-color: #fef2f2;
+    padding: 1.2rem; 
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 1rem; 
+}
+
+/* ==========================================
+   모바일 최적화 (iPhone 대응)
+   ========================================== */
+@media screen and (max-width: 768px) {
+    .block-container { 
+        width: 100% !important; 
+        padding: 1rem !important;
+    }
+    .custom-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.8rem;
+        padding-bottom: 1rem;
+    }
+    [data-testid="stVerticalBlockBorderWrapper"] {
+        padding: 1.5rem 1rem !important;
+    }
+    [data-baseweb="tab-list"] { gap: 1rem !important; }
+    [data-baseweb="tab"] { font-size: 0.95rem !important; }
+}
+</style>
     <script>
         const parentDoc = window.parent.document;
         let timerDiv = parentDoc.getElementById("live-exam-timer");
@@ -531,6 +821,7 @@ st.markdown('''
     Powered by Python & Streamlit
 </div>
 ''', unsafe_allow_html=True)
+
 
 
 
