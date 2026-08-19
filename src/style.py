@@ -173,5 +173,21 @@ div[data-testid="stTextInput"] input:focus {
     .hud-box { padding: 0.8rem; margin-bottom: 1rem; }
     .hud-value { font-size: 1.5rem; }
 }
+
+/* 작은 상태 대시보드 (우측 정렬용 뱃지) */
+.hud-container { display: flex; justify-content: flex-end; gap: 0.8rem; margin-bottom: 1rem; }
+.hud-badge {
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    padding: 0.4rem 1rem;
+    border-radius: 99px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #1e293b;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+}
+.hud-badge span { color: #3b82f6; font-weight: 800; margin-left: 0.3rem; }
+
 </style>
 """
