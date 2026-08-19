@@ -9,7 +9,7 @@ from src.db import load_leaderboard, save_score
 from src.timer import inject_timer, remove_timer
 from src.questions import generate_exam_quizzes, generate_single_quiz
 
-st.set_page_config(page_title="Data Science & ML Bootcamp", layout="wide", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="Data Science & ML Bootcamp", page_icon="logo.jpeg", layout="wide", initial_sidebar_state="collapsed")
 st.markdown(get_custom_css(), unsafe_allow_html=True)
 
 # 메인 페이지 헤더 (중앙 정렬 로고 + 제목 + 부제)
