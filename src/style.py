@@ -226,5 +226,55 @@ div[data-testid="stTextInput"] input:focus {
     }
 }
 
+
+/* ??? ?? ??? ?? ????? ? (Bottom Nav) */
+@media screen and (max-width: 768px) {
+    [data-baseweb="tab-list"] {
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        background: rgba(255, 255, 255, 0.9) !important;
+        backdrop-filter: blur(24px) saturate(180%) !important;
+        -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+        border-top: 1px solid rgba(0,0,0,0.08) !important;
+        border-bottom: none !important;
+        padding: 0.5rem 0.5rem 1rem 0.5rem !important; /* ??? ?? ?? ?? ?? */
+        margin: 0 !important;
+        z-index: 9999 !important;
+        display: flex !important;
+        justify-content: space-around !important;
+        box-shadow: 0 -8px 24px rgba(0,0,0,0.06) !important;
+        gap: 0 !important;
+    }
+    
+    [data-baseweb="tab"] {
+        flex: 1 !important;
+        text-align: center !important;
+        justify-content: center !important;
+        font-size: 0.85rem !important;
+        padding: 0.5rem 0 !important;
+        flex-direction: column !important;
+    }
+    
+    [aria-selected="true"] {
+        border-bottom: none !important;
+        color: #3b82f6 !important;
+        border-top: 3px solid #3b82f6 !important;
+        background: rgba(59, 130, 246, 0.05) !important;
+        border-radius: 8px 8px 0 0 !important;
+    }
+    
+    [aria-selected="false"] {
+        border-top: 3px solid transparent !important;
+        border-bottom: none !important;
+    }
+
+    /* ?? ??? ???? ???? ??? ?? ???? ?? ?? ?? */
+    .block-container {
+        padding-bottom: 6rem !important;
+    }
+}
+
 </style>
 """
