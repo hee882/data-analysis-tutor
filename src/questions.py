@@ -1,5 +1,9 @@
 import random
 
+def _prep(text):
+    return str(text).replace(' ', '').replace('"', "'").lower()
+
+
 def gen_easy_read():
     ext = random.choice(['csv', 'excel'])
     ans = f"df = pd.read_{ext}('data.{ext}')"
@@ -7,7 +11,7 @@ def gen_easy_read():
     return {
         'topic': '데이터 로드', 'question': f"`data.{ext}` 파일을 읽어 `df`에 할당하세요.", 
         'expected': ans, 'wrongs': wrongs, 'explanation': "pd.read_csv 또는 pd.read_excel을 사용합니다.",
-        'check': lambda x: f"read_{ext}" in x and "data" in x and "df" in x
+        'check': lambda x: f"read_{ext}" in _prep(x) and "data" in _prep(x) and "df" in _prep(x)
     }
 
 def gen_easy_head():
@@ -17,7 +21,7 @@ def gen_easy_head():
     return {
         'topic': '데이터 미리보기', 'question': f"`df`의 상단 {n}개 행을 확인하세요.", 
         'expected': ans, 'wrongs': wrongs, 'explanation': "df.head(n) 메서드를 사용합니다.",
-        'check': lambda x: "head" in x and str(n) in x
+        'check': lambda x: "head" in _prep(x) and str(n) in _prep(x)
     }
 
 def gen_easy_info():
@@ -26,7 +30,7 @@ def gen_easy_info():
     return {
         'topic': '데이터 메타정보', 'question': "`df`의 행 개수, 컬럼 타입, 결측치를 요약 출력하세요.", 
         'expected': ans, 'wrongs': wrongs, 'explanation': "df.info()는 데이터 전처리의 기본입니다.",
-        'check': lambda x: "info" in x
+        'check': lambda x: "info" in _prep(x)
     }
 
 def gen_easy_isnull():
@@ -35,7 +39,7 @@ def gen_easy_isnull():
     return {
         'topic': '결측치 집계', 'question': "`df`의 각 컬럼별 결측치(NaN) 총합을 구하세요.", 
         'expected': ans, 'wrongs': wrongs, 'explanation': "isnull().sum() 또는 isna().sum()을 사용합니다.",
-        'check': lambda x: ("isnull" in x or "isna" in x) and "sum" in x
+        'check': lambda x: ("isnull" in _prep(x) or "isna" in _prep(x)) and "sum" in _prep(x)
     }
 
 def gen_easy_fillna():
@@ -46,7 +50,7 @@ def gen_easy_fillna():
     return {
         'topic': '결측치 대체', 'question': f"`df['{col}']`의 결측치를 {val} 값으로 일괄 대체하세요.", 
         'expected': ans, 'wrongs': wrongs, 'explanation': "fillna() 메서드를 사용합니다.",
-        'check': lambda x: "fillna" in x and str(val) in x and col in x
+        'check': lambda x: "fillna" in _prep(x) and str(val).lower() in _prep(x) and col.lower() in _prep(x)
     }
 
 def gen_easy_drop():
@@ -56,7 +60,7 @@ def gen_easy_drop():
     return {
         'topic': '컬럼 제거', 'question': f"`df`에서 `{col}` 컬럼을 삭제하세요.", 
         'expected': ans, 'wrongs': wrongs, 'explanation': "drop(columns=[...]) 또는 drop(..., axis=1)을 사용합니다.",
-        'check': lambda x: "drop" in x and col in x and ("columns" in x or "axis=1" in x.replace(" ", ""))
+        'check': lambda x: "drop" in _prep(x) and col.lower() in _prep(x) and ("columns" in _prep(x) or "axis=1" in _prep(x))
     }
 
 def gen_easy_filter():
@@ -67,7 +71,7 @@ def gen_easy_filter():
     return {
         'topic': '조건부 필터링', 'question': f"`df`에서 `{col}` 값이 {val} 이상(>=)인 행만 추출하세요.", 
         'expected': ans, 'wrongs': wrongs, 'explanation': "불리언 인덱싱 df[df['col'] >= val] 형태를 사용합니다.",
-        'check': lambda x: col in x and str(val) in x and ">=" in x
+        'check': lambda x: col.lower() in _prep(x) and str(val) in _prep(x) and ">=" in _prep(x)
     }
 
 def gen_viz_bar():
@@ -77,7 +81,7 @@ def gen_viz_bar():
     return {
         'topic': '막대 그래프', 'question': f"Pandas 내장 함수로 x축 '{col1}', y축 '{col2}'의 막대 그래프를 그리세요.", 
         'expected': ans, 'wrongs': wrongs, 'explanation': ".plot(kind='bar') 또는 .plot.bar()를 사용합니다.",
-        'check': lambda x: "plot" in x and "bar" in x and col1 in x and col2 in x
+        'check': lambda x: "plot" in _prep(x) and "bar" in _prep(x) and col1.lower() in _prep(x) and col2.lower() in _prep(x)
     }
 
 def gen_viz_scatter():
@@ -87,7 +91,7 @@ def gen_viz_scatter():
     return {
         'topic': '산점도', 'question': f"Pandas 함수로 x축 '{col1}', y축 '{col2}'의 산점도(scatter plot)를 그리세요.", 
         'expected': ans, 'wrongs': wrongs, 'explanation': ".plot(kind='scatter')를 사용합니다.",
-        'check': lambda x: "plot" in x and "scatter" in x and col1 in x and col2 in x
+        'check': lambda x: "plot" in _prep(x) and "scatter" in _prep(x) and col1.lower() in _prep(x) and col2.lower() in _prep(x)
     }
 
 def gen_viz_hist():
@@ -97,7 +101,7 @@ def gen_viz_hist():
     return {
         'topic': '히스토그램', 'question': f"`df['{col}']`의 구간(bins)을 {bins}개로 나눈 히스토그램을 그리세요.", 
         'expected': ans, 'wrongs': wrongs, 'explanation': ".plot(kind='hist', bins=N)을 사용합니다.",
-        'check': lambda x: "hist" in x and str(bins) in x and col in x.replace('"',"'")
+        'check': lambda x: "hist" in _prep(x) and str(bins) in _prep(x) and col.lower() in _prep(x)
     }
 
 def gen_hard_merge():
@@ -107,7 +111,7 @@ def gen_hard_merge():
     return {
         'topic': '데이터 병합', 'question': f"`df1`과 `df2`를 'user_id' 기준으로 `{how}` Join 하세요.", 
         'expected': ans, 'wrongs': wrongs, 'explanation': "pd.merge() 함수를 활용합니다.",
-        'check': lambda x: "merge" in x and "user_id" in x and how in x
+        'check': lambda x: "merge" in _prep(x) and "user_id" in _prep(x) and how.lower() in _prep(x)
     }
 
 def gen_hard_pivot():
@@ -117,7 +121,7 @@ def gen_hard_pivot():
     return {
         'topic': '피벗 테이블', 'question': f"`df`에서 행 '{idx}', 열 'month', 값 'sales', 집계 'sum'인 피벗 테이블 코드를 작성하세요.", 
         'expected': ans, 'wrongs': wrongs, 'explanation': "df.pivot_table()을 사용합니다.",
-        'check': lambda x: "pivot_table" in x and idx in x and "month" in x and "sales" in x and "sum" in x
+        'check': lambda x: "pivot_table" in _prep(x) and idx.lower() in _prep(x) and "month" in _prep(x) and "sales" in _prep(x) and "sum" in _prep(x)
     }
 
 def gen_hard_str():
@@ -126,7 +130,7 @@ def gen_hard_str():
     return {
         'topic': '문자열 파싱', 'question': "`df['price']` 컬럼 내의 달러 기호('$')를 제거하고 float으로 변환하세요.", 
         'expected': ans, 'wrongs': wrongs, 'explanation': ".str.replace() 후 .astype(float)을 체이닝합니다.",
-        'check': lambda x: "replace" in x and "$" in x and ("astype" in x or "float" in x)
+        'check': lambda x: "replace" in _prep(x) and "$" in _prep(x) and ("astype" in _prep(x) or "float" in _prep(x))
     }
 
 def gen_hard_dt():
@@ -135,7 +139,7 @@ def gen_hard_dt():
     return {
         'topic': '시계열 처리', 'question': "`df['date']` 컬럼(datetime 형)에서 '월(month)' 데이터만 추출하세요.", 
         'expected': ans, 'wrongs': wrongs, 'explanation': ".dt 접근자를 사용합니다.",
-        'check': lambda x: ".dt.month" in x.replace(" ", "")
+        'check': lambda x: ".dt.month" in _prep(x)
     }
 
 def gen_numpy_array():
@@ -145,7 +149,7 @@ def gen_numpy_array():
     return {
         'topic': 'Numpy 배열 생성', 'question': f"모든 원소가 0으로 채워진 크기가 `{shape}`인 Numpy 배열을 생성하세요.",
         'expected': ans, 'wrongs': wrongs, 'explanation': "np.zeros((행, 열)) 함수를 사용합니다.",
-        'check': lambda x: "zeros" in x and str(shape[0]) in x and str(shape[1]) in x
+        'check': lambda x: "zeros" in _prep(x) and str(shape[0]) in _prep(x) and str(shape[1]) in _prep(x)
     }
 
 def gen_ml_split():
@@ -155,7 +159,7 @@ def gen_ml_split():
     return {
         'topic': '머신러닝 데이터 분할', 'question': f"Scikit-learn을 사용하여 특성 데이터 `X`와 타겟 `y`를 테스트 세트 비율 `{size}`로 분할하세요. (random_state=42)",
         'expected': ans, 'wrongs': wrongs, 'explanation': "sklearn.model_selection.train_test_split()을 사용합니다.",
-        'check': lambda x: "train_test_split" in x and str(size) in x and "42" in x
+        'check': lambda x: "train_test_split" in _prep(x) and str(size) in _prep(x) and "42" in _prep(x)
     }
 
 def gen_ml_rf():
@@ -165,7 +169,7 @@ def gen_ml_rf():
     return {
         'topic': '머신러닝 모델 객체 생성', 'question': f"Scikit-learn을 사용하여 트리의 개수가 `{estimators}`개인 랜덤 포레스트 분류기 객체를 생성하세요. (random_state=42)",
         'expected': ans, 'wrongs': wrongs, 'explanation': "RandomForestClassifier(n_estimators=...)을 사용합니다.",
-        'check': lambda x: "RandomForestClassifier" in x and str(estimators) in x
+        'check': lambda x: "randomforestclassifier" in _prep(x) and str(estimators) in _prep(x)
     }
 
 def gen_viz_sns():
@@ -176,7 +180,7 @@ def gen_viz_sns():
     return {
         'topic': 'Seaborn 시각화', 'question': f"Seaborn 라이브러리를 사용하여 `df`의 x축 '{x_col}', y축 '{y_col}' 산점도를 그리세요.",
         'expected': ans, 'wrongs': wrongs, 'explanation': "sns.scatterplot(data=..., x=..., y=...)을 사용합니다.",
-        'check': lambda x: "sns.scatterplot" in x and x_col in x and y_col in x
+        'check': lambda x: "sns.scatterplot" in _prep(x) and x_col.lower() in _prep(x) and y_col.lower() in _prep(x)
     }
 
 
@@ -195,7 +199,7 @@ def gen_param_nuance_concat():
         'question': f"두 데이터프레임 `df1`과 `df2`를 **{desc}**. 이때 파라미터 `axis`의 값으로 올바른 전체 코드를 작성하세요.",
         'expected': ans, 'wrongs': wrongs, 
         'explanation': f"axis=0은 행 방향(수직 병합), axis=1은 열 방향(수평 병합)을 의미합니다.",
-        'check': lambda x: "concat" in x and f"axis={axis}" in x.replace(" ", "")
+        'check': lambda x: "concat" in _prep(x) and f"axis={axis}" in _prep(x)
     }
 
 def gen_param_nuance_dropdup():
@@ -213,7 +217,7 @@ def gen_param_nuance_dropdup():
         'question': f"`df`에서 'user_id'가 중복되는 행들을 제거하려고 합니다. 단, **{desc}**만 남기고 나머지를 지워야 합니다. 알맞은 파라미터를 사용하세요.",
         'expected': ans, 'wrongs': wrongs, 
         'explanation': f"keep='first'는 첫 번째 값을 유지, keep='last'는 마지막 값을 유지합니다.",
-        'check': lambda x: "drop_duplicates" in x and "user_id" in x and f"keep='{keep}'" in x.replace('"', "'")
+        'check': lambda x: "drop_duplicates" in _prep(x) and "user_id" in _prep(x) and f"keep='{keep}'" in _prep(x)
     }
 
 
@@ -239,7 +243,7 @@ def gen_py_loop_control():
         'expected': expected,
         'wrongs': wrongs[:3],
         'explanation': f"i가 {skip_val}일 때는 continue로 넘어갔고, {break_val}일 때 break로 반복문이 완전히 종료되었습니다. 따라서 누적합은 {expected}입니다.",
-        'check': lambda x: expected in x.strip()
+        'check': lambda x: _prep(expected) in _prep(x)
     }
 
 def gen_py_str_split():
@@ -263,7 +267,7 @@ def gen_py_str_split():
         'expected': expected,
         'wrongs': wrongs[:3],
         'explanation': f"split('{sep}')을 통해 리스트로 분리한 후, 인덱스 {idx}에 해당하는 요소를 추출합니다.",
-        'check': lambda x: parts[idx] in x
+        'check': lambda x: _prep(parts[idx]) in _prep(x)
     }
 
 def gen_py_list_slice():
@@ -288,7 +292,7 @@ def gen_py_list_slice():
         'expected': expected,
         'wrongs': wrongs[:3],
         'explanation': f"슬라이싱 [a:b]는 인덱스 a부터 b-1(직전)까지의 요소를 추출합니다.",
-        'check': lambda x: expected.replace(" ", "") in x.replace(" ", "")
+        'check': lambda x: _prep(expected) in _prep(x)
     }
 
 def gen_py_dict_get():
@@ -307,7 +311,7 @@ def gen_py_dict_get():
         'expected': expected,
         'wrongs': wrongs[:3],
         'explanation': f"딕셔너리의 .get(key, default) 메서드는 키가 존재하지 않을 경우 에러(KeyError)를 발생시키지 않고 default 값({default})을 반환합니다.",
-        'check': lambda x: expected in x.strip()
+        'check': lambda x: _prep(expected) in _prep(x)
     }
 
 def _get_factories():
