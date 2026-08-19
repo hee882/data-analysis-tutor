@@ -169,48 +169,46 @@ div[data-testid="stTextInput"] input:focus { background: #ffffff !important; bor
 /* -------------------------------------------------------------
    MOBILE RESPONSIVE
 ------------------------------------------------------------- */
+
+/* -------------------------------------------------------------
+   MOBILE RESPONSIVE (?? ?? ???)
+------------------------------------------------------------- */
 @media screen and (max-width: 768px) {
-    .block-container { padding: 1rem 1rem 7rem 1rem !important; }
+    /* 1. ?? ?? ?? ???? */
+    .block-container { padding: 0.5rem 0.8rem 4rem 0.8rem !important; }
     
-    [data-baseweb="tab-list"] { bottom: 1rem !important; width: 95% !important; padding: 0.4rem !important; }
-    [data-baseweb="tab"] { font-size: 0.85rem !important; padding: 0.6rem 0 !important; }
+    /* 2. ?? ?? ?? ??? ?? ?? ?? ?? */
+    .custom-header { flex-direction: row !important; align-items: center !important; justify-content: flex-start !important; gap: 0.5rem !important; margin-bottom: 0.5rem !important; padding: 0 !important; text-align: left !important; }
+    .header-top-row { margin: 0 !important; gap: 0.5rem !important; justify-content: flex-start !important; }
+    .header-logo { width: 28px !important; height: 28px !important; border-radius: 6px !important; }
+    .header-title { font-size: 1.1rem !important; }
+    .header-subtitle { display: none !important; } /* ?? ?? */
     
-    [data-testid="stVerticalBlockBorderWrapper"], .stForm { padding: 1.5rem 1.2rem !important; border-radius: 20px !important; }
-    div[role="radiogroup"] > label { padding: 1rem 1.2rem !important; min-height: 3.5rem !important; border-radius: 12px !important; }
-    div[role="radiogroup"] > label > div:nth-child(2) { font-size: 0.95rem !important; }
+    /* 3. ?? ?? ?? ?? ??? */
+    [data-testid="stVerticalBlockBorderWrapper"], .stForm { padding: 1rem 1rem !important; border-radius: 16px !important; margin-bottom: 0.5rem !important; }
+    div[role="radiogroup"] > label { padding: 0.6rem 0.8rem !important; min-height: 2.8rem !important; border-radius: 10px !important; margin-bottom: 0.3rem !important; }
+    div[role="radiogroup"] > label > div:nth-child(2) { font-size: 0.9rem !important; }
     
-    .hud-container { justify-content: flex-start; gap: 0.5rem; }
-    .hud-badge { padding: 0.4rem 1rem; font-size: 0.85rem; }
+    /* 4. HUD ?? ?? ??? */
+    .hud-container { margin-bottom: 0.5rem !important; justify-content: flex-start !important; gap: 0.4rem !important; }
+    .hud-badge { padding: 0.2rem 0.5rem !important; font-size: 0.75rem !important; }
+    .hud-badge span { font-size: 0.85rem !important; }
     
-    .floating-exp { position: static; width: 100%; margin-top: 1.5rem; margin-bottom: 1rem; animation: none; box-shadow: 0 12px 32px rgba(0,0,0,0.1); border-radius: 20px; padding: 1.5rem; }
+    /* 5. ?? ??? ??? ??? ??, ??? ?? ??(Docking)?? ?? ?? ?? */
+    [data-baseweb="tab-list"] { 
+        bottom: 0 !important; width: 100% !important; border-radius: 0 !important; border-top: 1px solid rgba(0,0,0,0.1) !important;
+        padding: 0.3rem 0.2rem 1rem 0.2rem !important; /* ??? ?? ?? ?? 1rem? */
+    }
+    [data-baseweb="tab"] { font-size: 0.85rem !important; padding: 0.4rem 0 !important; color: #94a3b8 !important; }
+    [aria-selected="true"] { border-top: none !important; color: #3b82f6 !important; background: transparent !important; }
+    [aria-selected="true"]::before { content: ''; position: absolute; top: -3px; left: 20%; right: 20%; height: 3px; background: #3b82f6; border-radius: 0 0 4px 4px; }
+    
+    /* 6. ?? ?? ?? ?? */
+    .floating-exp { padding: 1rem !important; margin-top: 1rem !important; }
 }
 
-@media screen and (max-width: 1400px) {
+@media screen and (max-width: 1400px) and (min-width: 769px) {
     .floating-exp { position: static; width: 100%; margin-top: 1.5rem; margin-bottom: 1rem; animation: none; box-shadow: 0 12px 32px rgba(0,0,0,0.1); }
 }
 
-/* -------------------------------------------------------------
-   LEADERBOARD UI
-------------------------------------------------------------- */
-.lb-container { display: flex; flex-direction: column; gap: 0.8rem; margin-top: 1rem; }
-.lb-row {
-    display: flex; align-items: center; justify-content: space-between;
-    background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.9);
-    padding: 1rem 1.5rem; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); transition: transform 0.2s;
-}
-.lb-row:hover { transform: scale(1.01); background: rgba(255, 255, 255, 0.9); box-shadow: 0 8px 20px rgba(0,0,0,0.06); }
-.lb-rank { font-size: 1.2rem; font-weight: 800; color: #cbd5e1; width: 40px; }
-.lb-rank-1 { color: #fbbf24; font-size: 1.5rem; }
-.lb-rank-2 { color: #94a3b8; font-size: 1.3rem; }
-.lb-rank-3 { color: #b45309; font-size: 1.2rem; }
-.lb-name { flex: 1; font-size: 1.1rem; font-weight: 700; color: #1e293b; margin-left: 1rem; }
-.lb-score { font-size: 1.2rem; font-weight: 800; color: #3b82f6; background: rgba(59, 130, 246, 0.1); padding: 0.3rem 0.8rem; border-radius: 8px; }
-.lb-date { font-size: 0.85rem; color: #64748b; margin-left: 1rem; text-align: right; width: 130px; font-family: monospace; }
-
-@media screen and (max-width: 768px) {
-    .lb-row { padding: 0.8rem 1rem; }
-    .lb-date { display: none; } /* ?????? ?? ?? */
-}
-
 </style>
-"""
