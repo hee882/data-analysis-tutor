@@ -7,7 +7,7 @@ from datetime import datetime
 from src.style import get_custom_css
 from src.db import load_leaderboard, save_score
 from src.timer import inject_timer, remove_timer
-from src.questions import generate_exam_quizzes, generate_single_quiz
+from src.questions import generate_exam_quizzes, generate_single_quiz, get_available_topics
 from src.ml_lab import render_ml_lab
 
 st.set_page_config(page_title="Data Science & ML Bootcamp", layout="wide", initial_sidebar_state="collapsed")
@@ -51,10 +51,25 @@ with tabs[0]:
     if 's_total_solved' not in st.session_state:
         st.session_state.s_total_solved = 0
         st.session_state.s_total_correct = 0
-        st.session_state.s_current_q = generate_single_quiz(st.session_state.current_strategy)
+        st.session_state.s_current_q = generate_single_quiz(st.session_state.current_strategy, st.session_state.get("s_topic", "전체 랜덤"))
         st.session_state.s_attempts = 0
         st.session_state.s_show_exp = False
         st.session_state.s_correct = False
+
+
+    if 's_topic' not in st.session_state:
+        st.session_state.s_topic = "전체 랜덤"
+
+    available_topics = get_available_topics(st.session_state.current_strategy)
+    selected_topic = st.selectbox("🎯 집중 학습할 주제 선택", available_topics, index=available_topics.index(st.session_state.s_topic) if st.session_state.s_topic in available_topics else 0)
+    
+    if selected_topic != st.session_state.s_topic:
+        st.session_state.s_topic = selected_topic
+        st.session_state.s_current_q = generate_single_quiz(st.session_state.current_strategy, selected_topic)
+        st.session_state.s_attempts = 0
+        st.session_state.s_show_exp = False
+        st.session_state.s_correct = False
+        st.rerun()
 
     acc = (st.session_state.s_total_correct / st.session_state.s_total_solved * 100) if st.session_state.s_total_solved > 0 else 0
     
@@ -129,7 +144,7 @@ with tabs[0]:
         st.markdown(exp_html, unsafe_allow_html=True)
             
         if st.button("⏭️ 다음 문제 (Endless)", type="primary", key="btn_study_next", use_container_width=True):
-            st.session_state.s_current_q = generate_single_quiz(st.session_state.current_strategy)
+            st.session_state.s_current_q = generate_single_quiz(st.session_state.current_strategy, st.session_state.get("s_topic", "전체 랜덤"))
             st.session_state.s_attempts = 0
             st.session_state.s_show_exp = False
             st.session_state.s_correct = False

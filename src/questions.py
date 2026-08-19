@@ -362,9 +362,23 @@ def generate_exam_quizzes(strategy_id='bootcamp_day1_4'):
         
     return quizzes
 
-def generate_single_quiz(strategy_id='bootcamp_day1_4'):
+
+def get_available_topics(strategy_id='bootcamp_day1_4'):
     strategy = get_strategy(strategy_id)
     pool = strategy.easy_pool + strategy.hard_pool
+    topics = set()
+    for f in pool:
+        topics.add(f()['topic'])
+    return ["전체 랜덤"] + sorted(list(topics))
+
+def generate_single_quiz(strategy_id='bootcamp_day1_4', topic=None):
+    strategy = get_strategy(strategy_id)
+    pool = strategy.easy_pool + strategy.hard_pool
+    
+    if topic and topic != '전체 랜덤':
+        pool = [f for f in pool if f()['topic'] == topic]
+        if not pool:
+            pool = strategy.easy_pool + strategy.hard_pool
     
     f = random.choice(pool)
     q = f()
