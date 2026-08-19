@@ -14,11 +14,11 @@ st.markdown(get_custom_css(), unsafe_allow_html=True)
 
 st.markdown('''
 <div class="custom-header">
-    <h2>📊 Data Analysis Bootcamp</h2>
+    <h2>📊 Data Science & ML Bootcamp</h2>
     <span>Lv.1 Basic & Advanced</span>
 </div>
 <p style="color: #64748b; font-size: 1.1rem !important; margin-bottom: 2rem;">
-    Pandas 데이터 전처리 및 분석 역량 강화를 위한 실전 객관식/주관식 혼합 학습 시스템입니다.
+    Python, Numpy, Pandas부터 Scikit-learn, 데이터 시각화까지 데이터 분석 및 머신러닝 실전 역량 강화를 위한 실전 객관식/주관식 혼합 학습 시스템입니다.
 </p>
 ''', unsafe_allow_html=True)
 
@@ -239,4 +239,5 @@ with tabs[2]:
         df_lb.columns = ['수험자', '최종 스코어', '평가 일시']
         st.dataframe(df_lb, use_container_width=True)
 
-st.markdown('''<div class="custom-footer">© 2026 Data Analysis Bootcamp. All rights reserved.</div>''', unsafe_allow_html=True)
+st.markdown('''<div class="custom-footer">© 2026 Data Science & ML Bootcamp. All rights reserved.</div>''', unsafe_allow_html=True)
+

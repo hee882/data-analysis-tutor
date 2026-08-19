@@ -138,10 +138,51 @@ def gen_hard_dt():
         'check': lambda x: ".dt.month" in x.replace(" ", "")
     }
 
+def gen_numpy_array():
+    shape = random.choice([(3,3), (2,4), (4,4)])
+    ans = f"np.zeros({shape})"
+    wrongs = [f"np.empty({shape[0]}, {shape[1]})", f"np.array(0, shape={shape})", f"pd.zeros({shape})", f"np.matrix(zeros=True, size={shape})"]
+    return {
+        'topic': 'Numpy 배열 생성', 'question': f"모든 원소가 0으로 채워진 크기가 {shape}인 Numpy 배열을 생성하세요.",
+        'expected': ans, 'wrongs': wrongs, 'explanation': "np.zeros((행, 열)) 함수를 사용합니다.",
+        'check': lambda x: "zeros" in x and str(shape[0]) in x and str(shape[1]) in x
+    }
+
+def gen_ml_split():
+    size = random.choice([0.2, 0.25, 0.3])
+    ans = f"train_test_split(X, y, test_size={size}, random_state=42)"
+    wrongs = [f"split_data(X, y, ratio={1-size})", f"train_test_split(y, X, train_size={size})", f"model_selection.split(X, y, test={size})", f"train_test_split(X, y, test_ratio={size})"]
+    return {
+        'topic': '머신러닝 데이터 분할', 'question': f"Scikit-learn을 사용하여 특성 데이터 X와 타겟 y를 테스트 세트 비율 {size}로 분할하세요. (random_state=42)",
+        'expected': ans, 'wrongs': wrongs, 'explanation': "sklearn.model_selection.train_test_split()을 사용합니다.",
+        'check': lambda x: "train_test_split" in x and str(size) in x and "42" in x
+    }
+
+def gen_ml_rf():
+    estimators = random.choice([100, 200, 500])
+    ans = f"RandomForestClassifier(n_estimators={estimators}, random_state=42)"
+    wrongs = [f"RandomForest(trees={estimators})", f"RandomForestClassifier(max_trees={estimators})", f"EnsembleRF(n={estimators})", f"RandomForestClassifier(count={estimators})"]
+    return {
+        'topic': '머신러닝 모델 객체 생성', 'question': f"Scikit-learn을 사용하여 트리의 개수가 {estimators}개인 랜덤 포레스트 분류기 객체를 생성하세요. (random_state=42)",
+        'expected': ans, 'wrongs': wrongs, 'explanation': "RandomForestClassifier(n_estimators=...)을 사용합니다.",
+        'check': lambda x: "RandomForestClassifier" in x and str(estimators) in x
+    }
+
+def gen_viz_sns():
+    x_col = random.choice(['total_bill', 'age'])
+    y_col = random.choice(['tip', 'salary'])
+    ans = f"sns.scatterplot(data=df, x='{x_col}', y='{y_col}')"
+    wrongs = [f"sns.scatter(x='{x_col}', y='{y_col}', df=data)", f"df.sns.plot('{x_col}', '{y_col}')", f"sns.plot(kind='scatter', x='{x_col}', y='{y_col}')", f"sns.scatterplot('{x_col}', '{y_col}')"]
+    return {
+        'topic': 'Seaborn 시각화', 'question': f"Seaborn 라이브러리를 사용하여 df의 x축 '{x_col}', y축 '{y_col}' 산점도를 그리세요.",
+        'expected': ans, 'wrongs': wrongs, 'explanation': "sns.scatterplot(data=..., x=..., y=...)을 사용합니다.",
+        'check': lambda x: "sns.scatterplot" in x and x_col in x and y_col in x
+    }
+
 def generate_exam_cycle():
     easy_factories = [gen_easy_read, gen_easy_head, gen_easy_info, gen_easy_isnull, gen_easy_fillna, gen_easy_drop, gen_easy_filter]
     viz_factories = [gen_viz_bar, gen_viz_scatter, gen_viz_hist]
-    hard_factories = [gen_hard_merge, gen_hard_pivot, gen_hard_str, gen_hard_dt]
+    hard_factories = [gen_hard_merge, gen_hard_pivot, gen_hard_str, gen_hard_dt, gen_numpy_array, gen_ml_split, gen_ml_rf, gen_viz_sns]
     
     # 총 20문제 생성 (기초 14, 시각화 3, 심화 3)
     quizzes = [random.choice(easy_factories)() for _ in range(14)] + \
@@ -161,3 +202,4 @@ def generate_exam_cycle():
         quizzes[idx]['type'] = 'text'
         
     return quizzes
+
