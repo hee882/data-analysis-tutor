@@ -19,6 +19,14 @@ def render_ml_lab():
     with tab1:
         st.header("꽃의 종류 분류하기 (Iris Dataset)")
         st.markdown("K-Nearest Neighbors (KNN) 알고리즘을 사용하여 붓꽃의 종류를 분류합니다.")
+
+        st.info('''
+**🧠 K-Nearest Neighbors (KNN) 알고리즘이란?**  
+가장 직관적인 분류 알고리즘 중 하나입니다. 새로운 데이터가 주어졌을 때, 기존 데이터 중 가장 가까운 **K개의 이웃**을 찾아 그 이웃들이 가장 많이 속한 클래스(종류)로 예측합니다.
+* **K 값 (n_neighbors)**: 몇 명의 이웃을 참고할지 결정합니다. 너무 작으면 과대적합(Outlier에 민감), 너무 크면 과소적합(경계가 흐려짐)이 발생할 수 있습니다.
+* **특징 스케일링(StandardScaler)**: KNN은 거리를 기반으로 작동하므로, 각 특성(꽃받침 길이, 꽃잎 너비 등)의 단위가 다르면 왜곡이 발생합니다. 스케일러로 단위를 맞춰주는 것이 중요합니다.
+''')
+
         
         iris = sns.load_dataset('iris')
         with st.expander("데이터셋 보기"):
@@ -35,10 +43,10 @@ def render_ml_lab():
             test_size = st.slider("테스트 데이터 비율 (test_size)", 0.1, 0.5, 0.2, 0.05)
             use_scaler = st.toggle("StandardScaler 적용 (특징 스케일링)", value=True)
             
-            run_btn = st.button("모델 훈련 및 평가 (분류)", type="primary")
+            
 
         with col2:
-            if run_btn:
+            if True: # Instant update
                 if not selected_features:
                     st.warning("최소 1개의 특징(Feature)을 선택해주세요.")
                 else:
@@ -99,6 +107,15 @@ def render_ml_lab():
     with tab2:
         st.header("팁 금액 예측하기 (Tips Dataset)")
         st.markdown("단순 선형 회귀 (Linear Regression)를 사용하여 팁 금액을 예측합니다.")
+
+        st.info('''
+**📈 단순 선형 회귀 (Linear Regression)란?**  
+독립 변수(X)와 종속 변수(y) 사이의 관계를 가장 잘 설명하는 **하나의 직선(y = wx + b)**을 찾는 알고리즘입니다.
+* **R² Score (결정계수)**: 모델이 데이터를 얼마나 잘 설명하는지 나타냅니다. 1에 가까울수록 완벽한 예측을 의미하며, 0에 가까우면 평균으로 예측하는 것과 같음을 의미합니다.
+* **MAE (평균 절대 오차)**: 실제값과 예측값의 차이를 절댓값으로 변환해 평균을 낸 것입니다. 직관적인 오차 규모를 보여줍니다.
+* **RMSE (평균 제곱근 오차)**: 오차를 제곱하여 평균 낸 뒤 루트를 씌웁니다. 큰 오차에 대해 더 높은 패널티를 부여합니다.
+''')
+
         
         tips = sns.load_dataset('tips')
         with st.expander("데이터셋 보기"):
@@ -114,10 +131,10 @@ def render_ml_lab():
             y_col = st.selectbox("종속 변수 (y, 예측 대상)", numeric_cols, index=1 if len(numeric_cols)>1 else 0)
             reg_test_size = st.slider("테스트 데이터 비율", 0.1, 0.5, 0.2, 0.05, key='reg_test_size')
             
-            reg_run_btn = st.button("모델 훈련 및 평가 (회귀)", type="primary")
+            
 
         with col2:
-            if reg_run_btn:
+            if True: # Instant update
                 if x_col == y_col:
                     st.warning("독립 변수와 종속 변수를 다르게 설정해주세요.")
                 else:
@@ -165,7 +182,7 @@ def render_ml_lab():
             hue_opts = [None] + df_eda.columns.tolist()
             hue_col = st.selectbox("색상(Hue) 기준 변수", hue_opts, index=hue_opts.index('time') if 'time' in hue_opts else 0)
             
-        if st.button("Pairplot 생성"):
+        if True: # Instant update
             with st.spinner("그래프 생성 중..."):
                 fig_pair = sns.pairplot(df_eda, hue=hue_col)
                 st.pyplot(fig_pair.fig)
