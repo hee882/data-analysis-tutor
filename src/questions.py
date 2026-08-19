@@ -7,15 +7,19 @@ def _prep(text):
     text = re.sub(r'\s+', '', text)
     return text.lower()
 
-def gen_easy_read():
-    ans = "pd.read_csv('data.csv')"
-    wrongs = ["pd.read_excel('data.csv')", "pd.open_csv('data.csv')", "pd.load_csv('data.csv')"]
+# =====================================================================
+# [EASY POOL] - 기초 문법, 기본 Pandas, 기본 시각화 (총 16문제 출제용)
+# =====================================================================
+
+def gen_easy_read_excel():
+    ans = "pd.read_excel('data.xlsx')"
+    wrongs = ["pd.load_excel('data.xlsx')", "pd.open('data.xlsx')", "pd.read_csv('data.xlsx')"]
     return {
         'topic': '데이터 불러오기', 
-        'question': "Pandas를 사용하여 'data.csv' 파일을 읽어오는 코드를 작성하세요.",
+        'question': "Pandas를 사용하여 'data.xlsx' 엑셀 파일을 읽어오는 코드를 작성하세요.",
         'expected': ans, 'wrongs': wrongs, 
-        'explanation': "pd.read_csv() 함수를 사용하여 CSV 형식의 파일을 DataFrame으로 불러옵니다.",
-        'check': lambda x: "read_csv" in _prep(x) and "data.csv" in _prep(x)
+        'explanation': "pd.read_excel() 함수를 사용하여 엑셀 파일을 DataFrame으로 불러옵니다.",
+        'check': lambda x: "read_excel" in _prep(x) and "data.xlsx" in _prep(x)
     }
 
 def gen_easy_head():
@@ -30,48 +34,37 @@ def gen_easy_head():
         'check': lambda x: "head" in _prep(x) and str(n) in _prep(x)
     }
 
-def gen_easy_info():
-    ans = "df.info()"
-    wrongs = ["df.dtypes", "df.describe()", "pd.info(df)"]
+def gen_easy_dtypes():
+    ans = "df.dtypes"
+    wrongs = ["df.types", "df.info", "df.type()"]
     return {
-        'topic': '데이터 요약 정보', 
-        'question': "데이터프레임 `df`의 컬럼명, 데이터 타입, 결측치 수 등의 요약 정보를 한눈에 확인하는 코드를 작성하세요.",
+        'topic': '데이터 타입 확인', 
+        'question': "데이터프레임 `df`의 각 컬럼별 데이터 타입을 확인하는 코드를 작성하세요.",
         'expected': ans, 'wrongs': wrongs, 
-        'explanation': "df.info()는 DataFrame의 전반적인 구조와 결측치 현황을 파악하는 가장 기본적인 함수입니다.",
-        'check': lambda x: "df.info" in _prep(x)
+        'explanation': "df.dtypes 속성을 통해 각 열의 데이터 타입(int, float, object 등)을 확인할 수 있습니다.",
+        'check': lambda x: "df.dtypes" in _prep(x)
     }
 
 def gen_easy_isnull():
-    ans = "df.isnull().sum()"
+    ans = "df.isna().sum()"
     wrongs = ["df.isna().count()", "df.nulls()", "df.count_na()"]
     return {
         'topic': '결측치 개수 확인', 
         'question': "데이터프레임 `df`의 각 컬럼별 결측치(NaN) 총 개수를 구하는 코드를 작성하세요.",
         'expected': ans, 'wrongs': wrongs, 
-        'explanation': "df.isnull().sum() (또는 df.isna().sum())을 통해 열별 결측치 개수를 집계합니다.",
+        'explanation': "df.isna().sum() (또는 df.isnull().sum())을 통해 열별 결측치 개수를 집계합니다.",
         'check': lambda x: ("isnull" in _prep(x) or "isna" in _prep(x)) and "sum" in _prep(x)
     }
 
-def gen_easy_fillna():
-    ans = "df.fillna(0)"
-    wrongs = ["df.replace_na(0)", "df.na_fill(0)", "pd.fillna(df, 0)"]
+def gen_easy_dropna():
+    ans = "df.dropna()"
+    wrongs = ["df.drop_na()", "df.remove_na()", "df.delete_nulls()"]
     return {
-        'topic': '결측치 대체', 
-        'question': "데이터프레임 `df`의 모든 결측치를 0으로 채우는 코드를 작성하세요.",
+        'topic': '결측치 삭제', 
+        'question': "데이터프레임 `df`에서 결측치가 하나라도 포함된 행을 모두 삭제하는 코드를 작성하세요.",
         'expected': ans, 'wrongs': wrongs, 
-        'explanation': "df.fillna() 함수를 사용하여 NaN 값을 원하는 값(여기서는 0)으로 바꿀 수 있습니다.",
-        'check': lambda x: "fillna" in _prep(x) and "0" in _prep(x)
-    }
-
-def gen_easy_drop():
-    ans = "df.drop(columns=['age'])"
-    wrongs = ["df.drop('age')", "df.remove_column('age')", "df.delete('age')"]
-    return {
-        'topic': '컬럼 삭제', 
-        'question': "데이터프레임 `df`에서 'age' 컬럼을 삭제하는 코드를 작성하세요.",
-        'expected': ans, 'wrongs': wrongs, 
-        'explanation': "df.drop(columns=['col']) 또는 df.drop('col', axis=1)을 사용하여 컬럼을 삭제합니다.",
-        'check': lambda x: "drop" in _prep(x) and "age" in _prep(x)
+        'explanation': "df.dropna() 함수를 사용하여 결측치(NaN)가 포함된 행을 제거할 수 있습니다.",
+        'check': lambda x: "dropna" in _prep(x)
     }
 
 def gen_easy_filter():
@@ -85,259 +78,59 @@ def gen_easy_filter():
         'check': lambda x: "df" in _prep(x) and ">=" in _prep(x) and "20" in _prep(x) and "age" in _prep(x)
     }
 
-def gen_viz_bar():
-    ans = "df['category'].value_counts().plot(kind='bar')"
-    wrongs = ["plt.bar(df['category'])", "df['category'].barplot()", "df.plot(kind='bar', x='category')"]
+def gen_easy_loc():
+    ans = "df.loc[0, 'name']"
+    wrongs = ["df.iloc[0, 'name']", "df[0, 'name']", "df.loc['name', 0]"]
     return {
-        'topic': '시각화 (Bar chart)', 
-        'question': "데이터프레임 `df`의 'category' 컬럼의 항목별 빈도수를 막대 그래프(Bar chart)로 시각화하는 Pandas 코드를 작성하세요.",
+        'topic': '특정 데이터 접근 (loc)', 
+        'question': "데이터프레임 `df`에서 인덱스 이름이 0이고 컬럼명이 'name'인 곳의 데이터를 가져오거나 수정하려고 합니다. `.loc`를 사용한 코드를 작성하세요.",
         'expected': ans, 'wrongs': wrongs, 
-        'explanation': "value_counts()로 빈도수를 계산한 후 .plot(kind='bar')를 이어서 호출하면 손쉽게 막대 그래프가 생성됩니다.",
-        'check': lambda x: "value_counts" in _prep(x) and "plot" in _prep(x) and "bar" in _prep(x)
-    }
-
-def gen_viz_scatter():
-    ans = "df.plot(kind='scatter', x='age', y='income')"
-    wrongs = ["df.scatter(x='age', y='income')", "plt.scatter(df)", "df.plot_scatter('age', 'income')"]
-    return {
-        'topic': '시각화 (Scatter plot)', 
-        'question': "데이터프레임 `df`에서 x축을 'age', y축을 'income'으로 하는 산점도(Scatter plot)를 그리는 Pandas 코드를 작성하세요.",
-        'expected': ans, 'wrongs': wrongs, 
-        'explanation': "DataFrame의 내장 plot 메서드에서 kind='scatter' 옵션을 주어 산점도를 그릴 수 있습니다.",
-        'check': lambda x: "plot" in _prep(x) and "scatter" in _prep(x) and "age" in _prep(x) and "income" in _prep(x)
-    }
-
-def gen_viz_hist():
-    ans = "df['score'].plot(kind='hist')"
-    wrongs = ["df['score'].histogram()", "plt.histogram(df['score'])", "df.plot_hist('score')"]
-    return {
-        'topic': '시각화 (Histogram)', 
-        'question': "데이터프레임 `df`의 'score' 컬럼의 분포를 히스토그램(Histogram)으로 그리는 Pandas 코드를 작성하세요.",
-        'expected': ans, 'wrongs': wrongs, 
-        'explanation': "단일 컬럼(Series)에 대해 .plot(kind='hist') 또는 .hist()를 호출하여 분포를 확인합니다.",
-        'check': lambda x: "plot" in _prep(x) and "hist" in _prep(x) and "score" in _prep(x)
-    }
-
-def gen_hard_merge():
-    ans = "pd.merge(df1, df2, on='id', how='left')"
-    wrongs = ["df1.join(df2, on='id', type='left')", "pd.concat([df1, df2], axis=1)", "df1.merge_left(df2, 'id')"]
-    return {
-        'topic': '데이터 병합 (Left Merge)', 
-        'question': "데이터프레임 `df1`과 `df2`를 'id' 컬럼 기준으로 Left Merge(왼쪽 기준 병합) 하는 코드를 작성하세요.",
-        'expected': ans, 'wrongs': wrongs, 
-        'explanation': "pd.merge() 함수에서 how='left' 파라미터를 사용하면 왼쪽 데이터프레임을 기준으로 병합을 수행합니다.",
-        'check': lambda x: "merge" in _prep(x) and "left" in _prep(x) and "id" in _prep(x)
-    }
-
-def gen_hard_pivot():
-    ans = "df.pivot_table(index='region', values='sales', aggfunc='mean')"
-    wrongs = ["df.groupby('region')['sales'].pivot('mean')", "pd.pivot(df, 'region', 'sales', 'mean')", "df.pivot_table(group='region', target='sales', func='mean')"]
-    return {
-        'topic': '피벗 테이블 (Pivot Table)', 
-        'question': "데이터프레임 `df`에서 'region'을 인덱스로 하고 'sales'의 평균(mean)을 구하는 피벗 테이블 코드를 작성하세요.",
-        'expected': ans, 'wrongs': wrongs, 
-        'explanation': "pivot_table()을 사용하면 엑셀의 피벗 테이블처럼 인덱스, 컬럼, 값(통계량)을 구조화하여 요약할 수 있습니다.",
-        'check': lambda x: "pivot_table" in _prep(x) and "region" in _prep(x) and "sales" in _prep(x) and "mean" in _prep(x)
-    }
-
-def gen_hard_str():
-    ans = "df['email'].str.split('@').str[1]"
-    wrongs = ["df['email'].split('@')[1]", "df['email'].extract('@(.*)')", "df['email'].str.split('@')[1]"]
-    return {
-        'topic': '문자열 처리 (str.split)', 
-        'question': "데이터프레임 `df`의 'email' 컬럼에서 '@'를 기준으로 문자열을 분리한 뒤, 도메인 부분(두 번째 요소)만 추출하는 코드를 작성하세요.",
-        'expected': ans, 'wrongs': wrongs, 
-        'explanation': "Pandas에서 Series의 문자열 메서드를 연쇄적으로 사용할 때는 매번 .str 속성을 명시해야 합니다. (예: .str.split().str[1])",
-        'check': lambda x: "str.split" in _prep(x) and "str[" in _prep(x)
-    }
-
-def gen_hard_dt():
-    ans = "df['date'].dt.month"
-    wrongs = ["df['date'].month", "pd.to_datetime(df['date']).month", "df['date'].get_month()"]
-    return {
-        'topic': '날짜/시간 처리 (dt 접근자)', 
-        'question': "datetime 타입인 데이터프레임 `df`의 'date' 컬럼에서 '월(month)' 정보만 추출하는 코드를 작성하세요.",
-        'expected': ans, 'wrongs': wrongs, 
-        'explanation': "날짜 데이터(Series)에서 특정 요소(년, 월, 일 등)를 뽑아낼 때는 .dt 접근자를 사용해야 합니다.",
-        'check': lambda x: "dt.month" in _prep(x)
-    }
-
-def gen_numpy_array():
-    ans = "np.array([1, 2, 3])"
-    wrongs = ["np.list([1, 2, 3])", "pd.array([1, 2, 3])", "np.create([1, 2, 3])"]
-    return {
-        'topic': 'Numpy 배열 생성', 
-        'question': "[1, 2, 3] 리스트를 Numpy 배열(ndarray)로 변환하는 코드를 작성하세요.",
-        'expected': ans, 'wrongs': wrongs, 
-        'explanation': "Numpy의 핵심 자료구조인 ndarray는 np.array() 함수를 통해 리스트 등으로부터 생성합니다.",
-        'check': lambda x: "np.array" in _prep(x) and "1" in _prep(x) and "2" in _prep(x) and "3" in _prep(x)
-    }
-
-def gen_ml_split():
-    ans = "train_test_split(X, y, test_size=0.2)"
-    wrongs = ["split_data(X, y, 0.2)", "model_selection.split(X, y, test_size=0.2)", "pd.train_test_split(X, y, 0.2)"]
-    return {
-        'topic': '데이터 분할 (train_test_split)', 
-        'question': "특성 데이터 `X`와 정답 데이터 `y`를 훈련셋 80%, 테스트셋 20%로 분할하는 scikit-learn 코드를 작성하세요. (단축 임포트 가정)",
-        'expected': ans, 'wrongs': wrongs, 
-        'explanation': "sklearn.model_selection 모듈의 train_test_split 함수를 사용하여 데이터를 나눕니다.",
-        'check': lambda x: "train_test_split" in _prep(x) and "0.2" in _prep(x)
-    }
-
-def gen_ml_rf():
-    ans = "RandomForestClassifier()"
-    wrongs = ["RandomForest()", "RFClassifier()", "sklearn.ensemble.RandomForest()"]
-    return {
-        'topic': '머신러닝 모델 생성 (RandomForest)', 
-        'question': "scikit-learn을 사용하여 랜덤 포레스트 분류기(RandomForest Classifier) 객체를 생성하는 코드를 작성하세요. (단축 임포트 가정)",
-        'expected': ans, 'wrongs': wrongs, 
-        'explanation': "sklearn.ensemble 모듈에서 제공하는 RandomForestClassifier() 클래스를 초기화합니다.",
-        'check': lambda x: "randomforestclassifier" in _prep(x)
-    }
-
-def gen_viz_sns():
-    ans = "sns.scatterplot(data=df, x='age', y='income', hue='gender')"
-    wrongs = ["sns.plot(df, 'age', 'income', color='gender')", "plt.scatter(df['age'], df['income'], group=df['gender'])", "sns.scatter('age', 'income', df, 'gender')"]
-    return {
-        'topic': 'Seaborn 시각화 (Hue 적용)', 
-        'question': "Seaborn을 사용하여 데이터 `df`의 x축 'age', y축 'income' 산점도를 그리고, 'gender'별로 색상을 다르게 표현하는 코드를 작성하세요.",
-        'expected': ans, 'wrongs': wrongs, 
-        'explanation': "Seaborn에서는 hue 파라미터를 사용하여 특정 범주형 변수를 기준으로 색상을 손쉽게 구분할 수 있습니다.",
-        'check': lambda x: "sns.scatterplot" in _prep(x) and "hue" in _prep(x) and "gender" in _prep(x)
-    }
-
-def gen_param_nuance_concat():
-    ans = "pd.concat([df1, df2], axis=1)"
-    wrongs = ["pd.concat([df1, df2], axis=0)", "pd.merge([df1, df2], axis=1)", "df1.concat(df2, axis='col')"]
-    return {
-        'topic': '매개변수 뉘앙스 (concat axis)', 
-        'question': "`pd.concat([df1, df2])`는 기본적으로 위아래(행 방향)로 병합됩니다. 좌우(열 방향)로 나란히 이어 붙이려면 어떤 파라미터를 추가해야 하나요?",
-        'expected': ans, 'wrongs': wrongs, 
-        'explanation': "Pandas에서 대부분의 연산은 axis=0(행)이 기본값이며, 열 기준으로 방향을 틀려면 axis=1을 명시해야 합니다.",
-        'check': lambda x: "axis=1" in _prep(x)
-    }
-
-def gen_param_nuance_dropdup():
-    ans = "df.drop_duplicates(keep='last')"
-    wrongs = ["df.drop_duplicates(keep='first')", "df.drop_duplicates(keep=False)", "df.remove_duplicates(last=True)"]
-    return {
-        'topic': '매개변수 뉘앙스 (drop_duplicates keep)', 
-        'question': "데이터프레임 `df`에서 중복된 행을 제거할 때, 가장 마지막에 등장한(최신) 데이터만 남기고 싶습니다. 어떤 코드를 작성해야 하나요?",
-        'expected': ans, 'wrongs': wrongs, 
-        'explanation': "drop_duplicates()의 기본값은 keep='first'(첫 번째 남김)이며, keep='last'를 쓰면 마지막 행을 보존합니다.",
-        'check': lambda x: "keep" in _prep(x) and "last" in _prep(x)
-    }
-
-
-def gen_py_for_loop():
-    ans = "for i in range(5):"
-    wrongs = ["for i in 5:", "for i=0 to 5:", "loop i in range(5):"]
-    return {
-        'topic': 'Python 기초 (반복문)', 
-        'question': "0부터 4까지 총 5번 반복하는 기본적인 파이썬 `for` 반복문의 첫 줄을 작성하세요.",
-        'expected': ans, 'wrongs': wrongs, 
-        'explanation': "파이썬에서 지정된 횟수만큼 반복할 때는 `range()` 함수를 사용합니다. `range(5)`는 0부터 4까지의 숫자를 생성합니다.",
-        'check': lambda x: "for" in _prep(x) and "range(5)" in _prep(x)
-    }
-
-def gen_py_function():
-    ans = "def my_func(a, b):"
-    wrongs = ["function my_func(a, b):", "def my_func(a, b)", "func my_func(a, b):"]
-    return {
-        'topic': 'Python 기초 (함수 정의)', 
-        'question': "두 개의 인자(a, b)를 받는 파이썬 함수 `my_func`를 정의하는 첫 줄 코드를 작성하세요. (콜론 포함)",
-        'expected': ans, 'wrongs': wrongs, 
-        'explanation': "파이썬에서 함수를 정의할 때는 `def` 키워드를 사용하며, 선언문 끝에 반드시 콜론(`:`)을 붙여야 합니다.",
-        'check': lambda x: "def" in _prep(x) and "my_func" in _prep(x) and ":" in _prep(x)
-    }
-
-def gen_py_basic_type():
-    ans = "type(data)"
-    wrongs = ["typeof(data)", "class(data)", "dtype(data)"]
-    return {
-        'topic': 'Python 기초 (자료형 확인)', 
-        'question': "변수 `data`의 파이썬 내장 자료형(Type)이 무엇인지 확인하는 내장 함수를 작성하세요.",
-        'expected': ans, 'wrongs': wrongs, 
-        'explanation': "파이썬의 기본 내장 함수인 `type()`을 사용하여 객체의 자료형(예: int, str, list 등)을 확인할 수 있습니다. Pandas의 `dtype`과는 다릅니다.",
-        'check': lambda x: "type(" in _prep(x) and "data" in _prep(x)
-    }
-
-
-def gen_easy_read_excel():
-    ans = "pd.read_excel('data.xlsx')"
-    wrongs = ["pd.read_csv('data.xlsx')", "pd.open_excel('data.xlsx')", "pd.load('data.xlsx')"]
-    return {
-        'topic': '데이터 불러오기 (Excel)', 
-        'question': "Pandas를 사용하여 'data.xlsx' 엑셀 파일을 읽어오는 코드를 작성하세요.",
-        'expected': ans, 'wrongs': wrongs, 
-        'explanation': "엑셀 파일은 `pd.read_excel()` 함수를 사용하여 불러옵니다. CSV는 `read_csv()`를 사용합니다.",
-        'check': lambda x: "read_excel" in _prep(x) and "data.xlsx" in _prep(x)
-    }
-
-def gen_easy_isna():
-    ans = "df.isna()"
-    wrongs = ["df.isnull()", "df.empty()", "df.missing()"]
-    return {
-        'topic': '결측치 확인', 
-        'question': "데이터프레임 `df` 내에 결측치(NaN)가 있는지 여부를 True/False로 반환하는 메서드를 작성하세요.",
-        'expected': ans, 'wrongs': wrongs, 
-        'explanation': "Pandas에서 결측치를 확인할 때는 `isna()` 메서드를 사용합니다. (`isnull()`과 동일하지만 최신 권장 사항입니다.)",
-        'check': lambda x: "isna()" in _prep(x)
-    }
-
-def gen_easy_dropna():
-    ans = "df.dropna()"
-    wrongs = ["df.drop_missing()", "df.remove_nan()", "df.clean()"]
-    return {
-        'topic': '결측치 제거', 
-        'question': "데이터프레임 `df`에서 결측치(NaN)가 포함된 행을 모두 제거하는 코드를 작성하세요.",
-        'expected': ans, 'wrongs': wrongs, 
-        'explanation': "`dropna()` 메서드는 결측치가 하나라도 포함된 행(row)을 삭제합니다.",
-        'check': lambda x: "dropna()" in _prep(x)
+        'explanation': "df.loc[행이름, 열이름] 형식으로 특정 좌표의 데이터에 라벨 기반으로 접근할 수 있습니다.",
+        'check': lambda x: "loc[0," in _prep(x) and "name" in _prep(x)
     }
 
 def gen_easy_value_counts():
     ans = "df['category'].value_counts()"
-    wrongs = ["df['category'].count_values()", "df['category'].counts()", "df['category'].groupby_count()"]
+    wrongs = ["df['category'].count_values()", "df['category'].counts()", "pd.value_counts(df, 'category')"]
     return {
-        'topic': '고유값 빈도수 계산', 
-        'question': "데이터프레임 `df`의 'category' 컬럼 내에 있는 각 고유값들의 등장 빈도수(개수)를 세는 코드를 작성하세요.",
+        'topic': '카테고리 빈도수 확인', 
+        'question': "데이터프레임 `df`의 'category' 컬럼에 있는 항목별 빈도수(개수)를 구하는 코드를 작성하세요.",
         'expected': ans, 'wrongs': wrongs, 
-        'explanation': "범주형 데이터의 빈도수를 확인할 때는 Series의 `value_counts()` 메서드를 사용합니다.",
+        'explanation': "Series 객체의 .value_counts() 메서드를 사용하면 범주형 데이터의 빈도를 알 수 있습니다.",
         'check': lambda x: "value_counts" in _prep(x) and "category" in _prep(x)
     }
 
-def gen_easy_apply():
-    ans = "df['col'].apply(my_func)"
-    wrongs = ["df['col'].map_func(my_func)", "df['col'].run(my_func)", "df['col'].execute(my_func)"]
+def gen_viz_countplot():
+    ans = "sns.countplot(data=df, x='day')"
+    wrongs = ["sns.bar(df, 'day')", "plt.countplot(df['day'])", "df.plot(kind='count', x='day')"]
     return {
-        'topic': '함수 일괄 적용', 
-        'question': "데이터프레임 `df`의 'col' 컬럼의 모든 요소에 사용자 정의 함수 `my_func`를 일괄 적용하는 코드를 작성하세요.",
+        'topic': 'Seaborn 시각화 (Countplot)', 
+        'question': "Seaborn을 사용하여 데이터프레임 `df`의 'day' 컬럼(요일)별 데이터 개수를 막대 그래프(빈도수)로 시각화하는 코드를 작성하세요.",
         'expected': ans, 'wrongs': wrongs, 
-        'explanation': "Pandas Series의 모든 원소에 특정 함수를 한 번에 적용하려면 `apply()` 메서드를 사용합니다.",
-        'check': lambda x: "apply" in _prep(x) and "my_func" in _prep(x)
+        'explanation': "sns.countplot()은 범주형 변수의 각 카테고리별 빈도수를 보여주는 직관적인 시각화 도구입니다.",
+        'check': lambda x: "countplot" in _prep(x) and "day" in _prep(x)
     }
 
-def gen_easy_unique():
-    ans = "df['col'].unique()"
-    wrongs = ["df['col'].distinct()", "df['col'].levels()", "df['col'].drop_duplicates()"]
+def gen_viz_histplot():
+    ans = "sns.histplot(data=df, x='tip')"
+    wrongs = ["sns.histogram(df, 'tip')", "plt.histplot(df['tip'])", "sns.hist(df['tip'])"]
     return {
-        'topic': '고유값 배열 추출', 
-        'question': "데이터프레임 `df`의 'col' 컬럼에 존재하는 고유값(중복 제거된 값)들의 배열을 반환하는 코드를 작성하세요.",
+        'topic': 'Seaborn 시각화 (Histplot)', 
+        'question': "Seaborn을 사용하여 데이터프레임 `df`의 연속형 숫자 컬럼인 'tip'의 분포를 히스토그램으로 그리는 코드를 작성하세요.",
         'expected': ans, 'wrongs': wrongs, 
-        'explanation': "`unique()` 메서드는 해당 컬럼 내에 존재하는 모든 종류의 값들을 중복 없이 numpy 배열로 반환합니다.",
-        'check': lambda x: "unique()" in _prep(x) and "col" in _prep(x)
+        'explanation': "수치형 데이터의 분포(몰려있는 정도)를 볼 때는 sns.histplot()을 사용합니다.",
+        'check': lambda x: "histplot" in _prep(x) and "tip" in _prep(x)
     }
 
-def gen_py_loop_control():
-    ans = "break"
-    wrongs = ["continue", "pass", "stop"]
+def gen_viz_scatter():
+    ans = "sns.scatterplot(data=df, x='age', y='income')"
+    wrongs = ["sns.scatter(x='age', y='income')", "plt.scatter(df)", "df.plot_scatter('age', 'income')"]
     return {
-        'topic': '파이썬 기초 (반복문 제어)', 
-        'question': "`for` 또는 `while` 반복문을 실행하던 도중, 특정 조건을 만족했을 때 즉시 반복문을 완전히 탈출(종료)하게 만드는 키워드는 무엇인가요?",
+        'topic': 'Seaborn 시각화 (Scatter plot)', 
+        'question': "Seaborn을 사용하여 데이터프레임 `df`에서 x축을 'age', y축을 'income'으로 하는 산점도(Scatter plot)를 그리는 코드를 작성하세요.",
         'expected': ans, 'wrongs': wrongs, 
-        'explanation': "break는 반복문을 즉시 탈출하며, continue는 이번 차례의 나머지 코드를 건너뛰고 다음 반복으로 넘어갑니다.",
-        'check': lambda x: "break" == _prep(x)
+        'explanation': "수치형 변수 두 개 간의 관계를 2차원 평면에 점으로 찍어 표현할 때는 sns.scatterplot()을 사용합니다.",
+        'check': lambda x: "sns.scatterplot" in _prep(x) and "age" in _prep(x) and "income" in _prep(x)
     }
 
 def gen_py_str_split():
@@ -362,34 +155,6 @@ def gen_py_list_slice():
         'check': lambda x: "[::-1]" in _prep(x)
     }
 
-def gen_py_dict_get():
-    ans = "my_dict.get('age', 0)"
-    wrongs = ["my_dict['age'] or 0", "my_dict.find('age', 0)", "my_dict.fetch('age', 0)"]
-    return {
-        'topic': '파이썬 기초 (딕셔너리 안전 탐색)', 
-        'question': "딕셔너리 `my_dict`에서 'age' 키의 값을 가져오되, 만약 해당 키가 존재하지 않으면 에러 대신 0을 반환하도록 하는 메서드 기반의 코드를 작성하세요.",
-        'expected': ans, 'wrongs': wrongs, 
-        'explanation': "dict.get(key, default) 메서드를 사용하면 키 오류(KeyError) 없이 안전하게 값을 꺼내거나 기본값을 설정할 수 있습니다.",
-        'check': lambda x: "get" in _prep(x) and "age" in _prep(x) and "0" in _prep(x)
-    }
-
-def gen_sns_pairplot():
-    import random
-    hue = random.choice(['species', 'smoker', 'time'])
-    ans = f"sns.pairplot(df, hue='{hue}')"
-    wrongs = [
-        f"sns.scatterplot(df, hue='{hue}')", 
-        f"sns.pairplot(df, color='{hue}')", 
-        f"plt.pairplot(df, hue='{hue}')"
-    ]
-    return {
-        'topic': 'Seaborn 시각화 (pairplot)', 
-        'question': f"데이터프레임 `df`의 모든 숫자형 변수 쌍에 대해 산점도를 그리고, '{hue}' 열을 기준으로 색상을 구분하는 코드를 작성하세요.",
-        'expected': ans, 'wrongs': wrongs, 
-        'explanation': "sns.pairplot()은 변수 간의 모든 쌍(pair)에 대해 산점도를 그려 탐색적 데이터 분석(EDA)에 매우 유용합니다.",
-        'check': lambda x: "sns.pairplot" in _prep(x) and hue in _prep(x)
-    }
-
 def gen_sns_boxplot():
     import random
     x = random.choice(['day', 'sex'])
@@ -403,7 +168,7 @@ def gen_sns_boxplot():
     ]
     return {
         'topic': 'Seaborn 시각화 (boxplot)', 
-        'question': f"데이터 `df`에서 x축을 '{x}', y축을 '{y}'로 설정하고, '{hue}' 기준으로 박스플롯(Boxplot)을 그리는 코드를 작성하세요.",
+        'question': f"데이터 `df`에서 x축을 '{x}', y축을 '{y}'로 설정하고, '{hue}' 기준으로 쪼개어 박스플롯(Boxplot)을 그리는 코드를 작성하세요.",
         'expected': ans, 'wrongs': wrongs, 
         'explanation': "sns.boxplot()은 데이터의 분포와 이상치를 한눈에 파악하기 좋으며, hue 파라미터를 추가하면 그룹별로 비교할 수 있습니다.",
         'check': lambda x: "boxplot" in _prep(x) and x in _prep(x) and y in _prep(x) and hue in _prep(x)
@@ -420,40 +185,103 @@ def gen_np_log1p():
     ]
     return {
         'topic': 'Numpy 로그 변환 (log1p)', 
-        'question': f"데이터프레임 `df`의 '{col}' 열의 값이 너무 치우쳐 있어 로그 변환을 하려고 합니다. 0 값 오류를 방지하기 위해 1을 더한 후 로그를 취하는 Numpy 함수를 사용하세요.",
+        'question': f"데이터프레임 `df`의 '{col}' 열의 값이 너무 한쪽으로 치우쳐 있어 로그 변환을 하려고 합니다. 0 값 오류를 방지하기 위해 1을 더한 후 로그를 취하는 Numpy 함수를 사용하세요.",
         'expected': ans, 'wrongs': wrongs, 
         'explanation': "np.log1p()는 log(1+x)를 의미하며, 값이 0일 때 무한대(-inf) 오류가 발생하는 것을 방지하는 안전한 로그 변환 함수입니다.",
         'check': lambda x: "log1p" in _prep(x) and col in _prep(x)
     }
 
+# =====================================================================
+# [HARD POOL] - 심화 개념, 함정 문제 (총 4문제 출제용)
+# =====================================================================
+
+def gen_hard_apply():
+    ans = "df['reg'].apply(get_sido)"
+    wrongs = ["df['reg'].map(get_sido())", "apply(get_sido, df['reg'])", "df['reg'].apply(get_sido(x))"]
+    return {
+        'topic': '사용자 정의 함수 적용 (apply)', 
+        'question': "`get_sido(x)`라는 사용자 정의 함수가 이미 선언되어 있습니다. 데이터프레임 `df`의 'reg' 컬럼의 모든 행 데이터에 이 함수를 일괄 적용시키는 코드를 작성하세요.",
+        'expected': ans, 'wrongs': wrongs, 
+        'explanation': "Series.apply(함수명)을 사용하면 한 열의 모든 데이터에 똑같은 함수 로직을 반복문 없이 쉽게 적용할 수 있습니다. 괄호() 없이 함수 이름만 넘겨야 합니다.",
+        'check': lambda x: "apply" in _prep(x) and "get_sido" in _prep(x) and "()" not in _prep(x)
+    }
+
+def gen_hard_groupby():
+    ans = "df.groupby('sido')['spc_R'].mean()"
+    wrongs = ["df.groupby('sido').mean('spc_R')", "df['spc_R'].groupby('sido').mean()", "pd.groupby(df, 'sido')['spc_R'].mean()"]
+    return {
+        'topic': '그룹화 집계 (groupby)', 
+        'question': "데이터프레임 `df`에서 'sido'(시도) 별로 그룹을 묶은 뒤, 'spc_R'(특목고 진학률)의 평균(mean)을 구하는 Series 반환 코드를 작성하세요.",
+        'expected': ans, 'wrongs': wrongs, 
+        'explanation': "df.groupby('그룹기준열')['계산대상열'].통계함수() 형태로 작성하면 카테고리별 집계 데이터를 빠르게 추출할 수 있습니다.",
+        'check': lambda x: "groupby" in _prep(x) and "sido" in _prep(x) and "spc_r" in _prep(x) and "mean" in _prep(x)
+    }
+
+def gen_hard_merge():
+    ans = "pd.merge(df1, df2, on='code', how='left')"
+    wrongs = ["df1.join(df2, on='code', type='left')", "pd.concat([df1, df2], axis=1)", "df1.merge_left(df2, 'code')"]
+    return {
+        'topic': '데이터 병합 (Left Merge)', 
+        'question': "데이터프레임 `df1`과 `df2`를 'code' 컬럼 기준으로 Left Merge(왼쪽 기준 병합) 하는 코드를 작성하세요.",
+        'expected': ans, 'wrongs': wrongs, 
+        'explanation': "pd.merge() 함수에서 how='left' 파라미터를 사용하면 왼쪽 데이터프레임을 기준으로 삼아 병합을 수행합니다.",
+        'check': lambda x: "merge" in _prep(x) and "left" in _prep(x) and "code" in _prep(x)
+    }
+
+def gen_hard_pivot():
+    ans = "pd.pivot_table(df, index='sex', columns='smoker', values='tip', aggfunc='mean')"
+    wrongs = ["df.groupby(['sex','smoker'])['tip'].mean().pivot()", "pd.pivot(df, 'sex', 'smoker', 'tip')", "df.pivot_table(group='sex', target='tip', func='mean')"]
+    return {
+        'topic': '피벗 테이블 (Pivot Table)', 
+        'question': "데이터프레임 `df`에서 인덱스(행)를 'sex', 컬럼(열)을 'smoker'로 설정하고 'tip'의 평균(mean)을 구하는 2차원 피벗 테이블 코드를 작성하세요.",
+        'expected': ans, 'wrongs': wrongs, 
+        'explanation': "pd.pivot_table()을 사용하면 엑셀의 피벗 테이블처럼 복수의 카테고리에 대한 통계량(2차원 매트릭스)을 요약할 수 있습니다.",
+        'check': lambda x: "pivot_table" in _prep(x) and "sex" in _prep(x) and "smoker" in _prep(x) and "tip" in _prep(x)
+    }
+
 def gen_ml_knn():
-    ans = "KNeighborsClassifier()"
+    ans = "KNeighborsClassifier(n_neighbors=5)"
     wrongs = [
         "KNeighborsRegressor()", 
-        "KNNClassifier()", 
+        "KNNClassifier(k=5)", 
         "KNeighborsClassifier.fit()"
     ]
     return {
-        'topic': '머신러닝 알고리즘 (KNN 분류기)', 
-        'question': "주변의 가까운 이웃 데이터들의 클래스를 다수결로 판단하는 K-최근접 이웃(KNN) 분류 모델 객체를 생성하는 코드를 작성하세요.",
+        'topic': '머신러닝 모델 튜닝 (KNN)', 
+        'question': "주변 이웃 데이터들의 클래스를 다수결로 판단하는 K-최근접 이웃(KNN) 분류 모델 객체를 생성하되, 이웃의 수(K)를 5로 설정하는 파라미터를 포함해 작성하세요. (단축 임포트 가정)",
         'expected': ans, 'wrongs': wrongs, 
-        'explanation': "sklearn.neighbors 모듈의 KNeighborsClassifier()를 사용해 객체를 생성한 후 fit()으로 학습을 진행합니다.",
-        'check': lambda x: "kneighborsclassifier" in _prep(x)
+        'explanation': "KNeighborsClassifier(n_neighbors=K)에서 n_neighbors 파라미터는 모델의 복잡도를 결정하는 핵심 하이퍼파라미터입니다.",
+        'check': lambda x: "kneighborsclassifier" in _prep(x) and "n_neighbors" in _prep(x)
     }
 
-def gen_ml_stratify():
-    ans = "stratify=y"
+def gen_ml_split_stratify():
+    ans = "train_test_split(X, y, test_size=0.2, stratify=y)"
     wrongs = [
-        "shuffle=y", 
-        "random_state=y", 
-        "balance=y"
+        "train_test_split(X, y, 0.2)", 
+        "train_test_split(X, y, test_size=0.2, balance=True)", 
+        "pd.train_test_split(X, y, test_size=0.2, stratify=y)"
     ]
     return {
-        'topic': '데이터 분할 비율 유지 (stratify)', 
-        'question': "`train_test_split(X, y, ...)`를 사용하여 훈련/검증용 데이터를 나눌 때, 타겟 변수 `y`의 클래스 비율(예: 1:1:1)을 원본과 동일하게 유지하도록 하는 파라미터를 작성하세요.",
+        'topic': '데이터 분할과 층화추출 (stratify)', 
+        'question': "`train_test_split`을 사용하여 데이터를 훈련셋 80%, 검증셋 20%로 나눌 때, 타겟 변수 `y`의 원본 클래스 비율(예: 1:1:1)을 훈련셋과 검증셋에서도 동일하게 유지하도록 강제하는 파라미터를 포함해 코드를 작성하세요.",
         'expected': ans, 'wrongs': wrongs, 
-        'explanation': "stratify 파라미터에 타겟 변수를 지정하면, 샘플링 편향을 막고 데이터의 원래 클래스 분포 비율을 그대로 유지하며 분할합니다.",
-        'check': lambda x: "stratify=y" in _prep(x)
+        'explanation': "stratify=y 파라미터를 지정하면 샘플링 편향을 막고 데이터의 원래 클래스 분포 비율을 그대로 유지하며 분할합니다.",
+        'check': lambda x: "train_test_split" in _prep(x) and "stratify=y" in _prep(x)
+    }
+
+def gen_ml_cv():
+    ans = "cross_val_score(knn, train_x, train_y, cv=4).mean()"
+    wrongs = [
+        "cross_validate(knn, train_x, train_y, k=4).mean()", 
+        "knn.score(train_x, train_y, cv=4)", 
+        "cross_val_score(knn, train_x, train_y, fold=4).average()"
+    ]
+    return {
+        'topic': '교차 검증 (Cross Validation)', 
+        'question': "학습된 패턴이 우연인지 아닌지 확인하기 위해, 모델 `knn`과 훈련데이터 `train_x`, `train_y`를 4-Fold 교차 검증(Cross Validation)하여 얻어진 4개의 평가 점수 평균(mean)을 구하는 코드를 작성하세요.",
+        'expected': ans, 'wrongs': wrongs, 
+        'explanation': "cross_val_score() 함수에 cv=4(폴드 수)를 주어 교차 검증을 수행한 뒤, 반환된 배열의 .mean()을 호출하여 평균 정확도를 봅니다.",
+        'check': lambda x: "cross_val_score" in _prep(x) and "cv=4" in _prep(x) and "mean" in _prep(x)
     }
 
 # -------------------------------------------------------------------
@@ -468,59 +296,32 @@ class QuizStrategy:
         self.easy_pool = easy_pool
         self.hard_pool = hard_pool
 
-
-# ==========================================
-# 1. 종합 마스터 (Comprehensive) 모드 풀
-# ==========================================
-COMP_EASY = [
-    gen_easy_read, gen_easy_read_excel, gen_easy_head, gen_easy_info, gen_easy_isnull, gen_easy_isna, 
-    gen_easy_fillna, gen_easy_dropna, gen_easy_drop, gen_easy_filter,
-    gen_easy_value_counts, gen_easy_apply, gen_easy_unique,
-    gen_viz_bar, gen_viz_scatter, gen_viz_hist,
-    gen_py_for_loop, gen_py_function, gen_py_basic_type,
-    gen_py_loop_control, gen_py_str_split, gen_py_list_slice, gen_py_dict_get,
-    gen_sns_pairplot, gen_sns_boxplot, gen_np_log1p
+ALL_EASY = [
+    gen_easy_read_excel, gen_easy_head, gen_easy_dtypes, gen_easy_isnull, 
+    gen_easy_dropna, gen_easy_filter, gen_easy_loc, gen_easy_value_counts,
+    gen_viz_countplot, gen_viz_histplot, gen_viz_scatter, gen_sns_boxplot,
+    gen_py_str_split, gen_py_list_slice, gen_np_log1p
 ]
 
-COMP_HARD = [
-    gen_hard_merge, gen_hard_pivot, gen_hard_str, gen_hard_dt,
-    gen_numpy_array, gen_ml_split, gen_ml_rf, gen_viz_sns,
-    gen_param_nuance_concat, gen_param_nuance_dropdup,
-    gen_ml_knn, gen_ml_stratify
-]
-
-# ==========================================
-# 2. 베이직 (Basic / Day 1~4) 모드 풀
-# ==========================================
-# 교수님 강의 교안 및 노트북 덤프를 철저히 분석하여,
-# 사용하지 않은 문법(isnull, fillna, .str, datetime, numpy 배열 등)을 완벽히 배제하고
-# 오직 수업에서 다룬 문법(isna, dropna, read_excel, apply, value_counts 등)만 남긴 풀
-BASIC_EASY = [
-    gen_easy_read_excel, gen_easy_read, gen_easy_head, gen_easy_info, 
-    gen_easy_isna, gen_easy_dropna, gen_easy_drop, gen_easy_filter,
-    gen_easy_value_counts, gen_easy_apply, gen_easy_unique,
-    gen_py_for_loop, gen_py_function, gen_py_basic_type,
-    gen_py_loop_control, gen_py_list_slice
-]
-
-BASIC_HARD = [
-    gen_hard_merge, gen_hard_pivot
+ALL_HARD = [
+    gen_hard_apply, gen_hard_groupby, gen_hard_merge, gen_hard_pivot,
+    gen_ml_knn, gen_ml_split_stratify, gen_ml_cv
 ]
 
 STRATEGIES = {
     'bootcamp_day1_4': QuizStrategy(
         id='bootcamp_day1_4',
-        name='Day 1~4 Bootcamp (시험 대비)',
-        description='단기 부트캠프 진도에 맞춘 핵심 위주의 출제 모드입니다.',
-        easy_pool=BASIC_EASY,  
-        hard_pool=BASIC_HARD
+        name='Day 1~2 Bootcamp (시험 대비)',
+        description='단기 부트캠프 진도에 맞춰, 쉬운 문제 16개와 심화/응용 문제 4개가 출제됩니다.',
+        easy_pool=ALL_EASY,  
+        hard_pool=ALL_HARD
     ),
     'comprehensive': QuizStrategy(
         id='comprehensive',
         name='종합 마스터 (전범위 딥다이브)',
-        description='모듈화된 모든 라이브러리의 방대한 전범위를 다루는 극한 모드입니다.',
-        easy_pool=COMP_EASY,
-        hard_pool=COMP_HARD
+        description='전 범위를 다루는 하드코어 모드입니다. 응용 문제의 비율이 높아집니다.',
+        easy_pool=ALL_EASY,
+        hard_pool=ALL_HARD
     )
 }
 
@@ -533,6 +334,7 @@ def generate_exam_quizzes(strategy_id='bootcamp_day1_4'):
     hard_pool = strategy.hard_pool
     
     quizzes = []
+    # 20개 중 16개는 베이직(Easy) 풀에서 출제
     for _ in range(16):
         f = random.choice(easy_pool)
         q = f()
@@ -545,6 +347,7 @@ def generate_exam_quizzes(strategy_id='bootcamp_day1_4'):
             q['choices'] = opts
         quizzes.append(q)
         
+    # 20개 중 4개는 꼬아놓은 심화(Hard) 풀에서 출제
     for _ in range(4):
         f = random.choice(hard_pool)
         q = f()
