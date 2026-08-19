@@ -116,14 +116,14 @@ div[data-testid="stVerticalBlock"] { gap: 1rem !important; }
    MAIN CONTENT CARDS (Premium Glassmorphism)
 ------------------------------------------------------------- */
 [data-testid="stVerticalBlockBorderWrapper"], .stForm {
-    background: rgba(255, 255, 255, 0.5) !important; /* ??? ??? */
-    backdrop-filter: blur(40px) saturate(200%) !important; 
-    -webkit-backdrop-filter: blur(40px) saturate(200%) !important;
-    border: 1px solid rgba(255, 255, 255, 1) !important; /* ??? ?? ??? */
+    background: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: blur(48px) saturate(160%) !important; 
+    -webkit-backdrop-filter: blur(48px) saturate(160%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
     border-radius: 24px !important;
-    box-shadow: 0 24px 48px rgba(31, 38, 135, 0.1), inset 0 1px 2px rgba(255,255,255,1) !important; /* ??? ?? ??? */
-    padding: 1.5rem 2rem !important; 
-    margin-bottom: 0.5rem !important; 
+    box-shadow: 0 32px 64px rgba(0, 0, 0, 0.08), inset 0 2px 6px rgba(255, 255, 255, 0.6) !important;
+    padding: 2.5rem !important; 
+    margin-bottom: 2rem !important; 
     text-align: left !important;
     overflow: visible !important;
 }
@@ -185,7 +185,18 @@ div[data-testid="stTextInput"] input:focus { background: #ffffff !important; bor
     .header-subtitle { display: none !important; } /* ?? ?? */
     
     /* 3. ?? ?? ?? ?? ??? */
-    [data-testid="stVerticalBlockBorderWrapper"], .stForm { padding: 1rem 1rem !important; border-radius: 16px !important; margin-bottom: 0.5rem !important; }
+    [data-testid="stVerticalBlockBorderWrapper"], .stForm {
+    background: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: blur(48px) saturate(160%) !important; 
+    -webkit-backdrop-filter: blur(48px) saturate(160%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    border-radius: 24px !important;
+    box-shadow: 0 32px 64px rgba(0, 0, 0, 0.08), inset 0 2px 6px rgba(255, 255, 255, 0.6) !important;
+    padding: 2.5rem !important; 
+    margin-bottom: 2rem !important; 
+    text-align: left !important;
+    overflow: visible !important;
+}
     div[role="radiogroup"] > label { padding: 0.6rem 0.8rem !important; min-height: 2.8rem !important; border-radius: 10px !important; margin-bottom: 0.3rem !important; }
     div[role="radiogroup"] > label > div:nth-child(2) { font-size: 0.9rem !important; }
     
