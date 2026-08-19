@@ -246,6 +246,39 @@ def gen_easy_filter():
         'explanation': "대괄호 내부에 조건식을 전달하여 True인 행만 서브셋으로 추출합니다."
     }
 
+def gen_viz_bar():
+    col1 = random.choice(['region', 'category', 'team'])
+    col2 = random.choice(['sales', 'profit', 'count'])
+    return {
+        'topic': '데이터 시각화 (막대 그래프)', 'type': 'code',
+        'question': f"df에서 x축을 '{col1}', y축을 '{col2}'로 하는 막대 그래프(bar plot)를 Pandas 기본 내장 함수로 그리는 코드를 작성하세요.",
+        'check': lambda x: "plot" in x and "bar" in x and col1 in x and col2 in x,
+        'expected': f"df.plot(kind='bar', x='{col1}', y='{col2}')",
+        'explanation': "Pandas 내장 .plot(kind='bar')를 사용하여 빠르게 시각화할 수 있습니다."
+    }
+
+def gen_viz_scatter():
+    col1 = random.choice(['age', 'height', 'weight'])
+    col2 = random.choice(['score', 'salary', 'income'])
+    return {
+        'topic': '데이터 시각화 (산점도)', 'type': 'code',
+        'question': f"df에서 x축을 '{col1}', y축을 '{col2}'로 하는 산점도(scatter plot)를 그리는 코드를 작성하세요.",
+        'check': lambda x: "plot" in x and "scatter" in x and col1 in x and col2 in x,
+        'expected': f"df.plot(kind='scatter', x='{col1}', y='{col2}')",
+        'explanation': "두 연속형 변수 간의 상관관계를 볼 때 .plot(kind='scatter')를 사용합니다."
+    }
+
+def gen_viz_hist():
+    col = random.choice(['age', 'score', 'salary'])
+    bins = random.choice([10, 20, 30])
+    return {
+        'topic': '데이터 시각화 (히스토그램)', 'type': 'code',
+        'question': f"df['{col}'] 컬럼의 데이터 분포를 보기 위해 구간(bins)을 {bins}개로 나눈 히스토그램을 그리는 코드를 작성하세요.",
+        'check': lambda x: "hist" in x and str(bins) in x and col in x.replace('"',"'"),
+        'expected': f"df['{col}'].plot(kind='hist', bins={bins})",
+        'explanation': "단일 변수의 분포를 확인할 때는 히스토그램(.hist 또는 plot(kind='hist'))이 적합합니다."
+    }
+
 def gen_hard_merge():
     how = random.choice(['left', 'inner'])
     return {
@@ -286,12 +319,14 @@ def gen_hard_dt():
 
 def generate_exam_cycle():
     easy_factories = [gen_easy_read, gen_easy_head, gen_easy_info, gen_easy_isnull, gen_easy_fillna, gen_easy_drop, gen_easy_filter]
+    viz_factories = [gen_viz_bar, gen_viz_scatter, gen_viz_hist]
     hard_factories = [gen_hard_merge, gen_hard_pivot, gen_hard_str, gen_hard_dt]
     
-    easy_quizzes = [random.choice(easy_factories)() for _ in range(16)]
-    hard_quizzes = [random.choice(hard_factories)() for _ in range(4)]
+    easy_quizzes = [random.choice(easy_factories)() for _ in range(14)]
+    viz_quizzes = [random.choice(viz_factories)() for _ in range(3)]
+    hard_quizzes = [random.choice(hard_factories)() for _ in range(3)]
     
-    return easy_quizzes + hard_quizzes
+    return easy_quizzes + viz_quizzes + hard_quizzes
 
 # ==========================================
 # 3. 리더보드 로직
@@ -363,8 +398,15 @@ with tabs[0]:
         # 난이도 표시 텍스트 정제
         level_text = "Section 1: Basic Review" if idx < 16 else "Section 2: Advanced Tasks"
         
-        st.caption(f"{level_text} — {idx+1} / 20")
-        st.progress((idx) / 20)
+                st.caption(f"{level_text} — {idx+1} / 20")
+        
+        col1, col2 = st.columns([8, 2])
+        with col1:
+            st.progress((idx) / 20)
+        with col2:
+            if st.button("🔄 문제 재생성", help="현재 사이클을 초기화하고 완전히 새로운 문제들로 다시 섞습니다."):
+                st.session_state.clear()
+                st.rerun()
         
         with st.container(border=True):
             st.subheader(f"Question {idx+1:02d}. {q['topic']}")
@@ -426,3 +468,4 @@ st.markdown('''
     Powered by Python & Streamlit
 </div>
 ''', unsafe_allow_html=True)
+
