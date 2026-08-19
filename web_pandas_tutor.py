@@ -12,6 +12,29 @@ from src.questions import generate_exam_quizzes, generate_single_quiz
 st.set_page_config(page_title="Data Science & ML Bootcamp", page_icon="logo.jpeg", layout="wide", initial_sidebar_state="collapsed")
 st.markdown(get_custom_css(), unsafe_allow_html=True)
 
+# ???? ?? ??? (Sidebar)
+with st.sidebar:
+    st.markdown("### ?? ?? ?? ??")
+    selected_mode = st.radio(
+        "?? ?? ?? ??",
+        options=["bootcamp_day1_4", "comprehensive"],
+        format_func=lambda x: "?? Day 1~4 ?? ??" if x == "bootcamp_day1_4" else "?? ?? ??? (???)",
+        key="strategy_selector"
+    )
+    if selected_mode == "bootcamp_day1_4":
+        st.caption("???? ??? ?? ?? ??")
+    else:
+        st.caption("??? ?? ? ?? ????")
+
+    if 'current_strategy' not in st.session_state or st.session_state.current_strategy != selected_mode:
+        st.session_state.current_strategy = selected_mode
+        # ??? ??? ?? ???
+        st.session_state.s_current_q = generate_single_quiz(selected_mode)
+        st.session_state.exam_state = 'landing'
+        st.session_state.e_quizzes = generate_exam_quizzes(selected_mode)
+
+
+
 # 메인 페이지 헤더 (중앙 정렬 로고 + 제목 + 부제)
 st.markdown(f'''
 <div class="custom-header">
@@ -31,7 +54,7 @@ with tabs[0]:
     if 's_total_solved' not in st.session_state:
         st.session_state.s_total_solved = 0
         st.session_state.s_total_correct = 0
-        st.session_state.s_current_q = generate_single_quiz()
+        st.session_state.s_current_q = generate_single_quiz(st.session_state.current_strategy)
         st.session_state.s_attempts = 0
         st.session_state.s_show_exp = False
         st.session_state.s_correct = False
@@ -101,7 +124,7 @@ with tabs[0]:
         st.markdown(exp_html, unsafe_allow_html=True)
             
         if st.button("⏭️ 다음 문제 (Endless)", type="primary", key="btn_study_next", use_container_width=True):
-            st.session_state.s_current_q = generate_single_quiz()
+            st.session_state.s_current_q = generate_single_quiz(st.session_state.current_strategy)
             st.session_state.s_attempts = 0
             st.session_state.s_show_exp = False
             st.session_state.s_correct = False
@@ -110,7 +133,7 @@ with tabs[0]:
 with tabs[1]:
     if 'exam_state' not in st.session_state:
         st.session_state.exam_state = 'landing'
-        st.session_state.e_quizzes = generate_exam_quizzes()
+        st.session_state.e_quizzes = generate_exam_quizzes(st.session_state.current_strategy)
         st.session_state.e_score = 0
         st.session_state.e_user_answers = []
         st.session_state.exam_name = ""
@@ -132,7 +155,7 @@ with tabs[1]:
             if st.button("▶️ 모의고사 응시 시작", type="primary", use_container_width=True):
                 if candidate_name.strip():
                     st.session_state.exam_name = candidate_name.strip()
-                    st.session_state.e_quizzes = generate_exam_quizzes()
+                    st.session_state.e_quizzes = generate_exam_quizzes(st.session_state.current_strategy)
                     st.session_state.exam_start_time = time.time()
                     st.session_state.exam_state = 'running'
                     st.rerun()

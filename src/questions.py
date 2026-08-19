@@ -395,53 +395,104 @@ def gen_ml_stratify():
         'check': lambda x: "stratify=y" in _prep(x)
     }
 
-def _get_factories():
-    easy_factories = [
-        gen_easy_read, gen_easy_head, gen_easy_info, gen_easy_isnull, 
-        gen_easy_fillna, gen_easy_drop, gen_easy_filter,
-        gen_viz_bar, gen_viz_scatter, gen_viz_hist,
-        gen_py_loop_control, gen_py_str_split, gen_py_list_slice, gen_py_dict_get,
-        gen_sns_pairplot, gen_sns_boxplot, gen_np_log1p
-    ]
-    hard_factories = [
-        gen_hard_merge, gen_hard_pivot, gen_hard_str, gen_hard_dt, gen_param_nuance_concat, gen_param_nuance_dropdup,
-        gen_numpy_array, gen_ml_split, gen_ml_rf, gen_viz_sns
-    ]
-    return easy_factories, hard_factories
 
-def generate_exam_quizzes():
-    easy_factories, hard_factories = _get_factories()
+# -------------------------------------------------------------------
+# PLUGIN SYSTEM / STRATEGY REGISTRY
+# -------------------------------------------------------------------
+
+class QuizStrategy:
+    def __init__(self, id, name, description, easy_pool, hard_pool):
+        self.id = id
+        self.name = name
+        self.description = description
+        self.easy_pool = easy_pool
+        self.hard_pool = hard_pool
+
+# ?? ??? ??? (????)
+ALL_EASY = [
+    gen_easy_read, gen_easy_head, gen_easy_info, gen_easy_isnull, 
+    gen_easy_fillna, gen_easy_drop, gen_easy_filter,
+    gen_viz_bar, gen_viz_scatter, gen_viz_hist,
+    gen_py_loop_control, gen_py_str_split, gen_py_list_slice, gen_py_dict_get,
+    gen_sns_pairplot, gen_sns_boxplot, gen_np_log1p
+]
+
+ALL_HARD = [
+    gen_hard_merge, gen_hard_pivot, gen_hard_str, gen_hard_dt,
+    gen_numpy_array, gen_ml_split, gen_ml_rf, gen_viz_sns,
+    gen_param_nuance_concat, gen_param_nuance_dropdup,
+    gen_ml_knn, gen_ml_stratify
+]
+
+# ????(??) ?????
+STRATEGIES = {
+    'bootcamp_day1_4': QuizStrategy(
+        id='bootcamp_day1_4',
+        name='Day 1~4 Bootcamp (?? ??)',
+        description='?? ???? ??? ?? ?? ??? ?? ?????.',
+        easy_pool=ALL_EASY,  # ??? ?? ?????, ??? ??? ??
+        hard_pool=ALL_HARD
+    ),
+    'comprehensive': QuizStrategy(
+        id='comprehensive',
+        name='?? ??? (??? ????)',
+        description='???? ?? ?????? ??? ???? ??? ?? ?????.',
+        easy_pool=ALL_EASY,
+        hard_pool=ALL_HARD
+    )
+}
+
+def get_strategy(strategy_id='bootcamp_day1_4'):
+    return STRATEGIES.get(strategy_id, STRATEGIES['bootcamp_day1_4'])
+
+def generate_exam_quizzes(strategy_id='bootcamp_day1_4'):
+    strategy = get_strategy(strategy_id)
+    easy_pool = strategy.easy_pool
+    hard_pool = strategy.hard_pool
     
-    # 16 Easy (Day1~Day4 level), 4 Hard (Advanced concepts)
-    quizzes = [random.choice(easy_factories)() for _ in range(16)] + \
-              [random.choice(hard_factories)() for _ in range(4)]
-              
-    for q in quizzes:
-        q['type'] = 'radio'
-        choices = [q['expected']] + random.sample(q['wrongs'], 3)
-        random.shuffle(choices)
-        q['choices'] = choices
-
-    # 2문제를 무작위 주관식(text) 변환
-    text_indices = random.sample(range(20), 2)
-    for idx in text_indices:
-        quizzes[idx]['type'] = 'text'
+    quizzes = []
+    # 16 easy questions
+    for _ in range(16):
+        f = random.choice(easy_pool)
+        q = f()
+        # 10% ???(text) ?? (Exam ??)
+        if random.random() < 0.1:
+            q['type'] = 'text'
+        else:
+            q['type'] = 'radio'
+            opts = [q['expected']] + q['wrongs'][:3]
+            random.shuffle(opts)
+            q['choices'] = opts
+        quizzes.append(q)
+        
+    # 4 hard questions
+    for _ in range(4):
+        f = random.choice(hard_pool)
+        q = f()
+        if random.random() < 0.1:
+            q['type'] = 'text'
+        else:
+            q['type'] = 'radio'
+            opts = [q['expected']] + q['wrongs'][:3]
+            random.shuffle(opts)
+            q['choices'] = opts
+        quizzes.append(q)
         
     return quizzes
 
-def generate_single_quiz():
-    easy_factories, hard_factories = _get_factories()
-    all_factories = easy_factories + hard_factories
+def generate_single_quiz(strategy_id='bootcamp_day1_4'):
+    strategy = get_strategy(strategy_id)
+    pool = strategy.easy_pool + strategy.hard_pool
     
-    q = random.choice(all_factories)()
+    f = random.choice(pool)
+    q = f()
     
-    # 10% 확률로 주관식, 90% 확률로 객관식
+    # Study ????? 10% ??? ??? ? ??
     if random.random() < 0.1:
         q['type'] = 'text'
     else:
         q['type'] = 'radio'
-        choices = [q['expected']] + random.sample(q['wrongs'], 3)
-        random.shuffle(choices)
-        q['choices'] = choices
-        
+        opts = [q['expected']] + q['wrongs'][:3]
+        random.shuffle(opts)
+        q['choices'] = opts
     return q
