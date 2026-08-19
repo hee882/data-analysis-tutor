@@ -28,14 +28,9 @@ st.markdown(f'''
 ''', unsafe_allow_html=True)
 
 # 상단 글로벌 모드 스위처
-selected_mode = st.radio(
-    "글로벌 모드 스위처",
-    options=["bootcamp_day1_4", "comprehensive"],
-    format_func=lambda x: "🎓 Day 1~4 기초" if x == "bootcamp_day1_4" else "🔥 종합 마스터",
-    horizontal=True,
-    label_visibility="collapsed",
-    key="global_mode_switcher"
-)
+# ??? ?? ???? ?? ?? (st.radio ?? ?? ??)
+is_comp_mode = st.toggle("?? ?? ??? ?? ???", value=(st.session_state.current_strategy == "comprehensive"))
+selected_mode = "comprehensive" if is_comp_mode else "bootcamp_day1_4"
 
 if st.session_state.current_strategy != selected_mode:
     st.session_state.current_strategy = selected_mode
