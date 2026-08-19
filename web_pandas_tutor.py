@@ -366,3 +366,5 @@ with tabs[1]:
         df_lb.index = df_lb.index + 1
         df_lb.columns = ['학습자', '최종 스코어', '평가 일시']
         st.dataframe(df_lb, use_container_width=True)
+
+
