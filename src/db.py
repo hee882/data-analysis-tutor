@@ -25,16 +25,16 @@ def load_leaderboard():
             return json.load(f)
     return []
 
-def save_score(name, score):
+def save_score(name, score, strategy="bootcamp_day1_4"):
     supabase = get_supabase_client()
     if supabase:
         try:
-            supabase.table('leaderboard').insert({"name": name, "score": score}).execute()
+            supabase.table('leaderboard').insert({"name": f"{name}###{strategy}", "score": score}).execute()
             return True
         except Exception:
             return False
     lb = load_leaderboard()
-    lb.append({"name": name, "score": score, "created_at": datetime.now().strftime("%Y-%m-%d %H:%M")})
+    lb.append({"name": f"{name}###{strategy}", "score": score, "created_at": datetime.now().strftime("%Y-%m-%d %H:%M")})
     lb = sorted(lb, key=lambda x: x['score'], reverse=True)
     with open("leaderboard.json", "w", encoding="utf-8") as f:
         json.dump(lb, f, ensure_ascii=False, indent=4)

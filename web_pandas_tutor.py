@@ -193,7 +193,7 @@ with tabs[1]:
                                 score += 1
                 st.session_state.e_score = score
                 st.session_state.e_user_answers = user_answers
-                save_score(st.session_state.exam_name, st.session_state.e_score)
+                save_score(st.session_state.exam_name, st.session_state.e_score, st.session_state.current_strategy)
                 st.session_state.exam_state = 'finished'
                 st.rerun()
 
@@ -235,28 +235,50 @@ with tabs[1]:
 
 with tabs[2]:
     remove_timer()
+    st.markdown("<h3 style='text-align: center; margin-bottom: 0.5rem;'>?? ??? ??</h3>", unsafe_allow_html=True)
+    
+    # ???? ?? ???
+    lb_mode = st.radio("???? ????", ["bootcamp_day1_4", "comprehensive"], 
+                       format_func=lambda x: "?? Day 1~4 (??)" if x == "bootcamp_day1_4" else "?? ?? ???", 
+                       horizontal=True, label_visibility="collapsed")
+    
     lb = load_leaderboard()
-    if not lb:
-        st.info("??? ????. ? ?? ??? ??? ?????!")
+    
+    # ?? ? ???
+    filtered_lb = []
+    for row in lb:
+        raw_name = row['name']
+        if "###" in raw_name:
+            parsed_name, strategy = raw_name.split("###", 1)
+        else:
+            parsed_name, strategy = raw_name, "bootcamp_day1_4" # ??? ??? ???
+            
+        if strategy == lb_mode:
+            row['display_name'] = parsed_name
+            filtered_lb.append(row)
+            
+    if not filtered_lb:
+        st.info("?? ??? ??? ????. ? ?? ??? ??? ?????!")
     else:
-        df_lb = pd.DataFrame(lb)
+        df_lb = pd.DataFrame(filtered_lb)
+        df_lb = df_lb.sort_values(by='score', ascending=False).reset_index(drop=True)
         
         html = '<div class="lb-container">'
         for i, row in df_lb.iterrows():
             rank = i + 1
-            rank_class = f"lb-rank-{{rank}}" if rank <= 3 else ""
-            rank_display = ["??", "??", "??"][rank-1] if rank <= 3 else f"{{rank}}"
+            rank_class = f"lb-rank-{rank}" if rank <= 3 else ""
+            rank_display = ["??", "??", "??"][rank-1] if rank <= 3 else f"{rank}"
             
-            name = row['name']
+            name = row['display_name']
             score = row['score']
             date = pd.to_datetime(row['created_at'] if 'created_at' in row else row['date']).strftime('%y.%m.%d %H:%M')
             
             html += f'''
             <div class="lb-row">
-                <div class="lb-rank {{rank_class}}">{{rank_display}}</div>
-                <div class="lb-name">{{name}}</div>
-                <div class="lb-score">{{score}} / 20</div>
-                <div class="lb-date">{{date}}</div>
+                <div class="lb-rank {rank_class}">{rank_display}</div>
+                <div class="lb-name">{name}</div>
+                <div class="lb-score">{score} / 20</div>
+                <div class="lb-date">{date}</div>
             </div>
             '''
         html += '</div>'

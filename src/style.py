@@ -222,4 +222,35 @@ div[data-testid="stTextInput"] input:focus { background: #ffffff !important; bor
     .floating-exp { position: static; width: 100%; margin-top: 1.5rem; margin-bottom: 1rem; animation: none; box-shadow: 0 12px 32px rgba(0,0,0,0.1); }
 }
 
+
+/* ???? ?? ???(?? ?) ???? */
+div[role="radiogroup"]:has(> label[data-baseweb="radio"]) {
+    flex-direction: row !important;
+    justify-content: center !important;
+    gap: 0 !important;
+    background: rgba(255, 255, 255, 0.4) !important;
+    border-radius: 12px !important;
+    padding: 0.3rem !important;
+    width: auto !important;
+    margin: 0 auto 1.5rem auto !important;
+    display: inline-flex !important;
+}
+div[role="radiogroup"] > label[data-baseweb="radio"] {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0.6rem 1.5rem !important;
+    min-height: auto !important;
+    border-radius: 8px !important;
+    margin: 0 !important;
+}
+div[role="radiogroup"] > label[data-baseweb="radio"]:hover {
+    transform: none !important;
+}
+div[role="radiogroup"] > label[data-baseweb="radio"][data-checked="true"] {
+    background: #ffffff !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05) !important;
+    transform: none !important;
+}
+
 </style>
