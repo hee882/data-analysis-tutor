@@ -18,7 +18,7 @@ st.markdown('''
     <span>Lv.1 Basic & Advanced</span>
 </div>
 <p style="color: #64748b; font-size: 1.1rem !important; margin-bottom: 2rem;">
-    Pandas 데이터 전처리 및 분석 역량 강화를 위한 실전 객관식 학습 시스템입니다.
+    Pandas 데이터 전처리 및 분석 역량 강화를 위한 실전 객관식/주관식 혼합 학습 시스템입니다.
 </p>
 ''', unsafe_allow_html=True)
 
@@ -26,7 +26,7 @@ tabs = st.tabs(["📚 학습 모드 (Study)", "🎯 실전 모의고사 (Exam)",
 
 with tabs[0]:
     remove_timer()
-    st.info("💡 **학습 모드:** 보기를 클릭하고 제출하세요. (최대 3회 재시도 가능)")
+    st.info("💡 **학습 모드:** 보기를 클릭하거나 코드를 직접 입력하세요. (최대 3회 재시도 가능)")
     
     if 's_quizzes' not in st.session_state:
         st.session_state.s_quizzes = generate_exam_cycle()
@@ -63,18 +63,24 @@ with tabs[0]:
                 st.rerun()
         
         with st.container(border=True):
-            st.subheader(f"Question {s_idx+1:02d}. {q['topic']}")
+            st.subheader(f"Question {s_idx+1:02d}. {q['topic']} " + ("(주관식 ⌨️)" if q['type'] == 'text' else "(객관식 🖱️)"))
             st.write(q['question'])
             
-            # 객관식 라디오 버튼으로 교체
-            user_ans = st.radio("보기 선택", options=q['choices'], label_visibility="hidden", key=f"s_ans_{s_idx}", index=None)
+            if q['type'] == 'radio':
+                user_ans = st.radio("보기 선택", options=q['choices'], label_visibility="hidden", key=f"s_ans_{s_idx}", index=None)
+            else:
+                user_ans = st.text_input("직접 타이핑하여 코드를 완성하세요", placeholder="코드를 입력하세요", label_visibility="hidden", key=f"s_ans_{s_idx}")
 
         if not st.session_state.s_show_exp:
             if st.button("제출 및 채점", type="primary", key="btn_study_submit"):
                 if not user_ans:
-                    st.warning("보기를 선택해 주세요.")
+                    st.warning("답안을 입력하거나 보기를 선택해 주세요.")
                 else:
-                    is_correct = (user_ans == q['expected'])
+                    if q['type'] == 'radio':
+                        is_correct = (user_ans == q['expected'])
+                    else:
+                        is_correct = q['check'](user_ans)
+
                     if is_correct:
                         st.session_state.s_correct = True
                         st.session_state.s_show_exp = True
@@ -122,8 +128,8 @@ with tabs[1]:
         with st.container(border=True):
             st.markdown('''
             <div class="landing-box">
-                <h3>🚨 데이터 전처리 실전 객관식 모의고사</h3>
-                <p style="color: #64748b; margin-top: 1rem;">본 모의고사는 실무 환경과 동일한 조건에서 역량을 평가하기 위해 시간 제한이 적용됩니다.</p>
+                <h3>🚨 데이터 전처리 실전 모의고사</h3>
+                <p style="color: #64748b; margin-top: 1rem;">본 모의고사는 실무 환경과 동일한 조건에서 역량을 평가하기 위해 시간 제한이 적용됩니다.<br><b>객관식 18문항, 주관식 2문항</b>이 출제됩니다.</p>
                 <div class="stats">
                     <div class="stat-item"><strong>20</strong>문항 수</div>
                     <div class="stat-item"><strong>40</strong>제한 시간 (분)</div>
@@ -152,10 +158,14 @@ with tabs[1]:
         with st.form("exam_form"):
             user_answers = []
             for i, q in enumerate(st.session_state.e_quizzes):
-                st.markdown(f"**Q{i+1:02d}. {q['topic']}**")
+                st.markdown(f"**Q{i+1:02d}. {q['topic']}** " + ("(주관식 ⌨️)" if q['type'] == 'text' else "(객관식 🖱️)"))
                 st.markdown(f"{q['question']}")
-                # 객관식으로 교체
-                ans = st.radio(f"보기 {i+1}", options=q['choices'], label_visibility="hidden", key=f"exam_ans_{i}", index=None)
+                
+                if q['type'] == 'radio':
+                    ans = st.radio(f"보기 {i+1}", options=q['choices'], label_visibility="hidden", key=f"exam_ans_{i}", index=None)
+                else:
+                    ans = st.text_input(f"답안 {i+1}", placeholder="코드를 직접 타이핑하세요", label_visibility="hidden", key=f"exam_ans_{i}")
+                    
                 user_answers.append(ans)
                 st.markdown("---")
             
@@ -163,8 +173,13 @@ with tabs[1]:
                 st.session_state.exam_end_time = time.time()
                 score = 0
                 for i, q in enumerate(st.session_state.e_quizzes):
-                    if user_answers[i] == q['expected']:
-                        score += 1
+                    if user_answers[i]:
+                        if q['type'] == 'radio':
+                            if user_answers[i] == q['expected']:
+                                score += 1
+                        else:
+                            if q['check'](user_answers[i]):
+                                score += 1
                 st.session_state.e_score = score
                 st.session_state.e_user_answers = user_answers
                 save_score(st.session_state.exam_name, st.session_state.e_score)
@@ -187,7 +202,13 @@ with tabs[1]:
         st.markdown("### 📊 상세 성적표 (Report Card)")
         for i, q in enumerate(st.session_state.e_quizzes):
             u_ans = st.session_state.e_user_answers[i]
-            is_cor = (u_ans == q['expected'])
+            if not u_ans:
+                is_cor = False
+            elif q['type'] == 'radio':
+                is_cor = (u_ans == q['expected'])
+            else:
+                is_cor = q['check'](u_ans)
+                
             css_class = "report-correct" if is_cor else "report-wrong"
             st.markdown(f'''<div class="{css_class}">
                 <strong>Q{i+1:02d}. {q['topic']}</strong><br>
