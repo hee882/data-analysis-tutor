@@ -3,13 +3,10 @@ def get_custom_css():
 <style>
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css');
 
-/* -------------------------------------------------------------
-   GLOBAL BASE
-------------------------------------------------------------- */
 html, body, [class*="css"], .stMarkdown, .stText, p, li, h1, h2, h3, h4, h5, h6, label, div, input, button {
     font-family: 'Pretendard Variable', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif !important;
     letter-spacing: -0.02em !important;
-    word-break: keep-all !important; /* ?? ??? ??? (? ??? ??) */
+    word-break: keep-all !important;
 }
 
 .stApp { 
@@ -25,15 +22,14 @@ html, body, [class*="css"], .stMarkdown, .stText, p, li, h1, h2, h3, h4, h5, h6,
 p, li, span, label { color: #334155 !important; line-height: 1.5 !important; }
 h1, h2, h3, h4, h5, strong { color: #0f172a !important; letter-spacing: -0.03em !important; margin-bottom: 0.3rem !important; }
 
-/* ?? ? ??? ?? ?? */
 header, footer, #MainMenu { visibility: hidden !important; height: 0 !important; }
 h1 { display: none; }
 html, body { overflow: hidden !important; }
 .stApp > header { display: none !important; }
 
-/* ?? ???? */
+/* ?? ???? - ?? ??? ?? padding-bottom 6rem ?? */
 .block-container { 
-    padding: 1.5rem 1rem !important; 
+    padding: 1.5rem 1rem 6rem 1rem !important; 
     max-width: 860px !important; 
     width: 100% !important;
     margin: 0 auto !important;
@@ -44,205 +40,112 @@ html, body { overflow: hidden !important; }
 div[data-testid="stVerticalBlock"] { gap: 1rem !important; }
 
 /* -------------------------------------------------------------
-   HEADER
+   HEADER (?? ?? ?? ??)
 ------------------------------------------------------------- */
 .custom-header {
     display: flex; 
-    flex-direction: row;
+    flex-direction: column;
     align-items: center; 
-    justify-content: flex-start;
-    gap: 1rem;
+    justify-content: center;
     padding: 0.5rem 0 1rem 0; 
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
     border-bottom: 1px solid rgba(0,0,0,0.05);
-    text-align: left; /* ??? ?? */
+    text-align: center;
+}
+.header-top-row {
+    display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 0.8rem; margin-bottom: 0.5rem;
 }
 .header-logo {
     width: 48px; height: 48px; 
     border-radius: 10px; 
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    flex-shrink: 0; /* ??? ????? ?? */
-}
-.header-text-box {
-    display: flex; flex-direction: column; justify-content: center;
+    flex-shrink: 0;
 }
 .header-title {
-    margin: 0 !important; font-size: 1.4rem !important; font-weight: 800 !important; color: #0f172a; line-height: 1.2 !important;
+    margin: 0 !important; font-size: 1.6rem !important; font-weight: 800 !important; color: #0f172a; line-height: 1.2 !important;
 }
 .header-subtitle {
-    font-size: 0.85rem; font-weight: 500; color: #64748b; line-height: 1.3 !important; margin-top: 0.2rem;
+    font-size: 0.9rem; font-weight: 500; color: #64748b; line-height: 1.4 !important; max-width: 80%;
 }
 
 /* -------------------------------------------------------------
-   TAB BAR (PC)
+   TAB BAR (?? ?? ?? - ???? ? ???)
 ------------------------------------------------------------- */
-[data-baseweb="tab-list"] { gap: 2rem; margin-bottom: 1.5rem; border-bottom: 2px solid rgba(0,0,0,0.05); display: flex; flex-wrap: wrap; }
-[data-baseweb="tab"] { font-size: 1.05rem !important; font-weight: 600 !important; color: #94a3b8 !important; padding-bottom: 0.8rem !important; padding-top: 0 !important; transition: all 0.3s ease; background: transparent !important; }
-[aria-selected="true"] { color: #0f172a !important; border-bottom: 3px solid #3b82f6 !important; }
+[data-baseweb="tab-list"] {
+    position: fixed !important; bottom: 0 !important; left: 0 !important; right: 0 !important;
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(32px) saturate(180%) !important; -webkit-backdrop-filter: blur(32px) saturate(180%) !important;
+    border-top: 1px solid rgba(0,0,0,0.08) !important; border-bottom: none !important;
+    padding: 0.5rem 0.5rem 1rem 0.5rem !important; margin: 0 !important; z-index: 9999 !important;
+    display: flex !important; justify-content: center !important; gap: 0 !important;
+    box-shadow: 0 -8px 24px rgba(0,0,0,0.06) !important;
+}
+[data-baseweb="tab"] { flex: 1 !important; max-width: 250px !important; text-align: center !important; justify-content: center !important; font-size: 0.95rem !important; padding: 0.5rem 0 !important; flex-direction: column !important; transition: all 0.2s ease !important; }
+[aria-selected="true"] { border-bottom: none !important; color: #3b82f6 !important; border-top: 3px solid #3b82f6 !important; background: rgba(59, 130, 246, 0.05) !important; border-radius: 8px 8px 0 0 !important; }
+[aria-selected="false"] { border-top: 3px solid transparent !important; border-bottom: none !important; color: #64748b !important; }
 
 /* -------------------------------------------------------------
-   MAIN CARDS (?? ????)
+   MAIN CARDS
 ------------------------------------------------------------- */
 [data-testid="stVerticalBlockBorderWrapper"], .exam-card {
     background: rgba(255, 255, 255, 0.4) !important;
-    backdrop-filter: blur(24px) saturate(180%) !important;
-    -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.8) !important;
-    border-radius: 20px !important;
+    backdrop-filter: blur(24px) saturate(180%) !important; -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.8) !important; border-radius: 20px !important;
     box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.08), inset 0 0 0 1px rgba(255,255,255,0.5) !important;
-    padding: 2rem 2.5rem !important; 
-    margin-bottom: 1.5rem !important;
-    text-align: left !important;
+    padding: 2rem 2.5rem !important; margin-bottom: 1.5rem !important; text-align: left !important;
 }
 [data-testid="stVerticalBlockBorderWrapper"] p { margin-bottom: 1rem !important; font-size: 1.1rem !important; text-align: left !important; }
 
 /* -------------------------------------------------------------
-   RADIO BUTTONS (??? ??)
+   RADIO BUTTONS
 ------------------------------------------------------------- */
-div[role="radiogroup"] { 
-    gap: 0.8rem !important; 
-    margin-top: 1rem !important; 
-    margin-bottom: 1rem !important; 
-    width: 100% !important; 
-    display: flex !important; 
-    flex-direction: column !important; 
-    align-items: stretch !important; 
-}
+div[role="radiogroup"] { gap: 0.8rem !important; margin-top: 1rem !important; margin-bottom: 1rem !important; width: 100% !important; display: flex !important; flex-direction: column !important; align-items: stretch !important; }
 div[role="radiogroup"] > label {
-    background: rgba(255, 255, 255, 0.5) !important;
-    backdrop-filter: blur(12px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.9) !important;
-    border-radius: 14px !important;
-    padding: 1rem 1.5rem !important;
-    width: 100% !important;
-    min-height: 3.8rem !important;
-    box-sizing: border-box !important;
-    cursor: pointer !important;
-    margin-bottom: 0 !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.03) !important;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: flex-start !important; /* ?? ?? ?? */
-    text-align: left !important;
+    background: rgba(255, 255, 255, 0.5) !important; backdrop-filter: blur(12px) !important; border: 1px solid rgba(255, 255, 255, 0.9) !important;
+    border-radius: 14px !important; padding: 1rem 1.5rem !important; width: 100% !important; min-height: 3.8rem !important;
+    box-sizing: border-box !important; cursor: pointer !important; margin-bottom: 0 !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03) !important; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: flex-start !important; text-align: left !important;
 }
-div[role="radiogroup"] > label:hover { 
-    background: rgba(255, 255, 255, 0.95) !important; 
-    border-color: #cbd5e1 !important; 
-    transform: scale(1.015) !important; 
-    box-shadow: 0 8px 20px rgba(0,0,0,0.08) !important;
-}
-div[role="radiogroup"] > label[data-checked="true"] { 
-    border-color: #3b82f6 !important; 
-    background: #ffffff !important; 
-    box-shadow: 0 0 0 2px #3b82f6, 0 8px 20px rgba(59, 130, 246, 0.15) !important; 
-    transform: scale(1.01) !important;
-}
+div[role="radiogroup"] > label:hover { background: rgba(255, 255, 255, 0.95) !important; border-color: #cbd5e1 !important; transform: scale(1.015) !important; box-shadow: 0 8px 20px rgba(0,0,0,0.08) !important; }
+div[role="radiogroup"] > label[data-checked="true"] { border-color: #3b82f6 !important; background: #ffffff !important; box-shadow: 0 0 0 2px #3b82f6, 0 8px 20px rgba(59, 130, 246, 0.15) !important; transform: scale(1.01) !important; }
 div[role="radiogroup"] > label > div:first-child { display: none !important; } 
-div[role="radiogroup"] > label > div:nth-child(2) {
-    font-family: 'JetBrains Mono', 'D2Coding', monospace !important;
-    font-size: 1.05rem !important;
-    color: #1e293b !important;
-    font-weight: 600 !important;
-    margin-left: 0 !important;
-    text-align: left !important;
-    width: 100% !important; /* ?? ?? ?? ?? */
-}
+div[role="radiogroup"] > label > div:nth-child(2) { font-family: 'JetBrains Mono', 'D2Coding', monospace !important; font-size: 1.05rem !important; color: #1e293b !important; font-weight: 600 !important; margin-left: 0 !important; text-align: left !important; width: 100% !important; }
 
 /* -------------------------------------------------------------
    BUTTONS & INPUTS
 ------------------------------------------------------------- */
-.stButton > button { 
-    background-color: rgba(15, 23, 42, 0.85) !important; 
-    border-radius: 12px !important; 
-    padding: 0.6rem 1.2rem !important; 
-    font-size: 1.05rem !important; 
-    font-weight: 600 !important;
-    width: 100%; 
-    margin-top: 1rem !important; 
-    border: none !important;
-    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15) !important;
-    transition: all 0.2s ease !important;
-}
+.stButton > button { background-color: rgba(15, 23, 42, 0.85) !important; border-radius: 12px !important; padding: 0.6rem 1.2rem !important; font-size: 1.05rem !important; font-weight: 600 !important; width: 100%; margin-top: 1rem !important; border: none !important; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15) !important; transition: all 0.2s ease !important; }
 .stButton > button p, .stButton > button span, .stButton > button div { color: #ffffff !important; }
 .stButton > button:hover { transform: scale(1.01) !important; box-shadow: 0 6px 16px rgba(15, 23, 42, 0.25) !important; background-color: #0f172a !important; }
 [data-testid="stButton"] button[kind="primary"] { background-color: rgba(59, 130, 246, 0.9) !important; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2) !important; }
 [data-testid="stButton"] button[kind="primary"]:hover { background-color: #2563eb !important; box-shadow: 0 6px 16px rgba(59, 130, 246, 0.35) !important; }
-
-div[data-testid="stTextInput"] input {
-    background: rgba(255, 255, 255, 0.6) !important;
-    border: 2px solid rgba(255,255,255,0.8) !important;
-    border-radius: 12px !important;
-    padding: 1rem 1.2rem !important;
-    font-family: 'JetBrains Mono', monospace !important;
-    font-size: 1.1rem !important;
-    box-shadow: inset 0 2px 6px rgba(0,0,0,0.02) !important;
-    text-align: left !important;
-}
+div[data-testid="stTextInput"] input { background: rgba(255, 255, 255, 0.6) !important; border: 2px solid rgba(255,255,255,0.8) !important; border-radius: 12px !important; padding: 1rem 1.2rem !important; font-family: 'JetBrains Mono', monospace !important; font-size: 1.1rem !important; box-shadow: inset 0 2px 6px rgba(0,0,0,0.02) !important; text-align: left !important; }
 div[data-testid="stTextInput"] input:focus { background: #ffffff !important; border-color: #3b82f6 !important; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15), inset 0 2px 6px rgba(0,0,0,0.01) !important; }
 
 /* -------------------------------------------------------------
-   HUD (?? ?? ????)
+   HUD & FLOATING EXP
 ------------------------------------------------------------- */
 .hud-container { display: flex; justify-content: flex-end; align-items: center; gap: 0.8rem; margin-bottom: 1rem; flex-wrap: wrap; }
-.hud-badge {
-    background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.9);
-    padding: 0.4rem 1rem; border-radius: 99px; font-size: 0.9rem; font-weight: 700; color: #1e293b;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.04); display: flex; align-items: center;
-}
+.hud-badge { background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.9); padding: 0.4rem 1rem; border-radius: 99px; font-size: 0.9rem; font-weight: 700; color: #1e293b; box-shadow: 0 4px 12px rgba(0,0,0,0.04); display: flex; align-items: center; }
 .hud-badge span { color: #3b82f6; font-weight: 800; margin-left: 0.3rem; }
 
-/* -------------------------------------------------------------
-   FLOATING EXPLANATION (??)
-------------------------------------------------------------- */
-.floating-exp {
-    position: fixed; top: 20%; right: 3rem; width: 360px;
-    background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(24px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.9); border-radius: 20px;
-    box-shadow: 0 16px 40px rgba(31, 38, 135, 0.15), inset 0 0 0 1px rgba(255,255,255,0.5);
-    padding: 1.5rem; z-index: 9999; text-align: left;
-    animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
+.floating-exp { position: fixed; top: 20%; right: 3rem; width: 360px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(24px) saturate(180%); border: 1px solid rgba(255, 255, 255, 0.9); border-radius: 20px; box-shadow: 0 16px 40px rgba(31, 38, 135, 0.15), inset 0 0 0 1px rgba(255,255,255,0.5); padding: 1.5rem; z-index: 9999; text-align: left; animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
 @keyframes slideInRight { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
 
 /* -------------------------------------------------------------
-   MOBILE RESPONSIVE (??? ???)
+   MOBILE RESPONSIVE
 ------------------------------------------------------------- */
 @media screen and (max-width: 768px) {
-    /* ???? ??: ??? ?? ??? ?? */
-    .block-container { padding: 1rem 1.2rem 6rem 1.2rem !important; }
-    
-    /* ??: ?? ?? ?? ? ?? ?? */
-    .custom-header { gap: 0.8rem; padding: 0.2rem 0 1rem 0; align-items: flex-start; }
+    .block-container { padding: 1rem 1.2rem 6.5rem 1.2rem !important; }
     .header-logo { width: 40px; height: 40px; }
-    .header-title { font-size: 1.2rem !important; line-height: 1.3 !important; }
-    .header-subtitle { font-size: 0.8rem !important; margin-top: 0.3rem; }
-    
-    /* ?? ??: ?? ??? ?? ?? ?? ? ?? ?? */
+    .header-title { font-size: 1.3rem !important; }
+    .header-subtitle { max-width: 100%; font-size: 0.85rem !important; }
     [data-testid="stVerticalBlockBorderWrapper"], .exam-card { padding: 1.5rem 1.2rem !important; border-radius: 16px !important; }
-    
-    /* ??? ??: ??? ??? ? ?? ?? ?? ?? */
     div[role="radiogroup"] > label { padding: 0.8rem 1rem !important; min-height: 3rem !important; }
     div[role="radiogroup"] > label > div:nth-child(2) { font-size: 0.95rem !important; }
-    
-    /* HUD ??: ???? ???? ??? ???? ?? */
     .hud-container { justify-content: flex-start; gap: 0.5rem; }
     .hud-badge { padding: 0.3rem 0.8rem; font-size: 0.8rem; }
-    
-    /* ?? ?? (Bottom Nav) */
-    [data-baseweb="tab-list"] {
-        position: fixed !important; bottom: 0 !important; left: 0 !important; right: 0 !important;
-        background: rgba(255, 255, 255, 0.95) !important;
-        backdrop-filter: blur(24px) saturate(180%) !important; -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
-        border-top: 1px solid rgba(0,0,0,0.08) !important; border-bottom: none !important;
-        padding: 0.5rem 0.5rem 1.5rem 0.5rem !important; margin: 0 !important; z-index: 9999 !important;
-        display: flex !important; justify-content: space-around !important; gap: 0 !important;
-        box-shadow: 0 -8px 24px rgba(0,0,0,0.06) !important;
-    }
-    [data-baseweb="tab"] { flex: 1 !important; text-align: center !important; justify-content: center !important; font-size: 0.85rem !important; padding: 0.5rem 0 !important; flex-direction: column !important; }
-    [aria-selected="true"] { border-bottom: none !important; color: #3b82f6 !important; border-top: 3px solid #3b82f6 !important; background: rgba(59, 130, 246, 0.05) !important; border-radius: 8px 8px 0 0 !important; }
-    [aria-selected="false"] { border-top: 3px solid transparent !important; border-bottom: none !important; }
 }
 
 @media screen and (max-width: 1400px) {
