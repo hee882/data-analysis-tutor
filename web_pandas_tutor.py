@@ -28,8 +28,8 @@ st.markdown(f'''
 ''', unsafe_allow_html=True)
 
 # 상단 글로벌 모드 스위처
-# ??? ?? ???? ?? ?? (st.radio ?? ?? ??)
-is_comp_mode = st.toggle("?? ?? ??? ?? ???", value=(st.session_state.current_strategy == "comprehensive"))
+# 심플한 토글 스위치로 모드 변경 (st.radio 충돌 원천 차단)
+is_comp_mode = st.toggle("🔥 종합 마스터 모드 활성화", value=(st.session_state.current_strategy == "comprehensive"))
 selected_mode = "comprehensive" if is_comp_mode else "bootcamp_day1_4"
 
 if st.session_state.current_strategy != selected_mode:
@@ -101,6 +101,15 @@ with tabs[0]:
             
         if st.session_state.s_attempts > 0 and not st.session_state.s_show_exp:
             st.error(f"❌ 오답입니다. (남은 기회: {3 - st.session_state.s_attempts}번)")
+            
+            # Progressive Hints
+            exp_text = q['explanation']
+            if st.session_state.s_attempts == 1:
+                hint = exp_text[:max(10, len(exp_text)//4)] + "..."
+                st.warning(f"💡 [힌트 1단계] {hint}")
+            elif st.session_state.s_attempts == 2:
+                hint = exp_text[:max(20, len(exp_text)*2//3)] + "..."
+                st.warning(f"💡 [힌트 2단계] {hint}")
     else:
         if st.session_state.s_correct:
             st.success("✅ 정답입니다!")

@@ -44,8 +44,8 @@ header, footer, #MainMenu {{ display: none !important; }}
 ------------------------------------------------------------- */
 .block-container {{ 
     padding: 1rem 1rem 6rem 1rem !important; 
-    max-width: 860px !important; 
-    margin: 0 auto !important;
+    max-width: 650px !important; 
+    margin: 0 auto 0 10% !important;
     overflow-x: hidden !important;
 }}
 div[data-testid="stVerticalBlock"] {{ gap: 1rem !important; }}
@@ -62,7 +62,7 @@ div[data-testid="stVerticalBlock"] {{ gap: 1rem !important; }}
 .header-title {{ margin: 0 !important; font-size: 1.6rem !important; font-weight: 800 !important; color: #0f172a; line-height: 1.2 !important; }}
 .header-subtitle {{ font-size: 0.9rem; font-weight: 500; color: #64748b; line-height: 1.4 !important; max-width: 80%; }}
 
-/* ??? ??? (Toggle) ?? ?? */
+/* 글로벌 스위처 (Toggle) 중앙 정렬 */
 div[data-testid="stToggle"] {{
     display: flex !important; justify-content: center !important; margin-bottom: 1rem !important;
 }}
@@ -130,11 +130,32 @@ div[role="radiogroup"] > label > div:nth-child(2) {{ font-family: 'JetBrains Mon
 [data-testid="stButton"] button[kind="primary"] {{ background-color: {active_color} !important; box-shadow: 0 6px 16px rgba(0,0,0,0.2) !important; }}
 [data-testid="stButton"] button[kind="primary"]:hover {{ filter: brightness(0.9); box-shadow: 0 8px 24px rgba(0,0,0,0.3) !important; }}
 
+
+/* -------------------------------------------------------------
+   DESKTOP EXPLANATION BOX (Right Side)
+------------------------------------------------------------- */
+.floating-exp { 
+    position: fixed; 
+    top: 15%; 
+    right: 3rem; 
+    width: 450px; 
+    background: rgba(255, 255, 255, 0.85); 
+    backdrop-filter: blur(32px) saturate(200%); 
+    -webkit-backdrop-filter: blur(32px) saturate(200%);
+    border: 1px solid rgba(255, 255, 255, 0.8); 
+    border-radius: 24px; 
+    box-shadow: 0 24px 64px rgba(31, 38, 135, 0.15), inset 0 1px 2px rgba(255,255,255,1); 
+    padding: 2rem; 
+    z-index: 9999; 
+    text-align: left; 
+    animation: slideInRight 0.5s cubic-bezier(0.16, 1, 0.3, 1); 
+}
+
 /* -------------------------------------------------------------
    MOBILE EXTREME OPTIMIZATION (??)
 ------------------------------------------------------------- */
 @media screen and (max-width: 768px) {{
-    .block-container {{ padding: 0.5rem 0.8rem 4rem 0.8rem !important; }}
+    .block-container {{ padding: 0.5rem 0.8rem 4rem 0.8rem !important; margin: 0 auto !important; }}
     
     .custom-header {{ flex-direction: row !important; align-items: center !important; justify-content: flex-start !important; gap: 0.5rem !important; margin-bottom: 0.5rem !important; padding: 0 !important; text-align: left !important; }}
     .header-top-row {{ margin: 0 !important; gap: 0.5rem !important; justify-content: flex-start !important; }}
@@ -163,3 +184,4 @@ div[role="radiogroup"] > label > div:nth-child(2) {{ font-family: 'JetBrains Mon
 }}
 </style>
 """
+ 
