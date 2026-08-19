@@ -15,7 +15,6 @@ st.set_page_config(page_title="Data Analysis Tutor", layout="wide")
 
 st.markdown('''
 <style>
-/* 1. 최상급 폰트 설정 (Pretendard 기반) */
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css');
 
 html, body, [class*="css"], .stMarkdown, .stText, p, li, h1, h2, h3, h4, h5, h6, label, div, input, button {
@@ -23,210 +22,80 @@ html, body, [class*="css"], .stMarkdown, .stText, p, li, h1, h2, h3, h4, h5, h6,
     letter-spacing: -0.02em !important;
 }
 
-/* 2. 전역 배경 및 기본 텍스트 톤 조율 (눈이 편안한 SaaS 스타일) */
-.stApp { 
-    background-color: #f8fafc; /* 매우 옅은 쿨그레이 */
-}
-p, li, span, label {
-    color: #475569 !important; /* 부드러운 슬레이트 그레이 */
-    line-height: 1.6 !important;
-}
-h1, h2, h3, h4, h5, strong {
-    color: #0f172a !important; /* 거의 검은색에 가까운 네이비 */
-    letter-spacing: -0.03em !important;
-}
+.stApp { background-color: #f8fafc; }
+p, li, span, label { color: #475569 !important; line-height: 1.6 !important; }
+h1, h2, h3, h4, h5, strong { color: #0f172a !important; letter-spacing: -0.03em !important; }
 
-/* 3. Streamlit 기본 요소 강제 숨김 */
 header, footer, #MainMenu { visibility: hidden !important; }
-h1 { display: none; } /* 기존 거대 타이틀 숨김 */
+h1 { display: none; }
+html, body { overflow-y: scroll !important; }
 
-/* 4. 메인 컨테이너 규격 최적화 */
 .block-container { 
     padding-top: 2rem !important; 
     padding-bottom: 4rem !important; 
-    max-width: 1000px !important; /* 너무 넓지 않은 최적의 리딩 너비 */
+    max-width: 1000px !important; 
     width: 85% !important;
     margin: 0 auto !important;
     min-height: 85vh !important;
 }
 
-/* 5. 커스텀 헤더 (모던 앱 내비게이션 바 형태) */
 .custom-header {
-    background-color: transparent;
-    padding: 1rem 0 2rem 0;
-    margin-bottom: 2rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    border-bottom: 1px solid #e2e8f0;
+    background-color: transparent; padding: 1rem 0 2rem 0; margin-bottom: 2rem;
+    display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid #e2e8f0;
 }
-.custom-header h2 { 
-    margin: 0 !important; 
-    font-size: 1.6rem !important; 
-    font-weight: 800 !important; 
-}
-.custom-header span { 
-    font-size: 0.85rem; 
-    font-weight: 600; 
-    color: #3b82f6; 
-    background-color: #eff6ff; 
-    padding: 0.3rem 0.8rem; 
-    border-radius: 99px; 
-}
+.custom-header h2 { margin: 0 !important; font-size: 1.6rem !important; font-weight: 800 !important; }
+.custom-header span { font-size: 0.85rem; font-weight: 600; color: #3b82f6; background-color: #eff6ff; padding: 0.3rem 0.8rem; border-radius: 99px; }
 
-/* 6. 탭(Tab) 메뉴 UI 고급화 */
 [data-baseweb="tab-list"] {
-    gap: 2rem;
-    margin-bottom: 2rem;
-    border-bottom: 2px solid #f1f5f9;
+    gap: 2rem; margin-bottom: 2rem; border-bottom: 2px solid #f1f5f9; display: flex; flex-wrap: wrap;
 }
-[data-baseweb="tab"] {
-    font-size: 1.05rem !important;
-    font-weight: 600 !important;
-    color: #94a3b8 !important;
-    padding-bottom: 0.8rem !important;
-    padding-top: 0 !important;
-    transition: color 0.2s ease;
-}
-[aria-selected="true"] {
-    color: #0f172a !important;
-    border-bottom: 3px solid #0f172a !important;
-}
+[data-baseweb="tab"] { font-size: 1.05rem !important; font-weight: 600 !important; color: #94a3b8 !important; padding-bottom: 0.8rem !important; padding-top: 0 !important; transition: color 0.2s ease; }
+[aria-selected="true"] { color: #0f172a !important; border-bottom: 3px solid #0f172a !important; }
+[data-baseweb="tab-panel"] { min-height: 60vh !important; }
 
-/* 7. 메인 카드(문제 박스 등) 디자인 */
 [data-testid="stVerticalBlockBorderWrapper"], .exam-card {
-    background-color: #ffffff;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.04) !important;
-    border: 1px solid #e2e8f0 !important;
-    padding: 2.5rem !important;
-    margin-bottom: 2.5rem;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background-color: #ffffff; border-radius: 16px; box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.04) !important;
+    border: 1px solid #e2e8f0 !important; padding: 2.5rem !important; margin-bottom: 2.5rem; transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-[data-testid="stVerticalBlockBorderWrapper"]:hover {
-    box-shadow: 0 10px 30px -4px rgba(15, 23, 42, 0.08) !important;
-}
+[data-testid="stVerticalBlockBorderWrapper"]:hover { box-shadow: 0 10px 30px -4px rgba(15, 23, 42, 0.08) !important; }
 
-/* 8. 입력창(Input) 포커스 및 호버 개선 (Streamlit 기본 붉은색 제거) */
-div[data-baseweb="input"] {
-    border-radius: 10px !important;
-    border: 1px solid #cbd5e1 !important;
-    background-color: #f8fafc !important;
-    transition: all 0.2s ease !important;
-}
-div[data-baseweb="input"]:focus-within {
-    border-color: #3b82f6 !important;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
-    background-color: #ffffff !important;
-}
-input {
-    color: #0f172a !important;
-    font-weight: 500 !important;
-    font-size: 1.05rem !important;
-}
+div[data-baseweb="input"] { border-radius: 10px !important; border: 1px solid #cbd5e1 !important; background-color: #f8fafc !important; transition: all 0.2s ease !important; }
+div[data-baseweb="input"]:focus-within { border-color: #3b82f6 !important; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important; background-color: #ffffff !important; }
+input { color: #0f172a !important; font-weight: 500 !important; font-size: 1.05rem !important; }
 
-/* 9. 버튼(Button) 프리미엄 액션 스타일 */
-.stButton > button {
-    background-color: #0f172a !important; /* Primary를 고급스러운 다크 네이비로 */
-    color: #ffffff !important;
-    border: none !important;
-    border-radius: 10px !important;
-    padding: 0.6rem 1.5rem !important;
-    font-size: 1.05rem !important;
-    font-weight: 600 !important;
-    width: 100%;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
-.stButton > button:hover {
-    background-color: #1e293b !important;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 16px -4px rgba(15, 23, 42, 0.25) !important;
-}
-.stButton > button:active {
-    transform: translateY(0);
-    box-shadow: none !important;
-}
-/* Secondary 버튼 (일반 버튼) 톤다운 */
-[data-testid="stButton"] button:not(:disabled) {
-    background-color: #f1f5f9 !important;
-    color: #334155 !important;
-    border: 1px solid #e2e8f0 !important;
-    box-shadow: none !important;
-}
-[data-testid="stButton"] button:not(:disabled):hover {
-    background-color: #e2e8f0 !important;
-    border-color: #cbd5e1 !important;
-}
-/* Primary 버튼 속성 복구 */
-[data-testid="stButton"] button[kind="primary"] {
-    background-color: #3b82f6 !important;
-    color: white !important;
-    border: none !important;
-}
-[data-testid="stButton"] button[kind="primary"]:hover {
-    background-color: #2563eb !important;
-    box-shadow: 0 8px 16px -4px rgba(59, 130, 246, 0.3) !important;
-}
+.stButton > button { background-color: #0f172a !important; color: #ffffff !important; border: none !important; border-radius: 10px !important; padding: 0.6rem 1.5rem !important; font-size: 1.05rem !important; font-weight: 600 !important; width: 100%; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important; }
+.stButton > button:hover { background-color: #1e293b !important; transform: translateY(-2px); box-shadow: 0 8px 16px -4px rgba(15, 23, 42, 0.25) !important; }
+.stButton > button:active { transform: translateY(0); box-shadow: none !important; }
+[data-testid="stButton"] button:not(:disabled) { background-color: #f1f5f9 !important; color: #334155 !important; border: 1px solid #e2e8f0 !important; box-shadow: none !important; }
+[data-testid="stButton"] button:not(:disabled):hover { background-color: #e2e8f0 !important; border-color: #cbd5e1 !important; }
+[data-testid="stButton"] button[kind="primary"] { background-color: #3b82f6 !important; color: white !important; border: none !important; }
+[data-testid="stButton"] button[kind="primary"]:hover { background-color: #2563eb !important; box-shadow: 0 8px 16px -4px rgba(59, 130, 246, 0.3) !important; }
 
-/* 10. 프로그레스 바(Progress Bar) */
-.stProgress > div > div > div > div {
-    background-color: #3b82f6 !important;
-    border-radius: 99px !important;
-}
+.stProgress > div > div > div > div { background-color: #3b82f6 !important; border-radius: 99px !important; }
+[data-testid="stAlert"] { border-radius: 12px; border: none !important; box-shadow: 0 2px 8px rgba(0,0,0,0.02) !important; }
+code { font-family: 'JetBrains Mono', 'D2Coding', monospace !important; font-size: 0.95rem !important; color: #0284c7 !important; background-color: #f0f9ff !important; padding: 0.2rem 0.4rem !important; border-radius: 6px !important; border: 1px solid #e0f2fe; }
 
-/* 11. 알림 박스 (Success, Error, Info) 플랫 디자인 */
-[data-testid="stAlert"] {
-    border-radius: 12px;
-    border: none !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.02) !important;
-}
+.report-correct { border-left: 4px solid #10b981 !important; background-color: #f0fdf4; padding: 1.2rem; border-radius: 0 8px 8px 0; margin-bottom: 1rem; }
+.report-wrong { border-left: 4px solid #ef4444 !important; background-color: #fef2f2; padding: 1.2rem; border-radius: 0 8px 8px 0; margin-bottom: 1rem; }
 
-/* 12. 코드 블록 스타일링 */
-code {
-    font-family: 'JetBrains Mono', 'D2Coding', monospace !important;
-    font-size: 0.95rem !important;
-    color: #0284c7 !important;
-    background-color: #f0f9ff !important;
-    padding: 0.2rem 0.4rem !important;
-    border-radius: 6px !important;
-    border: 1px solid #e0f2fe;
-}
+.landing-box { text-align: center; padding: 3rem 1rem; }
+.landing-box h3 { font-size: 2rem !important; color: #0f172a !important; }
+.landing-box .stats { display: flex; justify-content: center; gap: 3rem; margin: 2rem 0; }
+.landing-box .stat-item { background: #f1f5f9; padding: 1.5rem; border-radius: 16px; min-width: 150px; }
+.landing-box .stat-item strong { display: block; font-size: 2rem; color: #2563eb; margin-bottom: 0.5rem; }
 
-/* 13. 성적표 리포트 스타일 */
-.report-correct { 
-    border-left: 4px solid #10b981 !important; 
-    background-color: #f0fdf4;
-    padding: 1.2rem; 
-    border-radius: 0 8px 8px 0;
-    margin-bottom: 1rem; 
-}
-.report-wrong { 
-    border-left: 4px solid #ef4444 !important; 
-    background-color: #fef2f2;
-    padding: 1.2rem; 
-    border-radius: 0 8px 8px 0;
-    margin-bottom: 1rem; 
-}
-
-/* ==========================================
-   모바일 최적화 (iPhone 대응)
-   ========================================== */
 @media screen and (max-width: 768px) {
-    .block-container { 
-        width: 100% !important; 
-        padding: 1rem !important;
-    }
-    .custom-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.8rem;
-        padding-bottom: 1rem;
-    }
-    [data-testid="stVerticalBlockBorderWrapper"] {
-        padding: 1.5rem 1rem !important;
-    }
-    [data-baseweb="tab-list"] { gap: 1rem !important; }
-    [data-baseweb="tab"] { font-size: 0.95rem !important; }
+    .block-container { width: 100% !important; padding: 1rem !important; }
+    .custom-header { flex-direction: column; align-items: flex-start; gap: 0.8rem; padding-bottom: 1rem; }
+    [data-testid="stVerticalBlockBorderWrapper"], .exam-card { padding: 1.5rem 1rem !important; }
+    .landing-box h3 { font-size: 1.5rem !important; }
+    .landing-box .stats { flex-direction: column; gap: 0.8rem !important; margin: 1rem 0 !important; }
+    .landing-box .stat-item { padding: 1rem; min-width: auto; }
+    h3 { font-size: 1.1rem !important; }
+    p, .stRadio label span, code { font-size: 0.95rem !important; }
+    .stButton > button { font-size: 0.95rem !important; padding: 0.5rem 1rem !important; }
+    [data-baseweb="tab-list"] { gap: 0.5rem !important; display: flex !important; flex-wrap: wrap !important; }
+    [data-baseweb="tab"] { font-size: 0.9rem !important; padding: 0 0.5rem !important; }
 }
 </style>
 ''', unsafe_allow_html=True)
@@ -285,7 +154,7 @@ def generate_exam_cycle():
            [random.choice(hard_factories)() for _ in range(3)]
 
 # ==========================================
-# 3. 리더보드 로직 (Supabase 연동)
+# 3. 리더보드 로직
 # ==========================================
 def get_supabase_client():
     try:
@@ -323,231 +192,24 @@ def save_score(name, score):
         json.dump(lb, f, ensure_ascii=False, indent=4)
     return True
 
-# JS 타이머 주입 함수
 def inject_timer(time_limit_sec, start_timestamp):
     html_code = f"""
-    <style>
-/* 1. 최상급 폰트 설정 (Pretendard 기반) */
-@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css');
-
-html, body, [class*="css"], .stMarkdown, .stText, p, li, h1, h2, h3, h4, h5, h6, label, div, input, button {
-    font-family: 'Pretendard Variable', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif !important;
-    letter-spacing: -0.02em !important;
-}
-
-/* 2. 전역 배경 및 기본 텍스트 톤 조율 (눈이 편안한 SaaS 스타일) */
-.stApp { 
-    background-color: #f8fafc; /* 매우 옅은 쿨그레이 */
-}
-p, li, span, label {
-    color: #475569 !important; /* 부드러운 슬레이트 그레이 */
-    line-height: 1.6 !important;
-}
-h1, h2, h3, h4, h5, strong {
-    color: #0f172a !important; /* 거의 검은색에 가까운 네이비 */
-    letter-spacing: -0.03em !important;
-}
-
-/* 3. Streamlit 기본 요소 강제 숨김 */
-header, footer, #MainMenu { visibility: hidden !important; }
-h1 { display: none; } /* 기존 거대 타이틀 숨김 */
-
-/* 4. 메인 컨테이너 규격 최적화 */
-.block-container { 
-    padding-top: 2rem !important; 
-    padding-bottom: 4rem !important; 
-    max-width: 1000px !important; /* 너무 넓지 않은 최적의 리딩 너비 */
-    width: 85% !important;
-    margin: 0 auto !important;
-    min-height: 85vh !important;
-}
-
-/* 5. 커스텀 헤더 (모던 앱 내비게이션 바 형태) */
-.custom-header {
-    background-color: transparent;
-    padding: 1rem 0 2rem 0;
-    margin-bottom: 2rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    border-bottom: 1px solid #e2e8f0;
-}
-.custom-header h2 { 
-    margin: 0 !important; 
-    font-size: 1.6rem !important; 
-    font-weight: 800 !important; 
-}
-.custom-header span { 
-    font-size: 0.85rem; 
-    font-weight: 600; 
-    color: #3b82f6; 
-    background-color: #eff6ff; 
-    padding: 0.3rem 0.8rem; 
-    border-radius: 99px; 
-}
-
-/* 6. 탭(Tab) 메뉴 UI 고급화 */
-[data-baseweb="tab-list"] {
-    gap: 2rem;
-    margin-bottom: 2rem;
-    border-bottom: 2px solid #f1f5f9;
-}
-[data-baseweb="tab"] {
-    font-size: 1.05rem !important;
-    font-weight: 600 !important;
-    color: #94a3b8 !important;
-    padding-bottom: 0.8rem !important;
-    padding-top: 0 !important;
-    transition: color 0.2s ease;
-}
-[aria-selected="true"] {
-    color: #0f172a !important;
-    border-bottom: 3px solid #0f172a !important;
-}
-
-/* 7. 메인 카드(문제 박스 등) 디자인 */
-[data-testid="stVerticalBlockBorderWrapper"], .exam-card {
-    background-color: #ffffff;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.04) !important;
-    border: 1px solid #e2e8f0 !important;
-    padding: 2.5rem !important;
-    margin-bottom: 2.5rem;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-[data-testid="stVerticalBlockBorderWrapper"]:hover {
-    box-shadow: 0 10px 30px -4px rgba(15, 23, 42, 0.08) !important;
-}
-
-/* 8. 입력창(Input) 포커스 및 호버 개선 (Streamlit 기본 붉은색 제거) */
-div[data-baseweb="input"] {
-    border-radius: 10px !important;
-    border: 1px solid #cbd5e1 !important;
-    background-color: #f8fafc !important;
-    transition: all 0.2s ease !important;
-}
-div[data-baseweb="input"]:focus-within {
-    border-color: #3b82f6 !important;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
-    background-color: #ffffff !important;
-}
-input {
-    color: #0f172a !important;
-    font-weight: 500 !important;
-    font-size: 1.05rem !important;
-}
-
-/* 9. 버튼(Button) 프리미엄 액션 스타일 */
-.stButton > button {
-    background-color: #0f172a !important; /* Primary를 고급스러운 다크 네이비로 */
-    color: #ffffff !important;
-    border: none !important;
-    border-radius: 10px !important;
-    padding: 0.6rem 1.5rem !important;
-    font-size: 1.05rem !important;
-    font-weight: 600 !important;
-    width: 100%;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
-.stButton > button:hover {
-    background-color: #1e293b !important;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 16px -4px rgba(15, 23, 42, 0.25) !important;
-}
-.stButton > button:active {
-    transform: translateY(0);
-    box-shadow: none !important;
-}
-/* Secondary 버튼 (일반 버튼) 톤다운 */
-[data-testid="stButton"] button:not(:disabled) {
-    background-color: #f1f5f9 !important;
-    color: #334155 !important;
-    border: 1px solid #e2e8f0 !important;
-    box-shadow: none !important;
-}
-[data-testid="stButton"] button:not(:disabled):hover {
-    background-color: #e2e8f0 !important;
-    border-color: #cbd5e1 !important;
-}
-/* Primary 버튼 속성 복구 */
-[data-testid="stButton"] button[kind="primary"] {
-    background-color: #3b82f6 !important;
-    color: white !important;
-    border: none !important;
-}
-[data-testid="stButton"] button[kind="primary"]:hover {
-    background-color: #2563eb !important;
-    box-shadow: 0 8px 16px -4px rgba(59, 130, 246, 0.3) !important;
-}
-
-/* 10. 프로그레스 바(Progress Bar) */
-.stProgress > div > div > div > div {
-    background-color: #3b82f6 !important;
-    border-radius: 99px !important;
-}
-
-/* 11. 알림 박스 (Success, Error, Info) 플랫 디자인 */
-[data-testid="stAlert"] {
-    border-radius: 12px;
-    border: none !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.02) !important;
-}
-
-/* 12. 코드 블록 스타일링 */
-code {
-    font-family: 'JetBrains Mono', 'D2Coding', monospace !important;
-    font-size: 0.95rem !important;
-    color: #0284c7 !important;
-    background-color: #f0f9ff !important;
-    padding: 0.2rem 0.4rem !important;
-    border-radius: 6px !important;
-    border: 1px solid #e0f2fe;
-}
-
-/* 13. 성적표 리포트 스타일 */
-.report-correct { 
-    border-left: 4px solid #10b981 !important; 
-    background-color: #f0fdf4;
-    padding: 1.2rem; 
-    border-radius: 0 8px 8px 0;
-    margin-bottom: 1rem; 
-}
-.report-wrong { 
-    border-left: 4px solid #ef4444 !important; 
-    background-color: #fef2f2;
-    padding: 1.2rem; 
-    border-radius: 0 8px 8px 0;
-    margin-bottom: 1rem; 
-}
-
-/* ==========================================
-   모바일 최적화 (iPhone 대응)
-   ========================================== */
-@media screen and (max-width: 768px) {
-    .block-container { 
-        width: 100% !important; 
-        padding: 1rem !important;
-    }
-    .custom-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.8rem;
-        padding-bottom: 1rem;
-    }
-    [data-testid="stVerticalBlockBorderWrapper"] {
-        padding: 1.5rem 1rem !important;
-    }
-    [data-baseweb="tab-list"] { gap: 1rem !important; }
-    [data-baseweb="tab"] { font-size: 0.95rem !important; }
-}
-</style>
     <script>
         const parentDoc = window.parent.document;
         let timerDiv = parentDoc.getElementById("live-exam-timer");
         if (!timerDiv) {{
             timerDiv = parentDoc.createElement("div");
             timerDiv.id = "live-exam-timer";
+            timerDiv.style.cssText = "position: fixed; bottom: 30px; right: 30px; background-color: #1e293b; color: #f8fafc; padding: 12px 24px; border-radius: 12px; font-family: 'JetBrains Mono', monospace; font-size: 1.4rem; font-weight: 800; z-index: 999999; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 2px solid #3b82f6; transition: all 0.3s ease;";
             parentDoc.body.appendChild(timerDiv);
+            
+            if (window.innerWidth <= 768) {{
+                timerDiv.style.bottom = "15px";
+                timerDiv.style.right = "15px";
+                timerDiv.style.padding = "8px 16px";
+                timerDiv.style.fontSize = "1.05rem";
+                timerDiv.style.borderWidth = "1px";
+            }}
         }}
         
         const startTime = {start_timestamp} * 1000;
@@ -591,9 +253,8 @@ def remove_timer():
     """
     components.html(html_code, height=0)
 
-
 # ==========================================
-# 4. 앱 메인 로직 및 탭 분리
+# 4. 앱 메인 로직
 # ==========================================
 st.markdown('''
 <div class="custom-header">
@@ -607,9 +268,8 @@ st.markdown('''
 
 tabs = st.tabs(["📚 학습 모드 (Study)", "🎯 실전 모의고사 (Exam)", "🏆 명예의 전당"])
 
-# ----------------- 📚 학습 모드 -----------------
 with tabs[0]:
-    remove_timer() # 학습 모드 진입 시 타이머 제거
+    remove_timer()
     st.info("💡 **학습 모드:** 문제를 제출하고 즉각 피드백을 받습니다. 최대 3번까지 재시도할 수 있으며, 3번 틀리면 해설이 공개됩니다.")
     
     if 's_quizzes' not in st.session_state:
@@ -690,11 +350,9 @@ with tabs[0]:
                     st.session_state.s_correct = False
                 st.rerun()
 
-# ----------------- 🎯 실전 모의고사 -----------------
 with tabs[1]:
-    # 모의고사 State 초기화
     if 'exam_state' not in st.session_state:
-        st.session_state.exam_state = 'landing' # landing, running, finished
+        st.session_state.exam_state = 'landing'
         st.session_state.e_quizzes = generate_exam_cycle()
         st.session_state.e_score = 0
         st.session_state.e_user_answers = []
@@ -707,7 +365,7 @@ with tabs[1]:
         with st.container(border=True):
             st.markdown('''
             <div class="landing-box">
-                <h3>🚨 파이썬 데이터 전처리 실전 모의고사</h3>
+                <h3>🚨 데이터 전처리 실전 모의고사</h3>
                 <p style="color: #64748b; margin-top: 1rem;">본 모의고사는 실무 환경과 동일한 조건에서 역량을 평가하기 위해 시간 제한이 적용됩니다.</p>
                 <div class="stats">
                     <div class="stat-item"><strong>20</strong>문항 수</div>
@@ -717,10 +375,8 @@ with tabs[1]:
             </div>
             ''', unsafe_allow_html=True)
             
-            st.info("⚠️ **주의사항:** 시험 도중 브라우저를 새로고침하면 답안이 모두 날아갑니다. 총 20문제를 모두 풀고 맨 하단의 제출 버튼을 누르세요.")
-            
-            st.markdown("<br>", unsafe_allow_html=True)
-            candidate_name = st.text_input("평가를 시작하려면 **수험자 이름(ID)**을 입력하세요:", placeholder="홍길동")
+            st.info("⚠️ 주의사항: 시험 도중 브라우저를 새로고침하면 답안이 날아갑니다.")
+            candidate_name = st.text_input("수험자 이름(ID)을 입력하세요:", placeholder="홍길동")
             
             if st.button("▶️ 모의고사 응시 시작", type="primary"):
                 if candidate_name.strip():
@@ -733,9 +389,7 @@ with tabs[1]:
                     st.warning("수험자 이름을 반드시 입력해야 시작할 수 있습니다.")
 
     elif st.session_state.exam_state == 'running':
-        # 타이머 주입 (20문제 * 2분 = 40분 = 2400초)
         inject_timer(2400, st.session_state.exam_start_time)
-        
         st.markdown(f"수험자: **{st.session_state.exam_name}** 님")
         st.markdown("---")
         
@@ -748,9 +402,7 @@ with tabs[1]:
                 user_answers.append(ans)
                 st.markdown("---")
             
-            submit_exam = st.form_submit_button("최종 답안 제출 및 채점하기", type="primary")
-            
-            if submit_exam:
+            if st.form_submit_button("최종 답안 제출 및 채점하기", type="primary"):
                 st.session_state.exam_end_time = time.time()
                 score = 0
                 for i, q in enumerate(st.session_state.e_quizzes):
@@ -758,21 +410,17 @@ with tabs[1]:
                         score += 1
                 st.session_state.e_score = score
                 st.session_state.e_user_answers = user_answers
-                
-                # 리더보드 자동 등록
                 save_score(st.session_state.exam_name, st.session_state.e_score)
-                
                 st.session_state.exam_state = 'finished'
                 st.rerun()
 
     elif st.session_state.exam_state == 'finished':
         remove_timer()
         st.balloons()
-        
         elapsed_sec = int(st.session_state.exam_end_time - st.session_state.exam_start_time)
         m, s = divmod(elapsed_sec, 60)
         
-        st.success(f"🎊 시험이 성공적으로 종료되었습니다. (리더보드 자동 등록 완료)")
+        st.success("🎊 시험이 종료되었습니다. (리더보드 자동 등록 완료)")
         
         col1, col2, col3 = st.columns(3)
         col1.metric(label="수험자", value=st.session_state.exam_name)
@@ -783,7 +431,6 @@ with tabs[1]:
         for i, q in enumerate(st.session_state.e_quizzes):
             u_ans = st.session_state.e_user_answers[i]
             is_cor = q['check'](u_ans) if u_ans else False
-            
             css_class = "report-correct" if is_cor else "report-wrong"
             st.markdown(f'''<div class="{css_class}">
                 <strong>Q{i+1:02d}. {q['topic']}</strong><br>
@@ -797,7 +444,6 @@ with tabs[1]:
             st.session_state.e_user_answers = []
             st.rerun()
 
-# ----------------- 🏆 명예의 전당 -----------------
 with tabs[2]:
     remove_timer()
     st.subheader("Leaderboard")
@@ -815,13 +461,4 @@ with tabs[2]:
         df_lb.columns = ['수험자', '최종 스코어', '평가 일시']
         st.dataframe(df_lb, use_container_width=True)
 
-st.markdown('''
-<div class="custom-footer">
-    © 2026 Data Analysis Bootcamp. All rights reserved.<br>
-    Powered by Python & Streamlit
-</div>
-''', unsafe_allow_html=True)
-
-
-
-
+st.markdown('''<div class="custom-footer">© 2026 Data Analysis Bootcamp. All rights reserved.</div>''', unsafe_allow_html=True)
