@@ -25,19 +25,63 @@ html, body, [class*="css"], .stMarkdown, .stText, p, li, h1, h2, h3, h4, h5, h6,
     background-color: #f8fafc;
 }
 
-/* 메인 타이틀 */
-h1 {
-    font-size: 2.0rem !important;
+/* Streamlit 기본 헤더/푸터 강제 숨김 */
+header {visibility: hidden !important;}
+footer {visibility: hidden !important;}
+#MainMenu {visibility: hidden !important;}
+
+/* 상단 패딩 제거하여 커스텀 헤더가 딱 붙게 */
+.block-container {
+    padding-top: 1rem !important;
+    padding-bottom: 2rem !important;
+}
+
+/* 커스텀 헤더 디자인 */
+.custom-header {
+    background-color: #ffffff;
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #3b82f6;
+}
+.custom-header h2 {
+    margin: 0 !important;
+    font-size: 1.4rem !important;
     font-weight: 800 !important;
     color: #0f172a !important;
-    padding-bottom: 1.0rem;
-    border-bottom: 2px solid #e2e8f0;
-    margin-bottom: 2.0rem !important;
+}
+.custom-header span {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #64748b;
+    background-color: #f1f5f9;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+}
+
+/* 커스텀 푸터 디자인 */
+.custom-footer {
+    text-align: center;
+    padding-top: 2rem;
+    margin-top: 3rem;
+    border-top: 1px solid #e2e8f0;
+    color: #94a3b8;
+    font-size: 0.85rem;
+}
+
+/* 메인 타이틀 (이제 커스텀 헤더가 있으므로 숨기거나 작게) */
+h1 {
+    display: none; 
 }
 
 /* 탭 UI 개선 */
 [data-baseweb="tab-list"] {
     gap: 2rem;
+    margin-bottom: 1.5rem;
 }
 [data-baseweb="tab"] {
     font-size: 1.1rem !important;
@@ -281,8 +325,15 @@ if 'quizzes' not in st.session_state:
     st.session_state.show_exp = False
     st.session_state.quiz_finished = False
 
-st.title("Data Analysis Mock Exam")
-st.markdown("Pandas 데이터 전처리 및 분석 역량 강화를 위한 20문항 실전 모의고사 시스템입니다.")
+st.markdown('''
+<div class="custom-header">
+    <h2>📊 Data Analysis Bootcamp</h2>
+    <span>Lv.1 Basic & Advanced</span>
+</div>
+<p style="color: #64748b; font-size: 1.1rem !important; margin-bottom: 2rem;">
+    Pandas 데이터 전처리 및 분석 역량 강화를 위한 20문항 실전 모의고사 시스템입니다.
+</p>
+''', unsafe_allow_html=True)
 
 tabs = st.tabs(["진행 화면", "리더보드"])
 
@@ -368,3 +419,10 @@ with tabs[1]:
         st.dataframe(df_lb, use_container_width=True)
 
 
+
+st.markdown('''
+<div class="custom-footer">
+    © 2026 Data Analysis Bootcamp. All rights reserved.<br>
+    Powered by Python & Streamlit
+</div>
+''', unsafe_allow_html=True)
