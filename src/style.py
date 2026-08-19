@@ -189,5 +189,8 @@ div[data-testid="stTextInput"] input:focus {
 }
 .hud-badge span { color: #3b82f6; font-weight: 800; margin-left: 0.3rem; }
 
+
+/* ?? ??? ?? ?? ?? (??? p ?? ???? ??) */
+.stButton > button p, .stButton > button span, .stButton > button div { color: #ffffff !important; }
 </style>
 """
