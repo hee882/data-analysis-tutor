@@ -13,29 +13,47 @@ with open(img_path, 'rb') as f:
 with open(style_path, 'r', encoding='utf-8') as f:
     style_content = f.read()
 
-# Replace or add HUD badge CSS
-if '.hud-badge' not in style_content:
-    hud_badge_css = """
-/* 작은 상태 대시보드 (우측 정렬용 뱃지) */
-.hud-container { display: flex; justify-content: flex-end; gap: 0.8rem; margin-bottom: 1rem; }
-.hud-badge {
-    background: rgba(255, 255, 255, 0.65);
-    backdrop-filter: blur(12px);
+if '.floating-exp' not in style_content:
+    floating_exp_css = """
+/* 우측 둥둥 떠있는(Floating) 해설 카드 (PC 기준) */
+.floating-exp {
+    position: fixed;
+    top: 20%;
+    right: 3rem;
+    width: 360px;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(24px) saturate(180%);
     border: 1px solid rgba(255, 255, 255, 0.9);
-    padding: 0.4rem 1rem;
-    border-radius: 99px;
-    font-size: 0.9rem;
-    font-weight: 700;
-    color: #1e293b;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    border-radius: 20px;
+    box-shadow: 0 16px 40px rgba(31, 38, 135, 0.15), inset 0 0 0 1px rgba(255,255,255,0.5);
+    padding: 1.5rem;
+    z-index: 9999;
+    animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.hud-badge span { color: #3b82f6; font-weight: 800; margin-left: 0.3rem; }
+
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(50px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+/* 모바일/태블릿: 화면이 좁아지면 원래대로 문제 하단에 배치되도록 자동 변환 */
+@media screen and (max-width: 1400px) {
+    .floating-exp {
+        position: static;
+        width: 100%;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+        animation: none;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+}
 """
-    style_content = style_content.replace('</style>', hud_badge_css + '\n</style>')
+    style_content = style_content.replace('</style>', floating_exp_css + '\n</style>')
     with open(style_path, 'w', encoding='utf-8') as f:
         f.write(style_content)
 
-# 2. Re-write web_pandas_tutor.py entirely to fix ???
+
+# 2. Re-write web_pandas_tutor.py
 main_content = f"""import streamlit as st
 import time
 import pandas as pd
@@ -129,9 +147,17 @@ with tabs[0]:
         else:
             st.error("❌ 3회 오답. 해설 공개.")
             
-        with st.expander("해설 및 모범 답안", expanded=True):
-            st.code(q['expected'], language='python')
-            st.markdown(q['explanation'])
+        # 해설 렌더링 (우측 플로팅 패널)
+        exp_html = f'''
+        <div class="floating-exp">
+            <h4 style="margin-top:0; margin-bottom:0.8rem; color:#3b82f6;">💡 해설 및 모범 답안</h4>
+            <div style="background:#1e293b; padding:1rem; border-radius:12px; margin-bottom:1rem; font-family:'JetBrains Mono', monospace; color:#e2e8f0; font-size:0.95rem; line-height:1.4;">
+                {{q['expected']}}
+            </div>
+            <p style="font-weight:600; font-size:1rem; color:#334155;">{{q['explanation']}}</p>
+        </div>
+        '''
+        st.markdown(exp_html, unsafe_allow_html=True)
             
         if st.button("⏭️ 다음 문제 (Endless)", type="primary", key="btn_study_next", use_container_width=True):
             st.session_state.s_current_q = generate_single_quiz()

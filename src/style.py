@@ -192,5 +192,39 @@ div[data-testid="stTextInput"] input:focus {
 
 /* ?? ??? ?? ?? ?? (??? p ?? ???? ??) */
 .stButton > button p, .stButton > button span, .stButton > button div { color: #ffffff !important; }
+
+/* 우측 둥둥 떠있는(Floating) 해설 카드 (PC 기준) */
+.floating-exp {
+    position: fixed;
+    top: 20%;
+    right: 3rem;
+    width: 360px;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    border-radius: 20px;
+    box-shadow: 0 16px 40px rgba(31, 38, 135, 0.15), inset 0 0 0 1px rgba(255,255,255,0.5);
+    padding: 1.5rem;
+    z-index: 9999;
+    animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(50px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+/* 모바일/태블릿: 화면이 좁아지면 원래대로 문제 하단에 배치되도록 자동 변환 */
+@media screen and (max-width: 1400px) {
+    .floating-exp {
+        position: static;
+        width: 100%;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+        animation: none;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+}
+
 </style>
 """

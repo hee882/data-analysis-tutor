@@ -91,9 +91,17 @@ with tabs[0]:
         else:
             st.error("❌ 3회 오답. 해설 공개.")
             
-        with st.expander("해설 및 모범 답안", expanded=True):
-            st.code(q['expected'], language='python')
-            st.markdown(q['explanation'])
+        # 해설 렌더링 (우측 플로팅 패널)
+        exp_html = f'''
+        <div class="floating-exp">
+            <h4 style="margin-top:0; margin-bottom:0.8rem; color:#3b82f6;">💡 해설 및 모범 답안</h4>
+            <div style="background:#1e293b; padding:1rem; border-radius:12px; margin-bottom:1rem; font-family:'JetBrains Mono', monospace; color:#e2e8f0; font-size:0.95rem; line-height:1.4;">
+                {q['expected']}
+            </div>
+            <p style="font-weight:600; font-size:1rem; color:#334155;">{q['explanation']}</p>
+        </div>
+        '''
+        st.markdown(exp_html, unsafe_allow_html=True)
             
         if st.button("⏭️ 다음 문제 (Endless)", type="primary", key="btn_study_next", use_container_width=True):
             st.session_state.s_current_q = generate_single_quiz()
