@@ -96,12 +96,50 @@ code { font-family: 'JetBrains Mono', 'D2Coding', monospace !important; font-siz
 .report-correct { border-left: 5px solid #22c55e !important; padding-left: 1rem; margin-bottom: 1rem; }
 .report-wrong { border-left: 5px solid #ef4444 !important; padding-left: 1rem; margin-bottom: 1rem; }
 
-/* 모의고사 랜딩 페이지 전용 스타일 */
-.landing-box { text-align: center; padding: 3rem 1rem; }
-.landing-box h3 { font-size: 2rem !important; color: #0f172a !important; }
-.landing-box .stats { display: flex; justify-content: center; gap: 3rem; margin: 2rem 0; }
-.landing-box .stat-item { background: #f1f5f9; padding: 1.5rem; border-radius: 16px; min-width: 150px; }
-.landing-box .stat-item strong { display: block; font-size: 2rem; color: #2563eb; margin-bottom: 0.5rem; }
+/* ==========================================
+   모바일 최적화 (iPhone 12 등 소형 기기 대응)
+   ========================================== */
+@media screen and (max-width: 768px) {
+    /* 레이아웃 풀사이즈로 확장 및 패딩 축소 */
+    .block-container { 
+        width: 100% !important; 
+        padding: 0.5rem !important;
+    }
+    /* 헤더 세로 정렬 및 여백 축소 */
+    .custom-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.8rem;
+        padding: 1rem;
+    }
+    .custom-header h2 { font-size: 1.15rem !important; }
+    
+    /* 문제 카드 내부 여백 대폭 축소 */
+    [data-testid="stVerticalBlockBorderWrapper"], .exam-card {
+        padding: 1.2rem 1rem !important;
+    }
+    
+    /* 랜딩 페이지 스탯 박스 세로 정렬 */
+    .landing-box h3 { font-size: 1.5rem !important; }
+    .landing-box .stats {
+        flex-direction: column;
+        gap: 0.8rem !important;
+        margin: 1rem 0 !important;
+    }
+    .landing-box .stat-item {
+        padding: 1rem;
+        min-width: auto;
+    }
+    
+    /* 폰트 사이즈 전체적 다운스케일링 */
+    h3 { font-size: 1.1rem !important; }
+    p, .stRadio label span, code { font-size: 0.95rem !important; }
+    .stButton > button { font-size: 0.95rem !important; padding: 0.5rem 1rem !important; }
+    
+    /* 탭 간격 좁히기 */
+    [data-baseweb="tab-list"] { gap: 0.5rem !important; }
+    [data-baseweb="tab"] { font-size: 0.9rem !important; padding: 0 0.5rem !important; }
+}
 </style>
 ''', unsafe_allow_html=True)
 
@@ -200,13 +238,25 @@ def save_score(name, score):
 # JS 타이머 주입 함수
 def inject_timer(time_limit_sec, start_timestamp):
     html_code = f"""
+    <style>
+        #live-exam-timer {{
+            position: fixed; bottom: 30px; right: 30px; background-color: #1e293b; color: #f8fafc; 
+            padding: 12px 24px; border-radius: 12px; font-family: 'JetBrains Mono', monospace; 
+            font-size: 1.4rem; font-weight: 800; z-index: 999999; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 2px solid #3b82f6; transition: all 0.3s ease;
+        }}
+        @media screen and (max-width: 768px) {{
+            #live-exam-timer {{
+                bottom: 15px; right: 15px; padding: 8px 16px; font-size: 1.05rem; border-width: 1px;
+            }}
+        }}
+    </style>
     <script>
         const parentDoc = window.parent.document;
         let timerDiv = parentDoc.getElementById("live-exam-timer");
         if (!timerDiv) {{
             timerDiv = parentDoc.createElement("div");
             timerDiv.id = "live-exam-timer";
-            timerDiv.style.cssText = "position: fixed; bottom: 30px; right: 30px; background-color: #1e293b; color: #f8fafc; padding: 12px 24px; border-radius: 12px; font-family: 'JetBrains Mono', monospace; font-size: 1.4rem; font-weight: 800; z-index: 999999; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 2px solid #3b82f6; transition: all 0.3s ease;";
             parentDoc.body.appendChild(timerDiv);
         }}
         
@@ -481,5 +531,6 @@ st.markdown('''
     Powered by Python & Streamlit
 </div>
 ''', unsafe_allow_html=True)
+
 
 
