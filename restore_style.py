@@ -1,4 +1,9 @@
-def get_custom_css():
+import os
+
+repo_path = r'C:\Users\user\Desktop\HDAT-DA\data-analysis-tutor'
+style_path = os.path.join(repo_path, 'src', 'style.py')
+
+content = '''def get_custom_css():
     return """
 <style>
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css');
@@ -250,3 +255,8 @@ div[role="radiogroup"] > label[data-baseweb="radio"][data-checked="true"] {
 }
 </style>
 """
+'''
+with open(style_path, 'w', encoding='utf-8') as f:
+    f.write(content)
+
+print("style.py restored!")
