@@ -9,16 +9,22 @@ from src.db import load_leaderboard, save_score
 from src.timer import inject_timer, remove_timer
 from src.questions import generate_exam_cycle
 
-st.set_page_config(page_title="Data Analysis Tutor", layout="wide", initial_sidebar_state="collapsed")
+# ==========================================
+# 1. 설정 및 UI 스타일링
+# ==========================================
+st.set_page_config(page_title="Data Analysis Tutor", layout="wide")
 st.markdown(get_custom_css(), unsafe_allow_html=True)
 
+# ==========================================
+# 2. 앱 메인 로직
+# ==========================================
 st.markdown('''
 <div class="custom-header">
     <h2>📊 Data Analysis Bootcamp</h2>
     <span>Lv.1 Basic & Advanced</span>
 </div>
 <p style="color: #64748b; font-size: 1.1rem !important; margin-bottom: 2rem;">
-    Pandas 데이터 전처리 및 분석 역량 강화를 위한 실전 객관식 학습 시스템입니다.
+    Pandas 데이터 전처리 및 분석 역량 강화를 위한 실전 학습 시스템입니다.
 </p>
 ''', unsafe_allow_html=True)
 
@@ -26,7 +32,7 @@ tabs = st.tabs(["📚 학습 모드 (Study)", "🎯 실전 모의고사 (Exam)",
 
 with tabs[0]:
     remove_timer()
-    st.info("💡 **학습 모드:** 보기를 클릭하고 제출하세요. (최대 3회 재시도 가능)")
+    st.info("💡 **학습 모드:** 문제를 제출하고 즉각 피드백을 받습니다. 최대 3번까지 재시도할 수 있으며, 3번 틀리면 해설이 공개됩니다.")
     
     if 's_quizzes' not in st.session_state:
         st.session_state.s_quizzes = generate_exam_cycle()
@@ -54,7 +60,7 @@ with tabs[0]:
         with col1:
             st.progress((s_idx) / 20)
         with col2:
-            if st.button("🔄 섞기", key="btn_study_shuffle"):
+            if st.button("🔄 섞기", key="btn_study_shuffle", help="문제 세트를 다시 생성합니다."):
                 st.session_state.s_quizzes = generate_exam_cycle()
                 st.session_state.s_idx = 0
                 st.session_state.s_attempts = 0
@@ -66,15 +72,14 @@ with tabs[0]:
             st.subheader(f"Question {s_idx+1:02d}. {q['topic']}")
             st.write(q['question'])
             
-            # 객관식 라디오 버튼으로 교체
-            user_ans = st.radio("보기 선택", options=q['choices'], label_visibility="hidden", key=f"s_ans_{s_idx}", index=None)
+            user_ans = st.text_input("Answer code", placeholder="코드를 작성해 주세요", label_visibility="hidden", key=f"s_ans_{s_idx}")
 
         if not st.session_state.s_show_exp:
             if st.button("제출 및 채점", type="primary", key="btn_study_submit"):
                 if not user_ans:
-                    st.warning("보기를 선택해 주세요.")
+                    st.warning("답안을 입력해 주세요.")
                 else:
-                    is_correct = (user_ans == q['expected'])
+                    is_correct = q['check'](user_ans)
                     if is_correct:
                         st.session_state.s_correct = True
                         st.session_state.s_show_exp = True
@@ -122,7 +127,7 @@ with tabs[1]:
         with st.container(border=True):
             st.markdown('''
             <div class="landing-box">
-                <h3>🚨 데이터 전처리 실전 객관식 모의고사</h3>
+                <h3>🚨 데이터 전처리 실전 모의고사</h3>
                 <p style="color: #64748b; margin-top: 1rem;">본 모의고사는 실무 환경과 동일한 조건에서 역량을 평가하기 위해 시간 제한이 적용됩니다.</p>
                 <div class="stats">
                     <div class="stat-item"><strong>20</strong>문항 수</div>
@@ -132,6 +137,7 @@ with tabs[1]:
             </div>
             ''', unsafe_allow_html=True)
             
+            st.info("⚠️ 주의사항: 시험 도중 브라우저를 새로고침하면 답안이 날아갑니다.")
             candidate_name = st.text_input("수험자 이름(ID)을 입력하세요:", placeholder="홍길동")
             
             if st.button("▶️ 모의고사 응시 시작", type="primary"):
@@ -154,8 +160,7 @@ with tabs[1]:
             for i, q in enumerate(st.session_state.e_quizzes):
                 st.markdown(f"**Q{i+1:02d}. {q['topic']}**")
                 st.markdown(f"{q['question']}")
-                # 객관식으로 교체
-                ans = st.radio(f"보기 {i+1}", options=q['choices'], label_visibility="hidden", key=f"exam_ans_{i}", index=None)
+                ans = st.text_input(f"Answer {i+1}", label_visibility="hidden", key=f"exam_ans_{i}")
                 user_answers.append(ans)
                 st.markdown("---")
             
@@ -163,7 +168,7 @@ with tabs[1]:
                 st.session_state.exam_end_time = time.time()
                 score = 0
                 for i, q in enumerate(st.session_state.e_quizzes):
-                    if user_answers[i] == q['expected']:
+                    if user_answers[i] and q['check'](user_answers[i]):
                         score += 1
                 st.session_state.e_score = score
                 st.session_state.e_user_answers = user_answers
@@ -187,7 +192,7 @@ with tabs[1]:
         st.markdown("### 📊 상세 성적표 (Report Card)")
         for i, q in enumerate(st.session_state.e_quizzes):
             u_ans = st.session_state.e_user_answers[i]
-            is_cor = (u_ans == q['expected'])
+            is_cor = q['check'](u_ans) if u_ans else False
             css_class = "report-correct" if is_cor else "report-wrong"
             st.markdown(f'''<div class="{css_class}">
                 <strong>Q{i+1:02d}. {q['topic']}</strong><br>

@@ -83,5 +83,52 @@ code { font-family: 'JetBrains Mono', 'D2Coding', monospace !important; font-siz
     [data-baseweb="tab-list"] { gap: 0.5rem !important; display: flex !important; flex-wrap: wrap !important; }
     [data-baseweb="tab"] { font-size: 0.9rem !important; padding: 0 0.5rem !important; }
 }
+/* ==========================================
+   객관식(Radio) 타일형 고급 디자인 변환
+   ========================================== */
+div[role="radiogroup"] {
+    gap: 1.2rem !important;
+    margin-top: 1rem;
+    margin-bottom: 1.5rem;
+}
+div[role="radiogroup"] > label {
+    background-color: #f8fafc !important;
+    border: 2px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    padding: 1.2rem 1.5rem !important;
+    width: 100% !important;
+    cursor: pointer !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+div[role="radiogroup"] > label:hover {
+    border-color: #3b82f6 !important;
+    background-color: #eff6ff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1) !important;
+}
+div[role="radiogroup"] > label[data-checked="true"] {
+    border-color: #2563eb !important;
+    background-color: #eff6ff !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15) !important;
+}
+/* 기존 라디오 원형 버튼 강제 숨김 */
+div[role="radiogroup"] > label > div:first-child {
+    display: none !important;
+}
+/* 선택지 텍스트를 코드 폰트로 */
+div[role="radiogroup"] > label > div:nth-child(2) {
+    font-family: 'JetBrains Mono', 'D2Coding', monospace !important;
+    font-size: 1.1rem !important;
+    color: #1e293b !important;
+    font-weight: 600 !important;
+    margin-left: 0 !important;
+}
+
+@media screen and (max-width: 768px) {
+    div[role="radiogroup"] > label { padding: 1rem !important; }
+    div[role="radiogroup"] > label > div:nth-child(2) { font-size: 1rem !important; }
+}
+
 </style>
     '''
+
