@@ -3,8 +3,10 @@ import random
 import pandas as pd
 import json
 import os
+import time
 from datetime import datetime
 from supabase import create_client
+import streamlit.components.v1 as components
 
 # ==========================================
 # 1. 설정 및 UI 스타일링
@@ -24,7 +26,7 @@ header {visibility: hidden !important;}
 footer {visibility: hidden !important;}
 #MainMenu {visibility: hidden !important;}
 
-.block-container { padding-top: 1rem !important; padding-bottom: 2rem !important; }
+.block-container { padding-top: 1rem !important; padding-bottom: 2rem !important; max-width: 70% !important; }
 
 .custom-header {
     background-color: #ffffff;
@@ -80,6 +82,13 @@ code { font-family: 'JetBrains Mono', 'D2Coding', monospace !important; font-siz
 
 .report-correct { border-left: 5px solid #22c55e !important; padding-left: 1rem; margin-bottom: 1rem; }
 .report-wrong { border-left: 5px solid #ef4444 !important; padding-left: 1rem; margin-bottom: 1rem; }
+
+/* 모의고사 랜딩 페이지 전용 스타일 */
+.landing-box { text-align: center; padding: 3rem 1rem; }
+.landing-box h3 { font-size: 2rem !important; color: #0f172a !important; }
+.landing-box .stats { display: flex; justify-content: center; gap: 3rem; margin: 2rem 0; }
+.landing-box .stat-item { background: #f1f5f9; padding: 1.5rem; border-radius: 16px; min-width: 150px; }
+.landing-box .stat-item strong { display: block; font-size: 2rem; color: #2563eb; margin-bottom: 0.5rem; }
 </style>
 ''', unsafe_allow_html=True)
 
@@ -155,7 +164,6 @@ def load_leaderboard():
             return response.data
         except Exception:
             return []
-    # 폴백: 로컬 JSON
     if os.path.exists("leaderboard.json"):
         with open("leaderboard.json", "r", encoding="utf-8") as f:
             return json.load(f)
@@ -169,13 +177,67 @@ def save_score(name, score):
             return True
         except Exception:
             return False
-    # 폴백: 로컬 JSON
     lb = load_leaderboard()
     lb.append({"name": name, "score": score, "created_at": datetime.now().strftime("%Y-%m-%d %H:%M")})
     lb = sorted(lb, key=lambda x: x['score'], reverse=True)
     with open("leaderboard.json", "w", encoding="utf-8") as f:
         json.dump(lb, f, ensure_ascii=False, indent=4)
     return True
+
+# JS 타이머 주입 함수
+def inject_timer(time_limit_sec, start_timestamp):
+    html_code = f"""
+    <script>
+        const parentDoc = window.parent.document;
+        let timerDiv = parentDoc.getElementById("live-exam-timer");
+        if (!timerDiv) {{
+            timerDiv = parentDoc.createElement("div");
+            timerDiv.id = "live-exam-timer";
+            timerDiv.style.cssText = "position: fixed; bottom: 30px; right: 30px; background-color: #1e293b; color: #f8fafc; padding: 12px 24px; border-radius: 12px; font-family: 'JetBrains Mono', monospace; font-size: 1.4rem; font-weight: 800; z-index: 999999; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 2px solid #3b82f6; transition: all 0.3s ease;";
+            parentDoc.body.appendChild(timerDiv);
+        }}
+        
+        const startTime = {start_timestamp} * 1000;
+        const timeLimit = {time_limit_sec} * 1000;
+        
+        if (window.timerInterval) clearInterval(window.timerInterval);
+        
+        window.timerInterval = setInterval(function() {{
+            const now = new Date().getTime();
+            const elapsed = now - startTime;
+            const remaining = timeLimit - elapsed;
+            
+            if (remaining <= 0) {{
+                clearInterval(window.timerInterval);
+                timerDiv.innerHTML = "🚨 TIME UP";
+                timerDiv.style.borderColor = "#ef4444";
+                timerDiv.style.color = "#ef4444";
+            }} else {{
+                const m = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+                const s = Math.floor((remaining % (1000 * 60)) / 1000);
+                timerDiv.innerHTML = "⏳ 남은 시간 " + (m < 10 ? "0"+m : m) + ":" + (s < 10 ? "0"+s : s);
+                
+                if (remaining < 300000) {{
+                    timerDiv.style.borderColor = "#ef4444";
+                    timerDiv.style.color = "#fca5a5";
+                }}
+            }}
+        }}, 1000);
+    </script>
+    """
+    components.html(html_code, height=0)
+
+def remove_timer():
+    html_code = """
+    <script>
+        const parentDoc = window.parent.document;
+        let timerDiv = parentDoc.getElementById("live-exam-timer");
+        if (timerDiv) timerDiv.remove();
+        if (window.timerInterval) clearInterval(window.timerInterval);
+    </script>
+    """
+    components.html(html_code, height=0)
+
 
 # ==========================================
 # 4. 앱 메인 로직 및 탭 분리
@@ -194,6 +256,7 @@ tabs = st.tabs(["📚 학습 모드 (Study)", "🎯 실전 모의고사 (Exam)",
 
 # ----------------- 📚 학습 모드 -----------------
 with tabs[0]:
+    remove_timer() # 학습 모드 진입 시 타이머 제거
     st.info("💡 **학습 모드:** 문제를 제출하고 즉각 피드백을 받습니다. 최대 3번까지 재시도할 수 있으며, 3번 틀리면 해설이 공개됩니다.")
     
     if 's_quizzes' not in st.session_state:
@@ -276,19 +339,53 @@ with tabs[0]:
 
 # ----------------- 🎯 실전 모의고사 -----------------
 with tabs[1]:
-    st.info("🚨 **실전 모의고사:** 20문제를 한 번에 풀고 맨 아래에서 '최종 제출'을 눌러야 채점 결과와 성적표가 나옵니다.")
-    
-    if 'e_quizzes' not in st.session_state:
+    # 모의고사 State 초기화
+    if 'exam_state' not in st.session_state:
+        st.session_state.exam_state = 'landing' # landing, running, finished
         st.session_state.e_quizzes = generate_exam_cycle()
-        st.session_state.e_submitted = False
         st.session_state.e_score = 0
         st.session_state.e_user_answers = []
+        st.session_state.exam_name = ""
+        st.session_state.exam_start_time = 0
+        st.session_state.exam_end_time = 0
 
-    if not st.session_state.e_submitted:
-        if st.button("🔄 새로운 모의고사 시험지로 교체", key="btn_exam_shuffle"):
-            st.session_state.e_quizzes = generate_exam_cycle()
-            st.rerun()
+    if st.session_state.exam_state == 'landing':
+        remove_timer()
+        with st.container(border=True):
+            st.markdown('''
+            <div class="landing-box">
+                <h3>🚨 파이썬 데이터 전처리 실전 모의고사</h3>
+                <p style="color: #64748b; margin-top: 1rem;">본 모의고사는 실무 환경과 동일한 조건에서 역량을 평가하기 위해 시간 제한이 적용됩니다.</p>
+                <div class="stats">
+                    <div class="stat-item"><strong>20</strong>문항 수</div>
+                    <div class="stat-item"><strong>40</strong>제한 시간 (분)</div>
+                    <div class="stat-item"><strong>100</strong>만점 점수</div>
+                </div>
+            </div>
+            ''', unsafe_allow_html=True)
             
+            st.info("⚠️ **주의사항:** 시험 도중 브라우저를 새로고침하면 답안이 모두 날아갑니다. 총 20문제를 모두 풀고 맨 하단의 제출 버튼을 누르세요.")
+            
+            st.markdown("<br>", unsafe_allow_html=True)
+            candidate_name = st.text_input("평가를 시작하려면 **수험자 이름(ID)**을 입력하세요:", placeholder="홍길동")
+            
+            if st.button("▶️ 모의고사 응시 시작", type="primary"):
+                if candidate_name.strip():
+                    st.session_state.exam_name = candidate_name.strip()
+                    st.session_state.e_quizzes = generate_exam_cycle()
+                    st.session_state.exam_start_time = time.time()
+                    st.session_state.exam_state = 'running'
+                    st.rerun()
+                else:
+                    st.warning("수험자 이름을 반드시 입력해야 시작할 수 있습니다.")
+
+    elif st.session_state.exam_state == 'running':
+        # 타이머 주입 (20문제 * 2분 = 40분 = 2400초)
+        inject_timer(2400, st.session_state.exam_start_time)
+        
+        st.markdown(f"수험자: **{st.session_state.exam_name}** 님")
+        st.markdown("---")
+        
         with st.form("exam_form"):
             user_answers = []
             for i, q in enumerate(st.session_state.e_quizzes):
@@ -301,27 +398,33 @@ with tabs[1]:
             submit_exam = st.form_submit_button("최종 답안 제출 및 채점하기", type="primary")
             
             if submit_exam:
+                st.session_state.exam_end_time = time.time()
                 score = 0
                 for i, q in enumerate(st.session_state.e_quizzes):
                     if user_answers[i] and q['check'](user_answers[i]):
                         score += 1
                 st.session_state.e_score = score
                 st.session_state.e_user_answers = user_answers
-                st.session_state.e_submitted = True
+                
+                # 리더보드 자동 등록
+                save_score(st.session_state.exam_name, st.session_state.e_score)
+                
+                st.session_state.exam_state = 'finished'
                 st.rerun()
-    else:
+
+    elif st.session_state.exam_state == 'finished':
+        remove_timer()
         st.balloons()
-        st.success(f"🎊 시험 종료! 최종 점수: {st.session_state.e_score} / 20 점")
         
-        with st.container(border=True):
-            st.subheader("🏆 리더보드 점수 등록")
-            u_name = st.text_input("학습자 성함을 입력해 주세요:", key="exam_name")
-            if st.button("점수 등록", type="primary", key="btn_exam_reg"):
-                if u_name:
-                    save_score(u_name, st.session_state.e_score)
-                    st.success("등록 완료! '명예의 전당' 탭을 확인하세요.")
-                else:
-                    st.warning("이름을 입력해야 등록이 가능합니다.")
+        elapsed_sec = int(st.session_state.exam_end_time - st.session_state.exam_start_time)
+        m, s = divmod(elapsed_sec, 60)
+        
+        st.success(f"🎊 시험이 성공적으로 종료되었습니다. (리더보드 자동 등록 완료)")
+        
+        col1, col2, col3 = st.columns(3)
+        col1.metric(label="수험자", value=st.session_state.exam_name)
+        col2.metric(label="최종 점수", value=f"{st.session_state.e_score} / 20")
+        col3.metric(label="소요 시간", value=f"{m}분 {s}초")
         
         st.markdown("### 📊 상세 성적표 (Report Card)")
         for i, q in enumerate(st.session_state.e_quizzes):
@@ -335,15 +438,15 @@ with tabs[1]:
                 정답: <code>{q['expected']}</code>
             </div>''', unsafe_allow_html=True)
             
-        if st.button("🔄 모의고사 다시 풀기 (새로운 문제)"):
-            st.session_state.e_quizzes = generate_exam_cycle()
-            st.session_state.e_submitted = False
+        if st.button("🔄 새로운 모의고사 다시 응시하기"):
+            st.session_state.exam_state = 'landing'
             st.session_state.e_score = 0
             st.session_state.e_user_answers = []
             st.rerun()
 
 # ----------------- 🏆 명예의 전당 -----------------
 with tabs[2]:
+    remove_timer()
     st.subheader("Leaderboard")
     lb = load_leaderboard()
     if not lb:
@@ -356,7 +459,7 @@ with tabs[2]:
             df_lb = df_lb[['name', 'score', 'created_at']]
         else:
             df_lb = df_lb[['name', 'score', 'date']]
-        df_lb.columns = ['학습자', '최종 스코어', '평가 일시']
+        df_lb.columns = ['수험자', '최종 스코어', '평가 일시']
         st.dataframe(df_lb, use_container_width=True)
 
 st.markdown('''
@@ -365,3 +468,4 @@ st.markdown('''
     Powered by Python & Streamlit
 </div>
 ''', unsafe_allow_html=True)
+
