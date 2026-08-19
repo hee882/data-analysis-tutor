@@ -16,7 +16,7 @@ st.markdown(get_custom_css(), unsafe_allow_html=True)
 with st.sidebar:
     st.markdown("### ?? ?? ?? ??")
     selected_mode = st.radio(
-        "?? ?? ?? ??",
+        "?? ?? ??",
         options=["bootcamp_day1_4", "comprehensive"],
         format_func=lambda x: "?? Day 1~4 ?? ??" if x == "bootcamp_day1_4" else "?? ?? ??? (???)",
         key="strategy_selector"
