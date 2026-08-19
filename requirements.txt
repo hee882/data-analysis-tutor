@@ -1,4 +1,8 @@
-﻿streamlit
+streamlit
 pandas
-rich
+numpy
+seaborn
+matplotlib
+scikit-learn
 supabase
+rich
