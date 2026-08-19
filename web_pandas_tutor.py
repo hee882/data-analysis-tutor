@@ -1,4 +1,4 @@
-import streamlit as st
+﻿import streamlit as st
 import time
 import pandas as pd
 from datetime import datetime
@@ -8,6 +8,7 @@ from src.style import get_custom_css
 from src.db import load_leaderboard, save_score
 from src.timer import inject_timer, remove_timer
 from src.questions import generate_exam_quizzes, generate_single_quiz
+from src.ml_lab import render_ml_lab
 
 st.set_page_config(page_title="Data Science & ML Bootcamp", layout="wide", initial_sidebar_state="collapsed")
 
@@ -42,7 +43,7 @@ if st.session_state.current_strategy != selected_mode:
     st.session_state.e_quizzes = generate_exam_quizzes(selected_mode)
     st.rerun()
 
-tabs = st.tabs(["📚 학습", "🚨 모의고사", "🏆 랭킹"])
+tabs = st.tabs(["📚 학습", "🚨 모의고사", "🏆 랭킹", "🧪 ML 실험실"])
 
 with tabs[0]:
     remove_timer()
@@ -283,3 +284,7 @@ with tabs[2]:
         html += '</div>'
         
         st.markdown(html, unsafe_allow_html=True)
+
+with tabs[3]:
+    remove_timer()
+    render_ml_lab()
