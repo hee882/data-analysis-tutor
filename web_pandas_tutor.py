@@ -214,14 +214,28 @@ with tabs[2]:
     remove_timer()
     lb = load_leaderboard()
     if not lb:
-        st.info("기록이 없습니다.")
+        st.info("??? ????. ? ?? ??? ??? ?????!")
     else:
         df_lb = pd.DataFrame(lb)
-        df_lb.index = df_lb.index + 1
-        if 'created_at' in df_lb.columns:
-            df_lb['created_at'] = pd.to_datetime(df_lb['created_at']).dt.strftime('%Y-%m-%d %H:%M')
-            df_lb = df_lb[['name', 'score', 'created_at']]
-        else:
-            df_lb = df_lb[['name', 'score', 'date']]
-        df_lb.columns = ['수험자', '스코어', '일시']
-        st.dataframe(df_lb, use_container_width=True)
+        
+        html = '<div class="lb-container">'
+        for i, row in df_lb.iterrows():
+            rank = i + 1
+            rank_class = f"lb-rank-{{rank}}" if rank <= 3 else ""
+            rank_display = ["??", "??", "??"][rank-1] if rank <= 3 else f"{{rank}}"
+            
+            name = row['name']
+            score = row['score']
+            date = pd.to_datetime(row['created_at'] if 'created_at' in row else row['date']).strftime('%y.%m.%d %H:%M')
+            
+            html += f'''
+            <div class="lb-row">
+                <div class="lb-rank {{rank_class}}">{{rank_display}}</div>
+                <div class="lb-name">{{name}}</div>
+                <div class="lb-score">{{score}} / 20</div>
+                <div class="lb-date">{{date}}</div>
+            </div>
+            '''
+        html += '</div>'
+        
+        st.markdown(html, unsafe_allow_html=True)

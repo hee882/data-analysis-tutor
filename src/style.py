@@ -31,7 +31,7 @@ html, body { overflow: hidden !important; }
    LAYOUT
 ------------------------------------------------------------- */
 .block-container { 
-    padding: 1.5rem 1rem 8rem 1rem !important; /* ?? ????? ?? ??? ?? */
+    padding: 1rem 1rem 6rem 1rem !important; /* ?? ????? ?? ??? ?? */
     max-width: 860px !important; 
     width: 100% !important;
     margin: 0 auto !important;
@@ -47,7 +47,7 @@ div[data-testid="stVerticalBlock"] { gap: 1rem !important; }
 ------------------------------------------------------------- */
 .custom-header {
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    padding: 0.5rem 0 1rem 0; margin-bottom: 1.5rem; text-align: center;
+    padding: 0.5rem 0 1rem 0; margin-bottom: 0.5rem; text-align: center;
 }
 .header-top-row { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 0.8rem; margin-bottom: 0.6rem; }
 .header-logo { width: 54px; height: 54px; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); flex-shrink: 0; }
@@ -122,8 +122,8 @@ div[data-testid="stVerticalBlock"] { gap: 1rem !important; }
     border: 1px solid rgba(255, 255, 255, 1) !important; /* ??? ?? ??? */
     border-radius: 24px !important;
     box-shadow: 0 24px 48px rgba(31, 38, 135, 0.1), inset 0 1px 2px rgba(255,255,255,1) !important; /* ??? ?? ??? */
-    padding: 2.5rem !important; 
-    margin-bottom: 2rem !important; 
+    padding: 1.5rem 2rem !important; 
+    margin-bottom: 0.5rem !important; 
     text-align: left !important;
     overflow: visible !important;
 }
@@ -131,10 +131,10 @@ div[data-testid="stVerticalBlock"] { gap: 1rem !important; }
 /* -------------------------------------------------------------
    RADIO BUTTONS (Choices)
 ------------------------------------------------------------- */
-div[role="radiogroup"] { gap: 0.8rem !important; margin-top: 1rem !important; margin-bottom: 1rem !important; width: 100% !important; display: flex !important; flex-direction: column !important; align-items: stretch !important; }
+div[role="radiogroup"] { gap: 0.5rem !important; margin-top: 0.5rem !important; margin-bottom: 0.5rem !important; width: 100% !important; display: flex !important; flex-direction: column !important; align-items: stretch !important; }
 div[role="radiogroup"] > label {
     background: rgba(255, 255, 255, 0.6) !important; backdrop-filter: blur(12px) !important; border: 1px solid rgba(255, 255, 255, 0.9) !important;
-    border-radius: 16px !important; padding: 1.2rem 1.5rem !important; width: 100% !important; min-height: 4rem !important;
+    border-radius: 16px !important; padding: 0.8rem 1.2rem !important; width: 100% !important; min-height: 3rem !important;
     box-sizing: border-box !important; cursor: pointer !important; margin-bottom: 0 !important;
     box-shadow: 0 4px 16px rgba(0,0,0,0.03) !important; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
     display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: flex-start !important; text-align: left !important;
@@ -153,13 +153,13 @@ div[role="radiogroup"] > label > div:nth-child(2) { font-family: 'JetBrains Mono
 [data-testid="stButton"] button[kind="primary"] { background-color: rgba(59, 130, 246, 0.9) !important; box-shadow: 0 8px 24px rgba(59, 130, 246, 0.2) !important; }
 [data-testid="stButton"] button[kind="primary"]:hover { background-color: #2563eb !important; box-shadow: 0 12px 32px rgba(59, 130, 246, 0.35) !important; }
 
-div[data-testid="stTextInput"] input { background: rgba(255, 255, 255, 0.7) !important; border: 2px solid rgba(255,255,255,0.9) !important; border-radius: 16px !important; padding: 1.2rem 1.5rem !important; font-family: 'JetBrains Mono', monospace !important; font-size: 1.1rem !important; box-shadow: inset 0 2px 6px rgba(0,0,0,0.02) !important; text-align: left !important; transition: all 0.3s ease !important; }
+div[data-testid="stTextInput"] input { background: rgba(255, 255, 255, 0.7) !important; border: 2px solid rgba(255,255,255,0.9) !important; border-radius: 16px !important; padding: 0.8rem 1.2rem !important; font-family: 'JetBrains Mono', monospace !important; font-size: 1.1rem !important; box-shadow: inset 0 2px 6px rgba(0,0,0,0.02) !important; text-align: left !important; transition: all 0.3s ease !important; }
 div[data-testid="stTextInput"] input:focus { background: #ffffff !important; border-color: #3b82f6 !important; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15), inset 0 2px 6px rgba(0,0,0,0.01) !important; }
 
 /* -------------------------------------------------------------
    HUD & FLOATING EXP
 ------------------------------------------------------------- */
-.hud-container { display: flex; justify-content: flex-end; align-items: center; gap: 0.8rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.hud-container { display: flex; justify-content: flex-end; align-items: center; gap: 0.8rem; margin-bottom: 0.5rem; flex-wrap: wrap; }
 .hud-badge { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 1); padding: 0.5rem 1.2rem; border-radius: 99px; font-size: 0.9rem; font-weight: 700; color: #1e293b; box-shadow: 0 8px 24px rgba(0,0,0,0.06); display: flex; align-items: center; }
 .hud-badge span { color: #3b82f6; font-weight: 800; margin-left: 0.4rem; font-size: 1rem; }
 
@@ -188,5 +188,29 @@ div[data-testid="stTextInput"] input:focus { background: #ffffff !important; bor
 @media screen and (max-width: 1400px) {
     .floating-exp { position: static; width: 100%; margin-top: 1.5rem; margin-bottom: 1rem; animation: none; box-shadow: 0 12px 32px rgba(0,0,0,0.1); }
 }
+
+/* -------------------------------------------------------------
+   LEADERBOARD UI
+------------------------------------------------------------- */
+.lb-container { display: flex; flex-direction: column; gap: 0.8rem; margin-top: 1rem; }
+.lb-row {
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.9);
+    padding: 1rem 1.5rem; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); transition: transform 0.2s;
+}
+.lb-row:hover { transform: scale(1.01); background: rgba(255, 255, 255, 0.9); box-shadow: 0 8px 20px rgba(0,0,0,0.06); }
+.lb-rank { font-size: 1.2rem; font-weight: 800; color: #cbd5e1; width: 40px; }
+.lb-rank-1 { color: #fbbf24; font-size: 1.5rem; }
+.lb-rank-2 { color: #94a3b8; font-size: 1.3rem; }
+.lb-rank-3 { color: #b45309; font-size: 1.2rem; }
+.lb-name { flex: 1; font-size: 1.1rem; font-weight: 700; color: #1e293b; margin-left: 1rem; }
+.lb-score { font-size: 1.2rem; font-weight: 800; color: #3b82f6; background: rgba(59, 130, 246, 0.1); padding: 0.3rem 0.8rem; border-radius: 8px; }
+.lb-date { font-size: 0.85rem; color: #64748b; margin-left: 1rem; text-align: right; width: 130px; font-family: monospace; }
+
+@media screen and (max-width: 768px) {
+    .lb-row { padding: 0.8rem 1rem; }
+    .lb-date { display: none; } /* ?????? ?? ?? */
+}
+
 </style>
 """
