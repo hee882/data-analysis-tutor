@@ -26,7 +26,20 @@ header {visibility: hidden !important;}
 footer {visibility: hidden !important;}
 #MainMenu {visibility: hidden !important;}
 
-.block-container { padding-top: 1rem !important; padding-bottom: 2rem !important; max-width: 70% !important; }
+html, body {
+    overflow-y: scroll !important;
+}
+.block-container { 
+    padding-top: 1rem !important; 
+    padding-bottom: 2rem !important; 
+    max-width: 1200px !important; 
+    width: 70% !important;
+    margin: 0 auto !important;
+    min-height: 85vh !important;
+}
+[data-baseweb="tab-panel"] {
+    min-height: 60vh !important;
+}
 
 .custom-header {
     background-color: #ffffff;
@@ -468,4 +481,5 @@ st.markdown('''
     Powered by Python & Streamlit
 </div>
 ''', unsafe_allow_html=True)
+
 
