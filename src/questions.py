@@ -228,6 +228,40 @@ def gen_param_nuance_dropdup():
         'check': lambda x: "keep" in _prep(x) and "last" in _prep(x)
     }
 
+
+def gen_py_for_loop():
+    ans = "for i in range(5):"
+    wrongs = ["for i in 5:", "for i=0 to 5:", "loop i in range(5):"]
+    return {
+        'topic': 'Python 기초 (반복문)', 
+        'question': "0부터 4까지 총 5번 반복하는 기본적인 파이썬 `for` 반복문의 첫 줄을 작성하세요.",
+        'expected': ans, 'wrongs': wrongs, 
+        'explanation': "파이썬에서 지정된 횟수만큼 반복할 때는 `range()` 함수를 사용합니다. `range(5)`는 0부터 4까지의 숫자를 생성합니다.",
+        'check': lambda x: "for" in _prep(x) and "range(5)" in _prep(x)
+    }
+
+def gen_py_function():
+    ans = "def my_func(a, b):"
+    wrongs = ["function my_func(a, b):", "def my_func(a, b)", "func my_func(a, b):"]
+    return {
+        'topic': 'Python 기초 (함수 정의)', 
+        'question': "두 개의 인자(a, b)를 받는 파이썬 함수 `my_func`를 정의하는 첫 줄 코드를 작성하세요. (콜론 포함)",
+        'expected': ans, 'wrongs': wrongs, 
+        'explanation': "파이썬에서 함수를 정의할 때는 `def` 키워드를 사용하며, 선언문 끝에 반드시 콜론(`:`)을 붙여야 합니다.",
+        'check': lambda x: "def" in _prep(x) and "my_func" in _prep(x) and ":" in _prep(x)
+    }
+
+def gen_py_basic_type():
+    ans = "type(data)"
+    wrongs = ["typeof(data)", "class(data)", "dtype(data)"]
+    return {
+        'topic': 'Python 기초 (자료형 확인)', 
+        'question': "변수 `data`의 파이썬 내장 자료형(Type)이 무엇인지 확인하는 내장 함수를 작성하세요.",
+        'expected': ans, 'wrongs': wrongs, 
+        'explanation': "파이썬의 기본 내장 함수인 `type()`을 사용하여 객체의 자료형(예: int, str, list 등)을 확인할 수 있습니다. Pandas의 `dtype`과는 다릅니다.",
+        'check': lambda x: "type(" in _prep(x) and "data" in _prep(x)
+    }
+
 def gen_py_loop_control():
     ans = "break"
     wrongs = ["continue", "pass", "stop"]
@@ -367,19 +401,41 @@ class QuizStrategy:
         self.easy_pool = easy_pool
         self.hard_pool = hard_pool
 
-ALL_EASY = [
+
+# ==========================================
+# 1. 종합 마스터 (Comprehensive) 모드 풀
+# ==========================================
+COMP_EASY = [
     gen_easy_read, gen_easy_head, gen_easy_info, gen_easy_isnull, 
     gen_easy_fillna, gen_easy_drop, gen_easy_filter,
     gen_viz_bar, gen_viz_scatter, gen_viz_hist,
+    gen_py_for_loop, gen_py_function, gen_py_basic_type,
     gen_py_loop_control, gen_py_str_split, gen_py_list_slice, gen_py_dict_get,
     gen_sns_pairplot, gen_sns_boxplot, gen_np_log1p
 ]
 
-ALL_HARD = [
+COMP_HARD = [
     gen_hard_merge, gen_hard_pivot, gen_hard_str, gen_hard_dt,
     gen_numpy_array, gen_ml_split, gen_ml_rf, gen_viz_sns,
     gen_param_nuance_concat, gen_param_nuance_dropdup,
     gen_ml_knn, gen_ml_stratify
+]
+
+# ==========================================
+# 2. 베이직 (Basic / Day 1~4) 모드 풀
+# ==========================================
+# 현업 수준의 치명적 뉘앙스, 시각화 세부 파라미터, 복잡한 ML은 제외하고
+# 교안(PDF) 및 수업(Jupyter) 기반의 가장 확실한 뼈대만 남긴 풀
+BASIC_EASY = [
+    gen_easy_read, gen_easy_head, gen_easy_info, gen_easy_isnull, 
+    gen_easy_fillna, gen_easy_drop, gen_easy_filter,
+    gen_py_for_loop, gen_py_function, gen_py_basic_type,
+    gen_py_loop_control, gen_py_str_split, gen_py_list_slice, gen_py_dict_get
+]
+
+BASIC_HARD = [
+    gen_hard_merge, gen_hard_pivot, gen_hard_str, gen_hard_dt,
+    gen_numpy_array
 ]
 
 STRATEGIES = {
@@ -387,15 +443,15 @@ STRATEGIES = {
         id='bootcamp_day1_4',
         name='Day 1~4 Bootcamp (시험 대비)',
         description='단기 부트캠프 진도에 맞춘 핵심 위주의 출제 모드입니다.',
-        easy_pool=ALL_EASY,  
-        hard_pool=ALL_HARD
+        easy_pool=BASIC_EASY,  
+        hard_pool=BASIC_HARD
     ),
     'comprehensive': QuizStrategy(
         id='comprehensive',
         name='종합 마스터 (전범위 딥다이브)',
         description='모듈화된 모든 라이브러리의 방대한 전범위를 다루는 극한 모드입니다.',
-        easy_pool=ALL_EASY,
-        hard_pool=ALL_HARD
+        easy_pool=COMP_EASY,
+        hard_pool=COMP_HARD
     )
 }
 
