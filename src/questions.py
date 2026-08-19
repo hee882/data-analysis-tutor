@@ -262,6 +262,73 @@ def gen_py_basic_type():
         'check': lambda x: "type(" in _prep(x) and "data" in _prep(x)
     }
 
+
+def gen_easy_read_excel():
+    ans = "pd.read_excel('data.xlsx')"
+    wrongs = ["pd.read_csv('data.xlsx')", "pd.open_excel('data.xlsx')", "pd.load('data.xlsx')"]
+    return {
+        'topic': '데이터 불러오기 (Excel)', 
+        'question': "Pandas를 사용하여 'data.xlsx' 엑셀 파일을 읽어오는 코드를 작성하세요.",
+        'expected': ans, 'wrongs': wrongs, 
+        'explanation': "엑셀 파일은 `pd.read_excel()` 함수를 사용하여 불러옵니다. CSV는 `read_csv()`를 사용합니다.",
+        'check': lambda x: "read_excel" in _prep(x) and "data.xlsx" in _prep(x)
+    }
+
+def gen_easy_isna():
+    ans = "df.isna()"
+    wrongs = ["df.isnull()", "df.empty()", "df.missing()"]
+    return {
+        'topic': '결측치 확인', 
+        'question': "데이터프레임 `df` 내에 결측치(NaN)가 있는지 여부를 True/False로 반환하는 메서드를 작성하세요.",
+        'expected': ans, 'wrongs': wrongs, 
+        'explanation': "Pandas에서 결측치를 확인할 때는 `isna()` 메서드를 사용합니다. (`isnull()`과 동일하지만 최신 권장 사항입니다.)",
+        'check': lambda x: "isna()" in _prep(x)
+    }
+
+def gen_easy_dropna():
+    ans = "df.dropna()"
+    wrongs = ["df.drop_missing()", "df.remove_nan()", "df.clean()"]
+    return {
+        'topic': '결측치 제거', 
+        'question': "데이터프레임 `df`에서 결측치(NaN)가 포함된 행을 모두 제거하는 코드를 작성하세요.",
+        'expected': ans, 'wrongs': wrongs, 
+        'explanation': "`dropna()` 메서드는 결측치가 하나라도 포함된 행(row)을 삭제합니다.",
+        'check': lambda x: "dropna()" in _prep(x)
+    }
+
+def gen_easy_value_counts():
+    ans = "df['category'].value_counts()"
+    wrongs = ["df['category'].count_values()", "df['category'].counts()", "df['category'].groupby_count()"]
+    return {
+        'topic': '고유값 빈도수 계산', 
+        'question': "데이터프레임 `df`의 'category' 컬럼 내에 있는 각 고유값들의 등장 빈도수(개수)를 세는 코드를 작성하세요.",
+        'expected': ans, 'wrongs': wrongs, 
+        'explanation': "범주형 데이터의 빈도수를 확인할 때는 Series의 `value_counts()` 메서드를 사용합니다.",
+        'check': lambda x: "value_counts" in _prep(x) and "category" in _prep(x)
+    }
+
+def gen_easy_apply():
+    ans = "df['col'].apply(my_func)"
+    wrongs = ["df['col'].map_func(my_func)", "df['col'].run(my_func)", "df['col'].execute(my_func)"]
+    return {
+        'topic': '함수 일괄 적용', 
+        'question': "데이터프레임 `df`의 'col' 컬럼의 모든 요소에 사용자 정의 함수 `my_func`를 일괄 적용하는 코드를 작성하세요.",
+        'expected': ans, 'wrongs': wrongs, 
+        'explanation': "Pandas Series의 모든 원소에 특정 함수를 한 번에 적용하려면 `apply()` 메서드를 사용합니다.",
+        'check': lambda x: "apply" in _prep(x) and "my_func" in _prep(x)
+    }
+
+def gen_easy_unique():
+    ans = "df['col'].unique()"
+    wrongs = ["df['col'].distinct()", "df['col'].levels()", "df['col'].drop_duplicates()"]
+    return {
+        'topic': '고유값 배열 추출', 
+        'question': "데이터프레임 `df`의 'col' 컬럼에 존재하는 고유값(중복 제거된 값)들의 배열을 반환하는 코드를 작성하세요.",
+        'expected': ans, 'wrongs': wrongs, 
+        'explanation': "`unique()` 메서드는 해당 컬럼 내에 존재하는 모든 종류의 값들을 중복 없이 numpy 배열로 반환합니다.",
+        'check': lambda x: "unique()" in _prep(x) and "col" in _prep(x)
+    }
+
 def gen_py_loop_control():
     ans = "break"
     wrongs = ["continue", "pass", "stop"]
@@ -406,8 +473,9 @@ class QuizStrategy:
 # 1. 종합 마스터 (Comprehensive) 모드 풀
 # ==========================================
 COMP_EASY = [
-    gen_easy_read, gen_easy_head, gen_easy_info, gen_easy_isnull, 
-    gen_easy_fillna, gen_easy_drop, gen_easy_filter,
+    gen_easy_read, gen_easy_read_excel, gen_easy_head, gen_easy_info, gen_easy_isnull, gen_easy_isna, 
+    gen_easy_fillna, gen_easy_dropna, gen_easy_drop, gen_easy_filter,
+    gen_easy_value_counts, gen_easy_apply, gen_easy_unique,
     gen_viz_bar, gen_viz_scatter, gen_viz_hist,
     gen_py_for_loop, gen_py_function, gen_py_basic_type,
     gen_py_loop_control, gen_py_str_split, gen_py_list_slice, gen_py_dict_get,
@@ -424,18 +492,19 @@ COMP_HARD = [
 # ==========================================
 # 2. 베이직 (Basic / Day 1~4) 모드 풀
 # ==========================================
-# 현업 수준의 치명적 뉘앙스, 시각화 세부 파라미터, 복잡한 ML은 제외하고
-# 교안(PDF) 및 수업(Jupyter) 기반의 가장 확실한 뼈대만 남긴 풀
+# 교수님 강의 교안 및 노트북 덤프를 철저히 분석하여,
+# 사용하지 않은 문법(isnull, fillna, .str, datetime, numpy 배열 등)을 완벽히 배제하고
+# 오직 수업에서 다룬 문법(isna, dropna, read_excel, apply, value_counts 등)만 남긴 풀
 BASIC_EASY = [
-    gen_easy_read, gen_easy_head, gen_easy_info, gen_easy_isnull, 
-    gen_easy_fillna, gen_easy_drop, gen_easy_filter,
+    gen_easy_read_excel, gen_easy_read, gen_easy_head, gen_easy_info, 
+    gen_easy_isna, gen_easy_dropna, gen_easy_drop, gen_easy_filter,
+    gen_easy_value_counts, gen_easy_apply, gen_easy_unique,
     gen_py_for_loop, gen_py_function, gen_py_basic_type,
-    gen_py_loop_control, gen_py_str_split, gen_py_list_slice, gen_py_dict_get
+    gen_py_loop_control, gen_py_list_slice
 ]
 
 BASIC_HARD = [
-    gen_hard_merge, gen_hard_pivot, gen_hard_str, gen_hard_dt,
-    gen_numpy_array
+    gen_hard_merge, gen_hard_pivot
 ]
 
 STRATEGIES = {
