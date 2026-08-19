@@ -1,5 +1,16 @@
 # 🚀 Data Science & ML Bootcamp
 
+<div align="center">
+  <img src="https://img.shields.io/badge/python-3.9+-blue.svg?style=flat-square&logo=python&logoColor=white" alt="Python">
+  <img src="https://img.shields.io/badge/Streamlit-FF4B4B?style=flat-square&logo=Streamlit&logoColor=white" alt="Streamlit">
+  <img src="https://img.shields.io/badge/pandas-150458.svg?style=flat-square&logo=pandas&logoColor=white" alt="Pandas">
+  <img src="https://img.shields.io/badge/scikit--learn-F7931E?style=flat-square&logo=scikit-learn&logoColor=white" alt="Scikit-Learn">
+  <img src="https://img.shields.io/badge/version-v1.0.0-success.svg?style=flat-square" alt="Version">
+  <img src="https://img.shields.io/badge/license-MIT-green.svg?style=flat-square" alt="License">
+</div>
+
+
+
 이 프로젝트는 파이썬 기반 데이터 분석 및 머신러닝의 풀스택 생태계(Python, Numpy, Pandas, Matplotlib, Seaborn, Scikit-learn)를 마스터하기 위한 **실전형 모의고사 및 부트캠프 시스템**입니다. 
 
 단순히 문법을 외우는 것을 넘어, 실무 현업에서 마주치는 실제 데이터를 어떻게 다룰 것인지, 그리고 치명적인 에러(Troubleshooting)를 어떻게 대처할 것인지를 훈련합니다.
