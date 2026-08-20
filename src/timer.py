@@ -1,4 +1,4 @@
-﻿import streamlit.components.v1 as components
+﻿import streamlit as st
 
 def inject_timer(time_limit_sec, start_timestamp):
     html_code = f"""
@@ -48,7 +48,7 @@ def inject_timer(time_limit_sec, start_timestamp):
         }}, 1000);
     </script>
     """
-    components.html(html_code, height=0)
+    st.html(html_code)
 
 def remove_timer():
     html_code = """
@@ -59,4 +59,4 @@ def remove_timer():
         if (window.timerInterval) clearInterval(window.timerInterval);
     </script>
     """
-    components.html(html_code, height=0)
+    st.html(html_code)
