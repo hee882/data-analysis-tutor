@@ -402,7 +402,7 @@ def gen_easy_while_loop():
     wrongs = ["0123", "12", "123", "01"]
     return {
         'topic': '[1] 파이썬 Basic - 파이썬 기초 (반복문)', 
-        'question': "다음 코드의 실행 결과로 올바른 것을 고르시오.\n\n`python\ncount = 0\nwhile count < 3:\n    print(count, end='')\n    count += 1\n`",
+        'question': "다음 코드의 실행 결과로 올바른 것을 고르시오.\n\n```python\ncount = 0\nwhile count < 3:\n    print(count, end='')\n    count += 1\n```",
         'expected': ans, 'wrongs': wrongs, 
         'explanation': "while 반복문은 count가 0, 1, 2일 때 실행되며, end='' 옵션으로 인해 줄바꿈 없이 012가 연속 출력됩니다.",
         'force_type': 'radio'
@@ -413,7 +413,7 @@ def gen_easy_list_mutability():
     wrongs = ["문자열은 수정이 가능하며, 리스트는 새로운 객체가 생성된다.", "리스트와 문자열 모두 수정할 수 있다.", "리스트와 문자열 모두 수정할 수 없다.", "리스트는 수정이 불가능하며, 문자열만 수정할 수 있다."]
     return {
         'topic': '[1] 파이썬 Basic - 파이썬 기초 (자료형)', 
-        'question': "다음 코드를 실행했을 때, 리스트와 문자열의 결과 처리에 대한 설명으로 옳은 것을 고르시오.\n\n`python\nmy_list = [1, 2, 3]\nmy_string = 'hello'\nmy_list[0] = 10\nmy_string = 'H' + my_string[1:]\n`",
+        'question': "다음 코드를 실행했을 때, 리스트와 문자열의 결과 처리에 대한 설명으로 옳은 것을 고르시오.\n\n```python\nmy_list = [1, 2, 3]\nmy_string = 'hello'\nmy_list[0] = 10\nmy_string = 'H' + my_string[1:]\n```",
         'expected': ans, 'wrongs': wrongs, 
         'explanation': "리스트(List)는 가변(Mutable) 객체이므로 값 수정이 가능하지만, 문자열(String)은 불변(Immutable) 객체이므로 재할당 시 새로운 객체가 생성됩니다.",
         'force_type': 'radio'
@@ -462,7 +462,7 @@ def gen_hard_train_predict():
     wrongs = ["X_train", "y_test", "X", "Y"]
     return {
         'topic': '[8] 머신러닝 기초 - 모델 예측 API', 
-        'question': "다음 코드에서 결정 트리 모델을 학습시키고, 테스트 데이터에 대한 예측을 수행하려고 합니다. 빈칸에 들어갈 코드로 가장 적절한 것을 고르시오.\n\n`python\ntree = DecisionTreeClassifier()\ntree.fit(X_train, y_train)\n\ny_pred = tree.predict(________)\n`",
+        'question': "다음 코드에서 결정 트리 모델을 학습시키고, 테스트 데이터에 대한 예측을 수행하려고 합니다. 빈칸에 들어갈 코드로 가장 적절한 것을 고르시오.\n\n```python\ntree = DecisionTreeClassifier()\ntree.fit(X_train, y_train)\n\ny_pred = tree.predict(________)\n```",
         'expected': ans, 'wrongs': wrongs, 
         'explanation': "모델 학습(fit)에는 훈련 데이터(X_train, y_train)가 사용되고, 새로운 데이터에 대한 예측(predict)을 수행할 때는 테스트 데이터의 피처(X_test)를 입력으로 제공해야 합니다.",
         'force_type': 'radio'
