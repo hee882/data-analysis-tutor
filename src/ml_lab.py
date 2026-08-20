@@ -168,21 +168,81 @@ def render_ml_lab():
                     st.pyplot(fig_reg)
                     
     with tab3:
-        st.header("상호작용 데이터 탐색 (Pairplot)")
-        st.markdown("선택한 데이터셋의 변수 간 관계를 시각적으로 확인해보세요.")
+        st.header("상호작용 데이터 탐색 (동적 시각화)")
+        st.markdown("데이터의 형태(범주형/수치형)에 따라 적합한 시각화 라이브러리(Seaborn) 함수를 선택하고 코드를 확인해보세요.")
         
-        dataset_name = st.radio("데이터셋 선택", ["iris", "tips"])
+        col_ds, col_plot = st.columns(2)
+        with col_ds:
+            dataset_name = st.selectbox("데이터셋 선택", ["iris", "tips", "titanic"])
         
-        if dataset_name == "iris":
-            df_eda = sns.load_dataset('iris')
-            hue_opts = [None] + df_eda.columns.tolist()
-            hue_col = st.selectbox("색상(Hue) 기준 변수", hue_opts, index=hue_opts.index('species'))
-        else:
-            df_eda = sns.load_dataset('tips')
-            hue_opts = [None] + df_eda.columns.tolist()
-            hue_col = st.selectbox("색상(Hue) 기준 변수", hue_opts, index=hue_opts.index('time') if 'time' in hue_opts else 0)
+        df_eda = sns.load_dataset(dataset_name)
+        
+        cat_cols = df_eda.select_dtypes(exclude=['float64', 'int64']).columns.tolist()
+        num_cols = df_eda.select_dtypes(include=['float64', 'int64']).columns.tolist()
+        all_cols = df_eda.columns.tolist()
+        
+        with col_plot:
+            plot_type = st.selectbox("시각화 함수 선택", ["sns.pairplot", "sns.scatterplot", "sns.boxplot", "sns.barplot", "sns.countplot", "sns.histplot"])
+
+        st.markdown("---")
+        
+        col_opt1, col_opt2 = st.columns(2)
+        with col_opt1:
+            hue_col = st.selectbox("색상(Hue) 기준 변수 (선택)", [None] + cat_cols, index=0)
             
-        if True: # Instant update
-            with st.spinner("그래프 생성 중..."):
-                fig_pair = sns.pairplot(df_eda, hue=hue_col)
-                st.pyplot(fig_pair.fig)
+        x_col, y_col = None, None
+        code_str = ""
+        
+        with col_opt2:
+            if plot_type == "sns.scatterplot":
+                x_col = st.selectbox("X축 (수치형)", num_cols, index=0)
+                y_col = st.selectbox("Y축 (수치형)", num_cols, index=1 if len(num_cols) > 1 else 0)
+            elif plot_type in ["sns.boxplot", "sns.barplot"]:
+                x_col = st.selectbox("X축 (범주형 권장)", all_cols, index=all_cols.index(cat_cols[0]) if cat_cols else 0)
+                y_col = st.selectbox("Y축 (수치형)", num_cols, index=0)
+            elif plot_type == "sns.countplot":
+                x_col = st.selectbox("X축 (범주형 권장)", all_cols, index=all_cols.index(cat_cols[0]) if cat_cols else 0)
+            elif plot_type == "sns.histplot":
+                x_col = st.selectbox("X축 (수치형)", num_cols, index=0)
+
+        # Set code and text
+        if plot_type == "sns.pairplot":
+            st.info("💡 pairplot은 데이터셋 내의 모든 수치형 변수 쌍의 관계를 한눈에 보여줍니다.")
+            code_str = f"sns.pairplot(df, hue={repr(hue_col)})"
+        elif plot_type == "sns.scatterplot":
+            st.info("💡 scatterplot(산점도)은 두 수치형(Numerical) 변수 간의 관계(상관성)를 확인하는 데 적합합니다.")
+            code_str = f"sns.scatterplot(data=df, x='{x_col}', y='{y_col}', hue={repr(hue_col)})"
+        elif plot_type in ["sns.boxplot", "sns.barplot"]:
+            func_name = plot_type.split('.')[1]
+            st.info(f"💡 {func_name}은 범주형(Categorical) 그룹별 수치형(Numerical) 변수의 분포나 평균을 비교할 때 유용합니다.")
+            code_str = f"{plot_type}(data=df, x='{x_col}', y='{y_col}', hue={repr(hue_col)})"
+        elif plot_type == "sns.countplot":
+            st.info("💡 countplot은 단일 범주형(Categorical) 변수의 데이터 개수(빈도)를 세어 막대 그래프로 나타냅니다.")
+            code_str = f"sns.countplot(data=df, x='{x_col}', hue={repr(hue_col)})"
+        elif plot_type == "sns.histplot":
+            st.info("💡 histplot은 단일 수치형(Numerical) 변수의 분포를 히스토그램으로 나타냅니다.")
+            code_str = f"sns.histplot(data=df, x='{x_col}', hue={repr(hue_col)}, kde=True)"
+
+        st.markdown("**💻 실행된 Python 코드 (Seaborn):**")
+        st.code(code_str, language='python')
+        
+        with st.spinner("그래프 생성 중..."):
+            try:
+                if plot_type == "sns.pairplot":
+                    fig_pair = sns.pairplot(df_eda, hue=hue_col)
+                    st.pyplot(fig_pair.fig)
+                else:
+                    fig, ax = plt.subplots(figsize=(10, 6))
+                    if plot_type == "sns.scatterplot":
+                        sns.scatterplot(data=df_eda, x=x_col, y=y_col, hue=hue_col, ax=ax)
+                    elif plot_type == "sns.boxplot":
+                        sns.boxplot(data=df_eda, x=x_col, y=y_col, hue=hue_col, ax=ax)
+                    elif plot_type == "sns.barplot":
+                        sns.barplot(data=df_eda, x=x_col, y=y_col, hue=hue_col, ax=ax)
+                    elif plot_type == "sns.countplot":
+                        sns.countplot(data=df_eda, x=x_col, hue=hue_col, ax=ax)
+                    elif plot_type == "sns.histplot":
+                        sns.histplot(data=df_eda, x=x_col, hue=hue_col, kde=True, ax=ax)
+                    st.pyplot(fig)
+            except Exception as e:
+                st.error(f"시각화 중 에러가 발생했습니다: {e}")
