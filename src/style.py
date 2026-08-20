@@ -42,16 +42,19 @@ header, footer, #MainMenu {{ display: none !important; }}
 /* -------------------------------------------------------------
    HUD CONTAINER (Stats)
 ------------------------------------------------------------- */
-.hud-container {
-    flex-wrap: nowrap !important;
-    white-space: nowrap !important;{
+.hud-container {{
     display: flex;
+    flex-wrap: nowrap !important;
+    white-space: nowrap !important;
     justify-content: flex-end;
     gap: 0.8rem;
     margin-bottom: 1rem;
 }}
 .hud-badge {{
     background: rgba(255, 255, 255, 0.8) !important;
+    white-space: nowrap !important;
+    min-width: max-content !important;
+    word-break: keep-all !important;
     backdrop-filter: blur(8px) !important;
     border: 1px solid rgba(0,0,0,0.1) !important;
     padding: 0.4rem 1rem !important;
@@ -93,9 +96,12 @@ header, footer, #MainMenu {{ display: none !important; }}
 /* -------------------------------------------------------------
    LAYOUT
 ------------------------------------------------------------- */
-.block-container {{ 
-    padding: 1rem 2rem 0.5rem 2rem !important; 
-    max-width: 98% !important; 
+.block-container {{
+    height: 100vh !important;
+    max-height: 100vh !important;
+    overflow: hidden !important; 
+    padding: 0.5rem 1rem 0rem 1rem !important; margin: 0 !important; 
+    width: 96vw !important; max-width: 96vw !important; 
     margin: 0 auto !important; 
     overflow-x: hidden !important;
 }}
@@ -218,10 +224,19 @@ div[data-testid="stToggle"] label {{
    MAIN CONTENT CARDS (Real Glassmorphism)
 ------------------------------------------------------------- */
 [data-testid="stVerticalBlockBorderWrapper"], .stForm {{
-    background: rgba(255, 255, 255, 0.8) !important; backdrop-filter: blur(48px) saturate(160%) !important; -webkit-backdrop-filter: blur(48px) saturate(160%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.4) !important; border-radius: 24px !important;
-    box-shadow: 0 32px 64px rgba(0, 0, 0, 0.08), inset 0 2px 6px rgba(255, 255, 255, 0.6) !important;
-    padding: 1.5rem !important; margin-bottom: 0.5rem !important; text-align: left !important;
+    background: linear-gradient(135deg, rgba(248, 250, 252, 0.95), rgba(226, 232, 240, 0.8)) !important; 
+    backdrop-filter: blur(48px) saturate(200%) !important; 
+    -webkit-backdrop-filter: blur(48px) saturate(200%) !important;
+    border: 1px solid rgba(148, 163, 184, 0.3) !important; 
+    border-top: 5px solid #6366f1 !important;
+    border-radius: 20px !important;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08), inset 0 2px 10px rgba(255, 255, 255, 1) !important;
+    padding: 2rem !important; margin-bottom: 0.5rem !important; text-align: left !important;
+    transition: all 0.3s ease !important;
+}}
+[data-testid="stVerticalBlockBorderWrapper"]:hover, .stForm:hover {{
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12), inset 0 2px 10px rgba(255, 255, 255, 1) !important;
+    transform: translateY(-2px) !important;
 }}
 
 /* -------------------------------------------------------------
@@ -322,7 +337,21 @@ ul[role="listbox"] li {
 ------------------------------------------------------------- */
 @media screen and (max-width: 768px) {{
     /* 1. Forbidden Zone: 하단 여백을 6rem으로 강제하여 컨텐츠가 탭바에 안가려지게 함 */
-    .block-container {{ padding: 0.5rem 0.8rem 6rem 0.8rem !important; margin: 0 auto !important; }}
+    .block-container {{
+    height: auto !important;
+    max-height: none !important;
+    overflow-y: auto !important;
+    padding: 0.5rem 0.8rem 6rem 0.8rem !important; margin: 0 auto !important; }}
+    
+    [data-testid="stAppViewContainer"] {{
+        overflow-y: auto !important;
+    }}
+    
+    [data-testid="column"] {{
+        max-height: none !important;
+        overflow-y: visible !important;
+    }}
+    
     
     .custom-header {{ flex-direction: row !important; align-items: center !important; justify-content: flex-start !important; gap: 0.5rem !important; margin-bottom: 0.5rem !important; padding: 0 !important; text-align: left !important; }}
     .header-top-row {{ margin: 0 !important; gap: 0.5rem !important; justify-content: flex-start !important; }}
@@ -334,15 +363,32 @@ ul[role="listbox"] li {
     div[data-testid="stToggle"]::before {{ font-size: 0.95rem; }}
     div[data-testid="stToggle"] label {{ font-size: 0.95rem !important; }}
     
-    [data-testid="stVerticalBlockBorderWrapper"], .stForm {{ padding: 1rem 1rem !important; border-radius: 16px !important; margin-bottom: 0.5rem !important; }}
+    [data-testid="stVerticalBlockBorderWrapper"], .stForm {{
+    background: linear-gradient(135deg, rgba(248, 250, 252, 0.95), rgba(226, 232, 240, 0.8)) !important; 
+    backdrop-filter: blur(48px) saturate(200%) !important; 
+    -webkit-backdrop-filter: blur(48px) saturate(200%) !important;
+    border: 1px solid rgba(148, 163, 184, 0.3) !important; 
+    border-top: 5px solid #6366f1 !important;
+    border-radius: 20px !important;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08), inset 0 2px 10px rgba(255, 255, 255, 1) !important;
+    padding: 1rem !important; margin-bottom: 0.5rem !important; text-align: left !important;
+    transition: all 0.3s ease !important;
+}}
+[data-testid="stVerticalBlockBorderWrapper"]:hover, .stForm:hover {{
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12), inset 0 2px 10px rgba(255, 255, 255, 1) !important;
+    transform: translateY(-2px) !important;
+}}
     
     div[role="radiogroup"] > label {{ padding: 0.6rem 0.8rem !important; min-height: 2.8rem !important; border-radius: 10px !important; margin-bottom: 0 !important; }}
     div[role="radiogroup"] > label > div:nth-child(2) {{ font-size: 0.9rem !important; line-height: 1.3 !important; }}
     
-    .hud-container {
+    .hud-container {{
     flex-wrap: nowrap !important;
-    white-space: nowrap !important;{ margin-bottom: 0.5rem !important; justify-content: flex-start !important; gap: 0.4rem !important; }}
-    .hud-badge {{ padding: 0.2rem 0.5rem !important; font-size: 0.75rem !important; }}
+    white-space: nowrap !important; margin-bottom: 0.5rem !important; justify-content: flex-start !important; gap: 0.4rem !important; }}
+    .hud-badge {{
+    white-space: nowrap !important;
+    min-width: max-content !important;
+    word-break: keep-all !important; padding: 0.2rem 0.5rem !important; font-size: 0.75rem !important; }}
     
     /* 2. iOS Style Bottom Dock for Tabs */
     [data-baseweb="tab-list"] {{ 
@@ -425,12 +471,36 @@ html, body, [data-testid="stAppViewContainer"], .main, .stApp, #root {{
     max-width: 100vw !important;
 }}
 [data-testid="stAppViewContainer"] {{
-    overflow-y: scroll !important; /* 항상 세로 스크롤바 트랙을 유지하여 컴포넌트 흔들림(Shift) 방지 */
+    overflow: hidden !important;
 }}
 
 
 /* Native tab highlight restored */
 [data-baseweb="tab-border"] {{ display: none !important; }}
+
+/* -------------------------------------------------------------
+   COLUMN SCROLL (Prevent Page Scroll)
+------------------------------------------------------------- */
+[data-testid="column"] {{
+    max-height: 80vh !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    scrollbar-width: none !important; /* Firefox */
+}}
+[data-testid="column"]::-webkit-scrollbar {{
+    display: none !important; /* Chrome/Safari */
+}}
+
+/* -------------------------------------------------------------
+   FULL WIDTH OVERRIDE
+------------------------------------------------------------- */
+[data-testid="stAppViewBlockContainer"] {{
+    max-width: 95vw !important;
+    width: 95vw !important;
+    padding: 1rem 1rem 0 1rem !important;
+}}
 </style>
 """
  
+
+
