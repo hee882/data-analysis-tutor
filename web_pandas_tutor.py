@@ -94,7 +94,7 @@ with tabs[0]:
     
     with study_col1:
         with st.container(border=True):
-            st.markdown(f"**Q. {q['topic']}** (객관식 4지선다)")
+            st.markdown(f"**Q. 다음 문제를 해결하는 코드를 선택하세요.**")
             st.markdown(f"{q['question']}")
             user_ans = st.radio("보기 선택", options=q['choices'], label_visibility="hidden", key=f"s_ans_endless", index=None)
 
@@ -109,6 +109,9 @@ with tabs[0]:
             exp_html = f'''
             <div style="background: {result_bg}; border: 2px solid {result_border}; border-radius: 20px; padding: 2rem; margin-bottom: 0; box-shadow: 0 12px 32px rgba(0,0,0,0.05);">
                 {result_title}
+                <div style="font-size: 0.95rem; font-weight: 700; color: #64748b; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="background: #e2e8f0; padding: 0.3rem 0.6rem; border-radius: 6px;">출제 주제</span> {q['topic']}
+                </div>
                 <h4 style="margin-top:0.5rem; margin-bottom:1rem; color:#3b82f6; font-size:1.2rem;">💡 정답 및 해설</h4>
                 <div style="background:#1e293b; padding:1.2rem; border-radius:12px; margin-bottom:1.2rem; font-family:'JetBrains Mono', monospace; color:#10b981; font-size:1.15rem; font-weight:700; line-height:1.4;">
                     {q['expected']}
