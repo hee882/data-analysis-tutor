@@ -98,9 +98,9 @@ header, footer, #MainMenu {{ display: none !important; }}
 ------------------------------------------------------------- */
 .block-container {{
     padding: 2rem 3rem !important;
-    max-width: 1300px !important;
+    max-width: 1400px !important;
     margin: 0 auto !important;
-    overflow-x: hidden !important;
+    overflow: visible !important;
 }}
 div[data-testid="stVerticalBlock"] {{ gap: 1rem !important; }}
 
@@ -473,7 +473,6 @@ ul[role="listbox"] li {{
 /* 글로벌 가로 스크롤 완전 차단 (데스크탑 와이드 모니터 이슈 방어) 및 세로 스크롤바 시프트 방지 */
 html, body, [data-testid="stAppViewContainer"], .main, .stApp, #root {{
     overflow-x: hidden !important;
-    max-width: 100vw !important;
 }}
 [data-testid="stAppViewContainer"] {{
     
