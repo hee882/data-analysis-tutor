@@ -97,7 +97,7 @@ header, footer, #MainMenu {{ display: none !important; }}
    LAYOUT
 ------------------------------------------------------------- */
 .block-container {{
-    padding: 2rem 1rem !important;
+    padding: 2rem 3rem !important;
     max-width: 1300px !important;
     margin: 0 auto !important;
     overflow-x: hidden !important;
@@ -476,7 +476,7 @@ html, body, [data-testid="stAppViewContainer"], .main, .stApp, #root {{
     max-width: 100vw !important;
 }}
 [data-testid="stAppViewContainer"] {{
-    overflow: hidden !important;
+    
 }}
 
 

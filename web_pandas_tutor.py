@@ -62,7 +62,7 @@ with tabs[0]:
 
     available_topics = get_available_topics(st.session_state.current_strategy)
     
-    tool_col1, tool_col2 = st.columns([6, 4], vertical_alignment="bottom")
+    tool_col1, tool_col2 = st.columns([1, 1], gap="medium", vertical_alignment="bottom")
     with tool_col1:
         selected_topic = st.selectbox("🎯 집중 학습할 주제 선택", available_topics, index=available_topics.index(st.session_state.s_topic) if st.session_state.s_topic in available_topics else 0)
     
@@ -88,7 +88,7 @@ with tabs[0]:
     study_col1, study_col2 = st.columns([1, 1], gap="large")
     
     with study_col1:
-        with st.container(height=720, border=True):
+        with st.container(border=True):
             st.markdown(f"**Q. {q['topic']}** " + ("(객관식 🖱️)" if q['type'] == 'radio' else "(주관식 ⌨️)"))
             st.markdown(f"{q['question']}")
             
@@ -133,7 +133,7 @@ with tabs[0]:
             st.button("제출 완료", disabled=True, use_container_width=True)
 
     with study_col2:
-        with st.container(height=720, border=False):
+        with st.container(border=False):
             if st.session_state.s_show_exp:
                 is_corr = st.session_state.s_correct
                 result_color = "#10b981" if is_corr else "#ef4444"
@@ -233,7 +233,9 @@ with tabs[1]:
 
     elif st.session_state.exam_state == 'finished':
         remove_timer()
-        st.balloons()
+        if not st.session_state.get('exam_balloons_shown', False):
+            st.balloons()
+            st.session_state.exam_balloons_shown = True
         elapsed_sec = int(st.session_state.exam_end_time - st.session_state.exam_start_time)
         m, s = divmod(elapsed_sec, 60)
         
@@ -267,7 +269,7 @@ with tabs[1]:
 
 with tabs[2]:
     remove_timer()
-    st.markdown("<h3 style='text-align: center; margin-bottom: 0.5rem;'>🏆 명예의 전당</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: center; margin-bottom: 1rem;'>🏆 명예의 전당</h3>", unsafe_allow_html=True)
     
     lb = load_leaderboard()
     
@@ -279,40 +281,42 @@ with tabs[2]:
         else:
             parsed_name, strategy = raw_name, "bootcamp_day1_4"
             
-        # 리더보드도 글로벌 모드 스위치에 따라 자동 필터링됨
         if strategy == st.session_state.current_strategy:
             row['display_name'] = parsed_name
             filtered_lb.append(row)
             
     if not filtered_lb:
-        st.info("해당 모드의 기록이 없습니다. 첫 번째 명예의 전당에 도전하세요!")
+        st.info("해당 과정의 랭킹이 없습니다. 첫 번째 랭커에 도전하세요!")
     else:
         df_lb = pd.DataFrame(filtered_lb)
         df_lb = df_lb.sort_values(by='score', ascending=False).reset_index(drop=True)
         
-        html = '<div class="lb-container">'
-        for i, row in df_lb.iterrows():
-            rank = i + 1
-            rank_class = f"lb-rank-{rank}" if rank <= 3 else ""
-            rank_display = ["🥇", "🥈", "🥉"][rank-1] if rank <= 3 else f"{rank}"
-            
-            name = row['display_name']
-            score = row['score']
-            date = pd.to_datetime(row['created_at'] if 'created_at' in row else row['date']).strftime('%y.%m.%d %H:%M')
-            
-            html += f'''
-            <div class="lb-row">
-                <div class="lb-rank {rank_class}">{rank_display}</div>
-                <div class="lb-name">{name}</div>
-                <div class="lb-score">{score} / 20</div>
-                <div class="lb-date">{date}</div>
-            </div>
-            '''
-        html += '</div>'
+        df_lb.index = df_lb.index + 1
         
-        st.markdown(html, unsafe_allow_html=True)
-
+        # 날짜 포맷
+        if 'created_at' in df_lb.columns:
+            df_lb['date_str'] = pd.to_datetime(df_lb['created_at']).dt.strftime('%m-%d %H:%M')
+        elif 'date' in df_lb.columns:
+            df_lb['date_str'] = pd.to_datetime(df_lb['date']).dt.strftime('%m-%d %H:%M')
+        else:
+            df_lb['date_str'] = "-"
+            
+        df_lb['time_sec'] = df_lb.get('time_sec', 0).astype(int).astype(str) + "초"
+        
+        display_df = df_lb[['display_name', 'score', 'time_sec', 'date_str']]
+        display_df.columns = ['유저 닉네임', '획득 점수 (점)', '소요 시간', '달성일']
+        
+        st.dataframe(
+            display_df,
+            use_container_width=True,
+            column_config={
+                "유저 닉네임": st.column_config.TextColumn("유저 닉네임", width="medium"),
+                "획득 점수 (점)": st.column_config.NumberColumn("획득 점수 (점)", format="%d 점"),
+                "소요 시간": st.column_config.TextColumn("소요 시간", width="small"),
+                "달성일": st.column_config.TextColumn("달성일", width="medium")
+            }
+        )
 with tabs[3]:
     remove_timer()
-    with st.container(height=720, border=False):
+    with st.container(border=False):
         render_ml_lab()
