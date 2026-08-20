@@ -1330,7 +1330,256 @@ def gen_killer_class_imbalance_strategy():
         'explanation': "클래스 불균형 해결 전략 비교: (1) SMOTE(오버샘플링): 소수 클래스 샘플을 보간(Interpolation)하여 합성 데이터를 생성합니다. 데이터가 부족할 때 효과적이지만, 실제 데이터 분포와 다른 인위적 패턴이 생길 수 있습니다. (2) 언더샘플링: 다수 클래스를 줄입니다. 빠르지만 정보 손실이 큽니다. (3) class_weight='balanced': 모델 학습 시 소수 클래스에 더 큰 페널티를 부여합니다 — 데이터를 변형하지 않으므로 가장 안전하며, sklearn 모델 대부분이 지원합니다. 데이터가 충분하다면 class_weight부터 시도하는 것이 실무의 기본 접근법입니다.",
         'force_type': 'radio'
     }
+import random
+
+def gen_easy_py_list_slice():
+    slices = [
+        ("lst[1:]", "두 번째 요소부터 끝까지"),
+        ("lst[:-2]", "처음부터 뒤에서 두 번째 요소 앞까지"),
+        ("lst[::-1]", "리스트 전체를 역순으로")
+    ]
+    code, desc = random.choice(slices)
+    ans = f"'{desc}' 추출"
+    wrongs = [f"'{w}' 추출" for c, w in slices if c != code] + ["오류 발생"]
+    return {
+        'topic': '[1] 파이썬 기초 - 리스트 슬라이싱',
+        'question': f"리스트 `lst = [10, 20, 30, 40, 50]`가 있습니다. `res = {code}`를 실행했을 때 `res`의 결과가 의미하는 것은 무엇인가요?",
+        'expected': ans,
+        'wrongs': random.sample(wrongs, 3),
+        'explanation': f"리스트 슬라이싱 `[start:stop:step]` 문법입니다. `lst[1:]`은 인덱스 1(두 번째)부터 끝까지, `lst[:-2]`는 인덱스 -2(뒤에서 두 번째) '전'까지를 의미하여 마지막 두 요소를 제외합니다. `lst[::-1]`은 step이 -1이므로 리스트를 뒤집습니다. 데이터 전처리나 문자열 파싱에서 매우 자주 쓰이는 기초 문법입니다."
+    }
+
+def gen_easy_py_dict_assign():
+    key = random.choice(['age', 'score', 'price'])
+    val = random.choice([25, 100, 5000])
+    dict_name = random.choice(['my_dict', 'info', 'data'])
+    ans = f"{dict_name}['{key}'] = {val}"
+    wrongs = [
+        f"{dict_name}.append('{key}': {val})",
+        f"{dict_name}.add('{key}', {val})",
+        f"{dict_name}.insert('{key}', {val})"
+    ]
+    return {
+        'topic': '[1] 파이썬 기초 - 딕셔너리 할당',
+        'question': f"딕셔너리 `{dict_name}`에 키가 '{key}'이고 값이 {val}인 새로운 쌍을 추가(또는 수정)하는 올바른 파이썬 코드는 무엇인가요?",
+        'expected': ans,
+        'wrongs': wrongs,
+        'explanation': f"딕셔너리에 새로운 키-값 쌍을 추가하거나 기존 값을 변경할 때는 `dict[key] = value` 형태를 사용합니다. 리스트처럼 `.append()`를 사용하지 않는다는 점에 주의하세요. 실무에서 JSON 데이터를 다루거나 새로운 속성을 동적으로 할당할 때 필수적인 문법입니다."
+    }
+
+def gen_easy_py_for_range():
+    start = random.randint(1, 3)
+    end = random.randint(5, 8)
+    ans = f"{end - 1}"
+    wrongs = [f"{end}", f"{end + 1}", f"{start - 1}"]
+    return {
+        'topic': '[1] 파이썬 기초 - for와 range',
+        'question': f"다음 코드에서 마지막으로 출력되는 `i`의 값은 무엇인가요?\n```python\nfor i in range({start}, {end}):\n    pass\nprint(i)\n```",
+        'expected': ans,
+        'wrongs': wrongs,
+        'explanation': f"`range(A, B)`는 A부터 시작해서 B-1까지의 정수를 생성합니다. 즉, 끝값 B는 포함되지 않습니다(Exclusive). 따라서 반복문이 모두 돌고 났을 때 `i`의 마지막 값은 `{end - 1}`이 됩니다. 반복문 작성 시 인덱스 범위 초과(Out of Range) 오류를 방지하기 위해 반드시 기억해야 할 파이썬의 핵심 특성입니다."
+    }
+
+def gen_easy_pd_series_create():
+    data = random.choice(["[10, 20, 30]", "['A', 'B', 'C']"])
+    idx = random.choice(["['x', 'y', 'z']", "[1, 2, 3]"])
+    ans = f"pd.Series({data}, index={idx})"
+    wrongs = [
+        f"pd.Series(data={data}, columns={idx})",
+        f"pd.DataFrame({data}, index={idx})",
+        f"pd.Series({idx}, index={data})"
+    ]
+    return {
+        'topic': '[2] Pandas 기초 - Series 생성',
+        'question': f"주어진 리스트 `data = {data}`를 값으로 하고, 인덱스를 `{idx}`로 지정하여 1차원 Pandas Series를 생성하는 올바른 코드는 무엇인가요?",
+        'expected': ans,
+        'wrongs': wrongs,
+        'explanation': f"Pandas의 Series는 1차원 데이터 구조로, 값(data)과 그에 대응하는 인덱스(index)로 구성됩니다. Series를 생성할 때는 `pd.Series(data, index=...)`를 사용합니다. 열 이름을 뜻하는 `columns` 파라미터는 2차원 구조인 DataFrame을 생성할 때 사용되므로 Series 생성 시에는 사용할 수 없습니다."
+    }
+
+def gen_easy_pd_df_create_dict():
+    col1 = random.choice(["'name'", "'city'"])
+    col2 = random.choice(["'age'", "'score'"])
+    ans = f"pd.DataFrame({{{col1}: lst1, {col2}: lst2}})"
+    wrongs = [
+        f"pd.DataFrame([{col1}: lst1, {col2}: lst2])",
+        f"pd.Series({{{col1}: lst1, {col2}: lst2}})",
+        f"pd.DataFrame(lst1, lst2)"
+    ]
+    return {
+        'topic': '[2] Pandas 기초 - 딕셔너리로 DataFrame 생성',
+        'question': f"리스트 `lst1`과 `lst2`를 각각 `{col1}`과 `{col2}` 컬럼으로 가지는 DataFrame을 딕셔너리를 활용하여 생성하는 올바른 코드는 무엇인가요?",
+        'expected': ans,
+        'wrongs': wrongs,
+        'explanation': f"딕셔너리의 키를 컬럼명으로, 딕셔너리의 값을 컬럼 데이터(리스트, 배열 등)로 사용하여 `pd.DataFrame(...)`에 전달하면 쉽게 DataFrame을 생성할 수 있습니다. 데이터를 직접 타이핑해서 테스트셋을 만들거나 웹 크롤링 결과를 표 형태로 변환할 때 가장 많이 사용되는 패턴입니다."
+    }
+
+def gen_easy_pd_col_math():
+    c1, c2 = random.choice([('price', 'tax'), ('math', 'eng'), ('A', 'B')])
+    new_col = random.choice(['total', 'sum', 'result'])
+    ans = f"df['{new_col}'] = df['{c1}'] + df['{c2}']"
+    wrongs = [
+        f"df['{new_col}'] = df['{c1}', '{c2}'].sum()",
+        f"df.{new_col} = df.{c1} + df.{c2}",
+        f"df.add_column('{new_col}', df['{c1}'] + df['{c2}'])"
+    ]
+    return {
+        'topic': '[2] Pandas 기초 - 컬럼 연산',
+        'question': f"DataFrame `df`에서 `{c1}` 컬럼과 `{c2}` 컬럼의 값을 더하여 새로운 `{new_col}` 컬럼을 생성하는 올바른 방법은 무엇인가요?",
+        'expected': ans,
+        'wrongs': wrongs,
+        'explanation': f"Pandas에서는 컬럼 간의 사칙연산을 벡터화(Vectorized)하여 매우 빠르게 수행할 수 있습니다. `df['A'] + df['B']`와 같이 Series 간 연산을 한 후, 이를 새로운 컬럼명 `df['new']`에 할당(`=`)하기만 하면 됩니다. `df.new`와 같이 점(.) 표기법으로 새로운 컬럼을 할당하는 것은 동작하지 않을 수 있으므로 대괄호 표기법을 사용하는 것이 안전합니다."
+    }
+
+def gen_easy_pd_cond_assign():
+    col1, val, col2, new_val = random.choice([
+        ('Age', 60, 'Status', "'Senior'"),
+        ('Score', 90, 'Grade', "'A'"),
+        ('Salary', 5000, 'Level', "'High'")
+    ])
+    ans = f"df.loc[df['{col1}'] >= {val}, '{col2}'] = {new_val}"
+    wrongs = [
+        f"df[df['{col1}'] >= {val}]['{col2}'] = {new_val}",
+        f"df.iloc[df['{col1}'] >= {val}, '{col2}'] = {new_val}",
+        f"df['{col2}'][df['{col1}'] >= {val}] = {new_val}"
+    ]
+    return {
+        'topic': '[2] Pandas 기초 - 조건부 값 할당',
+        'question': f"DataFrame `df`에서 `{col1}`이 {val} 이상인 행들의 `{col2}` 컬럼 값을 {new_val}로 변경하는 가장 올바르고 안전한 코드는 무엇인가요?",
+        'expected': ans,
+        'wrongs': wrongs,
+        'explanation': f"조건에 맞는 특정 위치의 값을 변경할 때는 반드시 `.loc[행조건, 열이름]`을 사용해야 합니다. `df[조건]['컬럼'] = 값` 형태로 사용하면 'SettingWithCopyWarning'이 발생하며 원본 데이터가 변경되지 않을 수 있습니다. 이는 Day3 실습에서 매우 강조된 부분으로, 데이터 전처리 시 가장 잦은 실수를 방지하는 핵심 문법입니다."
+    }
+
+def gen_easy_pd_apply_custom():
+    col = random.choice(['text', 'date', 'price'])
+    func = random.choice(['clean_text', 'parse_date', 'calc_tax'])
+    ans = f"df['{col}'].apply({func})"
+    wrongs = [
+        f"df['{col}'].apply({func}())",
+        f"df.apply(df['{col}'], {func})",
+        f"{func}(df['{col}'])"
+    ]
+    return {
+        'topic': '[2] Pandas 기초 - apply 함수 적용',
+        'question': f"DataFrame `df`의 `{col}` 컬럼의 모든 요소에 사용자 정의 함수 `{func}`를 각각 적용한 결과를 반환하는 코드는 무엇인가요?",
+        'expected': ans,
+        'wrongs': wrongs,
+        'explanation': f"Series의 각 요소에 복잡한 연산이나 커스텀 함수를 일괄 적용할 때는 `.apply(함수명)`을 사용합니다. 이때 주의할 점은 함수 자체를 전달해야 하므로 괄호 `()`를 붙이지 않는다는 것입니다. `apply(func())`라고 쓰면 함수를 즉시 실행한 결과를 전달하게 되어 오류가 발생합니다."
+    }
+
+def gen_easy_pd_unique():
+    col = random.choice(['category', 'city', 'type'])
+    ans = f"df['{col}'].unique()"
+    wrongs = [
+        f"df['{col}'].distinct()",
+        f"df['{col}'].nunique()",
+        f"pd.unique(df['{col}'].values())"
+    ]
+    return {
+        'topic': '[2] Pandas 기초 - 고유값 확인',
+        'question': f"DataFrame `df`의 `{col}` 컬럼에 어떤 고유한 값(카테고리)들이 존재하는지 중복 없이 배열(array) 형태로 확인하는 함수는 무엇인가요?",
+        'expected': ans,
+        'wrongs': wrongs,
+        'explanation': f"Series의 중복을 제거한 고유값 배열을 반환할 때는 `.unique()`를 사용합니다. SQL의 DISTINCT와 유사한 역할을 합니다. 참고로 `.nunique()`는 고유값의 '개수(number)'를 정수로 반환하며, `.value_counts()`는 각 고유값의 빈도수를 반환하므로 목적에 맞게 구별해서 사용해야 합니다."
+    }
+
+def gen_easy_ml_fit():
+    model = random.choice(['rf', 'lr', 'xgb'])
+    ans = f"{model}.fit(X_train, y_train)"
+    wrongs = [
+        f"{model}.train(X_train, y_train)",
+        f"{model}.fit(y_train, X_train)",
+        f"{model}.predict(X_train, y_train)"
+    ]
+    return {
+        'topic': '[3] 머신러닝 기초 - 모델 학습',
+        'question': f"분류 모델 `{model}` 객체가 준비되어 있을 때, 학습 데이터 `X_train`과 정답 `y_train`을 사용하여 모델을 학습(훈련)시키는 올바른 코드는 무엇인가요?",
+        'expected': ans,
+        'wrongs': wrongs,
+        'explanation': f"Scikit-learn(사이킷런)을 비롯한 대부분의 파이썬 ML 라이브러리에서 모델 학습은 항상 `.fit(X, y)` 메서드를 사용합니다. 이때 특징 데이터(X)가 먼저 오고 정답 레이블(y)이 뒤에 옵니다. `.train()`이 아니라는 점에 유의하세요. 이는 사이킷런 API의 가장 강력한 일관성 중 하나입니다."
+    }
+
+def gen_easy_ml_predict():
+    ans = "model.predict(X_test)"
+    wrongs = [
+        "model.fit(X_test)",
+        "model.predict(X_test, y_test)",
+        "model.score(X_test)"
+    ]
+    return {
+        'topic': '[3] 머신러닝 기초 - 모델 예측',
+        'question': "학습이 완료된 머신러닝 `model`을 사용하여, 새로운 테스트 데이터 `X_test`에 대한 예측값을 생성하는 올바른 코드는 무엇인가요?",
+        'expected': ans,
+        'wrongs': wrongs,
+        'explanation': f"학습된 모델에 새로운 데이터(특징)를 넣어 예측값을 얻으려면 `.predict(X_test)`를 사용합니다. 이때 예측 시점에는 당연히 정답(y_test)을 알 수 없거나 주지 않아야 하므로, X값만 전달해야 합니다. 반환값은 각 행에 대한 예측 결과를 담은 배열(array)입니다."
+    }
+
+def gen_easy_ml_score():
+    ans = "model.score(X_valid, y_valid)"
+    wrongs = [
+        "model.evaluate(X_valid, y_valid)",
+        "model.predict(X_valid, y_valid)",
+        "model.accuracy(X_valid, y_valid)"
+    ]
+    return {
+        'topic': '[3] 머신러닝 기초 - 모델 검증',
+        'question': "분류 모델 `model`에 대해, 검증 데이터 `X_valid`와 실제 정답 `y_valid`를 넣어 정확도(Accuracy)를 한 번에 계산해주는 사이킷런 메서드는 무엇인가요?",
+        'expected': ans,
+        'wrongs': wrongs,
+        'explanation': f"사이킷런 모델 객체의 `.score(X, y)` 메서드는 X를 통해 예측값을 구하고, 이를 실제 y와 비교하여 평가 지표(분류는 주로 정확도, 회귀는 R^2)를 바로 반환해 주는 편리한 함수입니다. 내부적으로 `predict`를 수행한 뒤 지표를 계산해 주므로 간단한 성능 확인 시 매우 유용합니다."
+    }
+
+def gen_easy_ml_train_test_split():
+    ts = random.choice([0.2, 0.25, 0.3])
+    ans = f"X_train, X_test, y_train, y_test = train_test_split(X, y, test_size={ts})"
+    wrongs = [
+        f"X_train, y_train, X_test, y_test = train_test_split(X, y, test_size={ts})",
+        f"train_X, train_y, test_X, test_y = train_test_split(X, y, test_size={ts})",
+        f"X_train, X_test, y_train, y_test = split_data(X, y, test_size={ts})"
+    ]
+    return {
+        'topic': '[3] 머신러닝 기초 - 데이터 분할',
+        'question': f"특징 데이터 `X`와 정답 데이터 `y`를 학습용과 테스트용으로 분할하려 합니다. 테스트 세트 비율을 {ts}로 설정하여 4개의 변수로 분할하는 올바른 코드는 무엇인가요?",
+        'expected': ans,
+        'wrongs': wrongs,
+        'explanation': f"`train_test_split`의 반환 순서는 항상 `X_train, X_test, y_train, y_test`입니다 (X를 먼저 학습/테스트로 나누고, y를 학습/테스트로 나눔). 이 언패킹 순서를 틀리게 적으면 학습과 정답 데이터가 뒤섞여 치명적인 오류가 발생하므로 완벽히 암기해야 하는 필수 문법입니다."
+    }
+
+def gen_easy_sns_load_dataset():
+    ds = random.choice(['titanic', 'tips', 'iris'])
+    ans = f"sns.load_dataset('{ds}')"
+    wrongs = [
+        f"pd.read_dataset('{ds}')",
+        f"sns.get_data('{ds}')",
+        f"sns.import_dataset('{ds}')"
+    ]
+    return {
+        'topic': '[2] Pandas & 시각화 - 데이터셋 로드',
+        'question': f"Seaborn 라이브러리(`sns`)에서 제공하는 교육용 내장 데이터셋인 '{ds}'를 Pandas DataFrame 형태로 불러오는 올바른 코드는 무엇인가요?",
+        'expected': ans,
+        'wrongs': wrongs,
+        'explanation': f"Seaborn은 시각화 실습을 위해 여러 샘플 데이터셋을 제공합니다. `sns.load_dataset('데이터셋이름')`을 사용하면 해당 데이터를 깃허브 등에서 다운로드하여 즉시 Pandas DataFrame으로 반환해 줍니다. Day1~3 실습에서 별도 CSV 파일 없이 실습 환경을 구성할 때 핵심적으로 사용된 함수입니다."
+    }
+
+def gen_easy_ml_gridsearch_best():
+    ans = "grid.best_estimator_"
+    wrongs = [
+        "grid.best_params_",
+        "grid.best_model",
+        "grid.best_score_"
+    ]
+    return {
+        'topic': '[3] 머신러닝 기초 - 하이퍼파라미터 튜닝',
+        'question': "`GridSearchCV`를 사용하여 객체 `grid`에 `.fit()`을 완료했습니다. 탐색 결과 가장 성능이 좋았던 '학습된 모델 자체'를 꺼내오기 위한 속성(attribute)은 무엇인가요?",
+        'expected': ans,
+        'wrongs': wrongs,
+        'explanation': f"`GridSearchCV`에서 `best_estimator_`는 최적의 파라미터로 전체 학습 데이터에 재학습된 '가장 좋은 모델(객체)'을 반환합니다. 반면 `best_params_`는 그때의 '파라미터 값(딕셔너리)'을, `best_score_`는 교차 검증 '최고 점수'를 반환합니다. 이 속성들 뒤에 언더스코어(`_`)가 붙는다는 점은 '학습(fit) 이후에 생성된 속성'이라는 사이킷런의 규칙입니다."
+    }
+
+
 ALL_EASY = [
+    gen_easy_py_list_slice, gen_easy_py_dict_assign, gen_easy_py_for_range, gen_easy_pd_series_create, gen_easy_pd_df_create_dict, gen_easy_pd_col_math, gen_easy_pd_cond_assign, gen_easy_pd_apply_custom, gen_easy_pd_unique, gen_easy_ml_fit, gen_easy_ml_predict, gen_easy_ml_score, gen_easy_ml_train_test_split, gen_easy_sns_load_dataset, gen_easy_ml_gridsearch_best,
     gen_py_list_comprehension, gen_py_dict_operations, gen_easy_drop_column, gen_easy_sort_values, gen_easy_describe, gen_easy_concat, gen_easy_corr,     gen_easy_while_loop, gen_easy_list_mutability, gen_easy_scaling_reason, gen_easy_iloc_slicing,
     gen_eda_concept_cat_num,
     gen_easy_read_excel, gen_easy_head, gen_easy_dtypes, gen_easy_isnull, 
