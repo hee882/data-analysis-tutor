@@ -20,35 +20,33 @@ def render_ml_lab():
     tab1, tab2, tab3 = st.tabs(["📊 기초 탐색 & 시각화 (EDA)", "🤖 예측 모델링 (ML)", "⌨️ 인터랙티브 코딩 샌드박스"])
 
     with tab1:
-        st.subheader("🔍 상호작용형 데이터 탐색")
-        st.markdown("데이터의 형태에 따라 적합한 시각화(Seaborn) 함수를 선택하고 동작 원리를 확인하세요.")
+        st.subheader("🔍 상호작용형 데이터 탐색 (비교 분석)")
+        st.markdown("다양한 시각화 설정을 추가(Add)하여 여러 그래프를 한눈에 비교해 보세요.")
         
+        if 'eda_configs' not in st.session_state:
+            st.session_state.eda_configs = []
+            
         col_ds, col_plot = st.columns(2)
         with col_ds:
             dataset_name = st.selectbox("데이터셋 선택", ["iris", "tips", "titanic", "penguins"], key="eda_ds")
         
         df_eda = sns.load_dataset(dataset_name).dropna()
-        
         cat_cols = df_eda.select_dtypes(exclude=['float64', 'int64']).columns.tolist()
         num_cols = df_eda.select_dtypes(include=['float64', 'int64']).columns.tolist()
         all_cols = df_eda.columns.tolist()
         
         with col_plot:
-            plot_type = st.selectbox("시각화 함수 선택", ["sns.scatterplot", "sns.histplot", "sns.boxplot", "sns.barplot", "sns.countplot", "sns.pairplot"], key="eda_plot")
+            plot_type = st.selectbox("시각화 함수 선택", ["sns.scatterplot", "sns.histplot", "sns.boxplot", "sns.barplot", "sns.countplot"], key="eda_plot")
 
-        st.markdown("---")
-        
-        col_opt1, col_opt2 = st.columns(2)
+        col_opt1, col_opt2, col_opt3 = st.columns([2, 2, 1])
         with col_opt1:
-            hue_col = st.selectbox("색상(Hue) 기준 변수 (선택)", [None] + cat_cols, index=0)
+            hue_col = st.selectbox("색상(Hue) 기준", [None] + cat_cols, index=0)
             
         x_col, y_col = None, None
-        code_str = ""
-        
         with col_opt2:
             if plot_type == "sns.scatterplot":
-                x_col = st.selectbox("X축 (수치형)", num_cols, index=0)
-                y_col = st.selectbox("Y축 (수치형)", num_cols, index=1 if len(num_cols) > 1 else 0)
+                x_col = st.selectbox("X축", num_cols, index=0)
+                y_col = st.selectbox("Y축", num_cols, index=1 if len(num_cols) > 1 else 0)
             elif plot_type in ["sns.boxplot", "sns.barplot"]:
                 x_col = st.selectbox("X축 (범주형 권장)", all_cols, index=all_cols.index(cat_cols[0]) if cat_cols else 0)
                 y_col = st.selectbox("Y축 (수치형)", num_cols, index=0)
@@ -57,48 +55,51 @@ def render_ml_lab():
             elif plot_type == "sns.histplot":
                 x_col = st.selectbox("X축 (수치형)", num_cols, index=0)
 
-        # Set code and text
-        if plot_type == "sns.pairplot":
-            st.info("💡 pairplot은 데이터셋 내의 모든 수치형 변수들 간의 관계를 한눈에 보여줍니다.")
-            code_str = f"sns.pairplot(df, hue={repr(hue_col)})"
-        elif plot_type == "sns.scatterplot":
-            st.info("💡 scatterplot(산점도)은 두 수치형(Numerical) 변수 간의 관계(상관성)를 확인하는 데 적합합니다.")
-            code_str = f"sns.scatterplot(data=df, x='{x_col}', y='{y_col}', hue={repr(hue_col)})"
-        elif plot_type in ["sns.boxplot", "sns.barplot"]:
-            func_name = plot_type.split('.')[1]
-            st.info(f"💡 {func_name}은 범주형(Categorical) 그룹별 수치형(Numerical) 변수의 분포나 평균을 비교할 때 사용합니다.")
-            code_str = f"{plot_type}(data=df, x='{x_col}', y='{y_col}', hue={repr(hue_col)})"
-        elif plot_type == "sns.countplot":
-            st.info("💡 countplot은 단일 범주형(Categorical) 변수의 차이와 개수(빈도)를 세어 막대 그래프로 나타냅니다.")
-            code_str = f"sns.countplot(data=df, x='{x_col}', hue={repr(hue_col)})"
-        elif plot_type == "sns.histplot":
-            st.info("💡 histplot은 단일 수치형(Numerical) 변수의 분포를 히스토그램으로 나타냅니다.")
-            code_str = f"sns.histplot(data=df, x='{x_col}', hue={repr(hue_col)}, kde=True)"
-
-        st.markdown("**👉 실행된 Python 코드 (Seaborn):**")
-        st.code(code_str, language='python')
-        
-        with st.spinner("그래프 생성 중..."):
-            try:
-                if plot_type == "sns.pairplot":
-                    fig_pair = sns.pairplot(df_eda, hue=hue_col)
-                    st.pyplot(fig_pair.fig)
-                else:
-                    fig, ax = plt.subplots(figsize=(10, 6))
-                    if plot_type == "sns.scatterplot":
-                        sns.scatterplot(data=df_eda, x=x_col, y=y_col, hue=hue_col, ax=ax)
-                    elif plot_type == "sns.boxplot":
-                        sns.boxplot(data=df_eda, x=x_col, y=y_col, hue=hue_col, ax=ax)
-                    elif plot_type == "sns.barplot":
-                        sns.barplot(data=df_eda, x=x_col, y=y_col, hue=hue_col, ax=ax)
-                    elif plot_type == "sns.countplot":
-                        sns.countplot(data=df_eda, x=x_col, hue=hue_col, ax=ax)
-                    elif plot_type == "sns.histplot":
-                        sns.histplot(data=df_eda, x=x_col, hue=hue_col, kde=True, ax=ax)
-                    st.pyplot(fig)
-            except Exception as e:
-                st.error(f"시각화 중 에러가 발생했습니다: {e}")
-
+        with col_opt3:
+            st.markdown("<div style='margin-top:28px;'></div>", unsafe_allow_html=True)
+            if st.button("➕ 그래프 추가", use_container_width=True):
+                st.session_state.eda_configs.append({
+                    'type': plot_type, 'ds': dataset_name, 'x': x_col, 'y': y_col, 'hue': hue_col
+                })
+                st.rerun()
+                
+        if st.session_state.eda_configs:
+            if st.button("🗑️ 모두 지우기"):
+                st.session_state.eda_configs = []
+                st.rerun()
+                
+            st.markdown("---")
+            # 2개씩 한 줄에 렌더링 (2x2 그리드 등)
+            cols = st.columns(2)
+            for i, config in enumerate(st.session_state.eda_configs):
+                with cols[i % 2]:
+                    # 작게 렌더링 (비교용)
+                    fig, ax = plt.subplots(figsize=(5, 3.5))
+                    c_df = sns.load_dataset(config['ds']).dropna()
+                    try:
+                        if config['type'] == "sns.scatterplot":
+                            sns.scatterplot(data=c_df, x=config['x'], y=config['y'], hue=config['hue'], ax=ax)
+                        elif config['type'] == "sns.boxplot":
+                            sns.boxplot(data=c_df, x=config['x'], y=config['y'], hue=config['hue'], ax=ax)
+                        elif config['type'] == "sns.barplot":
+                            sns.barplot(data=c_df, x=config['x'], y=config['y'], hue=config['hue'], ax=ax)
+                        elif config['type'] == "sns.countplot":
+                            sns.countplot(data=c_df, x=config['x'], hue=config['hue'], ax=ax)
+                        elif config['type'] == "sns.histplot":
+                            sns.histplot(data=c_df, x=config['x'], hue=config['hue'], kde=True, ax=ax)
+                        st.pyplot(fig)
+                        
+                        # 코드 스니펫 표시
+                        code_str = f"{config['type']}(data={config['ds']}, x='{config['x']}'"
+                        if config['y']: code_str += f", y='{config['y']}'"
+                        if config['hue']: code_str += f", hue='{config['hue']}'"
+                        code_str += ")"
+                        st.code(code_str, language='python')
+                    except Exception as e:
+                        st.error("그래프 생성 에러")
+        else:
+            st.info("👆 '그래프 추가' 버튼을 눌러 비교 캔버스에 시각화를 등록하세요.")
+            
     with tab2:
         st.subheader("🤖 알고리즘 실험 (Classification & Regression)")
         task_type = st.radio("머신러닝 태스크 선택", ["분류 (Classification) - 붓꽃 종 예측", "회귀 (Regression) - 팁 금액 예측"], horizontal=True)

@@ -88,7 +88,7 @@ with tabs[0]:
     study_col1, study_col2 = st.columns([1, 1], gap="large")
     
     with study_col1:
-        with st.container(height=650, border=True):
+        with st.container(height=720, border=True):
             st.markdown(f"**Q. {q['topic']}** " + ("(객관식 🖱️)" if q['type'] == 'radio' else "(주관식 ⌨️)"))
             st.markdown(f"{q['question']}")
             
@@ -133,7 +133,7 @@ with tabs[0]:
             st.button("제출 완료", disabled=True, use_container_width=True)
 
     with study_col2:
-        with st.container(height=650, border=False):
+        with st.container(height=720, border=False):
             if st.session_state.s_show_exp:
                 is_corr = st.session_state.s_correct
                 result_color = "#10b981" if is_corr else "#ef4444"
@@ -314,4 +314,5 @@ with tabs[2]:
 
 with tabs[3]:
     remove_timer()
-    render_ml_lab()
+    with st.container(height=720, border=False):
+        render_ml_lab()

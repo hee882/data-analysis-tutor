@@ -476,7 +476,7 @@ html, body, [data-testid="stAppViewContainer"], .main, .stApp, #root {{
     max-width: 100vw !important;
 }}
 [data-testid="stAppViewContainer"] {{
-    overflow-y: auto !important;
+    overflow: hidden !important;
 }}
 
 
@@ -493,6 +493,9 @@ html, body, [data-testid="stAppViewContainer"], .main, .stApp, #root {{
 ------------------------------------------------------------- */
 
 </style>
+
+
+
 """
  
 
