@@ -40,6 +40,30 @@ h1, h2, h3, h4, h5, strong {{ color: #0f172a !important; letter-spacing: -0.03em
 header, footer, #MainMenu {{ display: none !important; }}
 
 /* -------------------------------------------------------------
+   MODERN SCROLLBAR (Sleek & Clean)
+------------------------------------------------------------- */
+::-webkit-scrollbar {{
+    width: 6px;
+    height: 6px;
+}}
+::-webkit-scrollbar-track {{
+    background: transparent;
+}}
+::-webkit-scrollbar-thumb {{
+    background: rgba(100, 116, 139, 0.3);
+    border-radius: 10px;
+}}
+::-webkit-scrollbar-thumb:hover {{
+    background: rgba(100, 116, 139, 0.5);
+}}
+
+/* Firefox scrollbar support */
+* {{
+    scrollbar-width: thin;
+    scrollbar-color: rgba(100, 116, 139, 0.3) transparent;
+}}
+
+/* -------------------------------------------------------------
    LAYOUT
 ------------------------------------------------------------- */
 .block-container {{ 
@@ -179,7 +203,7 @@ div[role="radiogroup"] > label > div:nth-child(2) {{ font-family: 'JetBrains Mon
 
 
 /* -------------------------------------------------------------
-   MOBILE EXTREME OPTIMIZATION (??)
+   MOBILE EXTREME OPTIMIZATION
 ------------------------------------------------------------- */
 @media screen and (max-width: 768px) {{
     .block-container {{ padding: 0.5rem 0.8rem 4rem 0.8rem !important; margin: 0 auto !important; }}
@@ -202,19 +226,20 @@ div[role="radiogroup"] > label > div:nth-child(2) {{ font-family: 'JetBrains Mon
     .hud-container {{ margin-bottom: 0.5rem !important; justify-content: flex-start !important; gap: 0.4rem !important; }}
     .hud-badge {{ padding: 0.2rem 0.5rem !important; font-size: 0.75rem !important; }}
     
+    /* 모바일 탭 디자인 최적화 (하단 고정 찌꺼기 제거) */
     [data-baseweb="tab-list"] {{ 
-        bottom: 0 !important; width: 100% !important; border-radius: 0 !important; border-top: 1px solid rgba(0,0,0,0.1) !important;
-        padding: 0.3rem 0.2rem 1rem 0.2rem !important; max-width: none !important;
+        margin-bottom: 1rem !important;
+        padding: 0.2rem !important; 
     }}
-    [data-baseweb="tab"] {{ font-size: 0.85rem !important; padding: 0.4rem 0 !important; }}
-    [aria-selected="true"] {{ border-radius: 8px !important; box-shadow: none !important; background: transparent !important; color: {active_color} !important; border-bottom: 3px solid {active_color} !important; }}
+    [data-baseweb="tab"] {{ font-size: 0.85rem !important; padding: 0.5rem 0.1rem !important; }}
     
     .floating-exp {{ position: static; width: 100%; margin-top: 1rem !important; animation: none; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 1rem !important; border-radius: 16px !important; }}
 }}
 
 /* 글로벌 가로 스크롤 완전 차단 (데스크탑 와이드 모니터 이슈 방어) */
-html, body, [data-testid="stAppViewContainer"], .main, .stApp {{
+html, body, [data-testid="stAppViewContainer"], .main, .stApp, #root {{
     overflow-x: hidden !important;
+    max-width: 100vw !important;
 }}
 </style>
 """
