@@ -1641,12 +1641,12 @@ def generate_exam_quizzes(strategy_id='bootcamp_day1_4'):
             quizzes.append(q)
             
     if strategy_id == 'bootcamp_day1_4':
-        add_questions(easy_pool, 16)
-        add_questions(hard_pool, 2)
-        add_questions(killer_pool, 2)
+        add_questions(easy_pool, 8)  # 기초 파이썬/Pandas 8문제
+        add_questions(hard_pool, 9)  # 데이터사이언스/ML 심화 9문제
+        add_questions(killer_pool, 3) # 고난도/엣지케이스 3문제
     else:
-        add_questions(easy_pool, 8)
-        add_questions(hard_pool, 8)
+        add_questions(easy_pool, 6)
+        add_questions(hard_pool, 10)
         if killer_pool:
             add_questions(killer_pool, 4)
             
