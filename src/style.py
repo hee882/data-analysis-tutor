@@ -44,8 +44,8 @@ header, footer, #MainMenu {{ display: none !important; }}
 ------------------------------------------------------------- */
 .block-container {{ 
     padding: 1rem 1rem 6rem 1rem !important; 
-    max-width: 650px !important; 
-    margin: 0 auto 0 10% !important;
+    max-width: 800px !important; 
+    margin: 0 auto !important; 
     overflow-x: hidden !important;
 }}
 div[data-testid="stVerticalBlock"] {{ gap: 1rem !important; }}
@@ -73,7 +73,7 @@ div[data-testid="stToggle"] label {{ color: {active_color} !important; font-weig
 ------------------------------------------------------------- */
 [data-baseweb="tab-list"] {{
     position: fixed !important; bottom: 1.5rem !important; left: 50% !important; transform: translateX(-50%) !important;
-    width: 90% !important; max-width: 500px !important;
+    width: 95% !important; max-width: 700px !important;
     background: rgba(255, 255, 255, 0.8) !important; backdrop-filter: blur(24px) saturate(200%) !important; -webkit-backdrop-filter: blur(24px) saturate(200%) !important;
     border: 1px solid rgba(255, 255, 255, 0.9) !important; border-radius: 99px !important;
     padding: 0.4rem !important; margin: 0 !important; z-index: 9999 !important;
@@ -82,7 +82,7 @@ div[data-testid="stToggle"] label {{ color: {active_color} !important; font-weig
 }}
 [data-baseweb="tab"] {{ 
     flex: 1 !important; border-radius: 99px !important; font-size: 0.95rem !important; font-weight: 700 !important; 
-    padding: 0.6rem 0 !important; color: #64748b !important; background: transparent !important; border: none !important;
+    padding: 0.6rem 0.2rem !important; color: #64748b !important; background: transparent !important; border: none !important;
 }}
 [aria-selected="true"] {{ background: {active_color} !important; color: #ffffff !important; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important; border: none !important; }}
 [aria-selected="false"]:hover {{ background: rgba(255, 255, 255, 0.5) !important; color: #0f172a !important; }}
@@ -137,8 +137,11 @@ div[role="radiogroup"] > label > div:nth-child(2) {{ font-family: 'JetBrains Mon
 .floating-exp {{ 
     position: fixed; 
     top: 15%; 
-    right: 3rem; 
-    width: 450px; 
+    right: 2rem; 
+    width: 400px; 
+    max-height: 80vh;
+    overflow-y: auto;
+    overflow-x: hidden;
     background: rgba(255, 255, 255, 0.85); 
     backdrop-filter: blur(32px) saturate(200%); 
     -webkit-backdrop-filter: blur(32px) saturate(200%);
@@ -150,6 +153,21 @@ div[role="radiogroup"] > label > div:nth-child(2) {{ font-family: 'JetBrains Mon
     text-align: left; 
     animation: slideInRight 0.5s cubic-bezier(0.16, 1, 0.3, 1); 
 }}
+
+/* 태블릿 및 작은 모니터 환경 방어 (가로 스크롤 및 겹침 방지) */
+@media screen and (max-width: 1250px) {{
+    .floating-exp {{ 
+        position: static !important; 
+        width: 100% !important; 
+        margin-top: 1.5rem !important; 
+        animation: none !important; 
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important; 
+        padding: 1.5rem !important; 
+        border-radius: 16px !important; 
+        max-height: none !important;
+    }}
+}}
+
 
 /* -------------------------------------------------------------
    MOBILE EXTREME OPTIMIZATION (??)
