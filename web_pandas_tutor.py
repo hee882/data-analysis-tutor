@@ -337,33 +337,30 @@ with tabs[2]:
             bg, border = rank_colors.get(rank, ("transparent", "transparent"))
             time_disp = f"{row_data['time_sec']}초" if row_data['time_sec'] > 0 else "-"
             bold = "font-weight: 700;" if rank <= 3 else ""
-            rows_html += f"""
-            <tr style="background: {bg}; border-left: 3px solid {border};">
-                <td style="text-align:center; font-size:1.3rem; padding: 0.75rem 1rem;">{medal}</td>
-                <td style="padding: 0.75rem 1rem; {bold}">{row_data['display_name']}</td>
-                <td style="text-align:center; padding: 0.75rem 1rem; {bold} color:#3b82f6; font-size:1.1rem;">{int(row_data['score'])} 점</td>
-                <td style="text-align:center; padding: 0.75rem 1rem; color:#64748b;">{time_disp}</td>
-                <td style="text-align:center; padding: 0.75rem 1rem; color:#94a3b8; font-size:0.9rem;">{row_data['date_str']}</td>
-            </tr>"""
+            rows_html += f"""<tr style="background: {bg}; border-left: 3px solid {border};">
+<td style="text-align:center; font-size:1.3rem; padding: 0.75rem 1rem;">{medal}</td>
+<td style="padding: 0.75rem 1rem; {bold}">{row_data['display_name']}</td>
+<td style="text-align:center; padding: 0.75rem 1rem; {bold} color:#3b82f6; font-size:1.1rem;">{int(row_data['score'])} 점</td>
+<td style="text-align:center; padding: 0.75rem 1rem; color:#64748b;">{time_disp}</td>
+<td style="text-align:center; padding: 0.75rem 1rem; color:#94a3b8; font-size:0.9rem;">{row_data['date_str']}</td>
+</tr>"""
 
-        lb_html = f"""
-        <div style="border-radius: 16px; overflow: hidden; border: 1px solid rgba(59,130,246,0.15); box-shadow: 0 8px 32px rgba(0,0,0,0.06);">
-            <table style="width:100%; border-collapse: collapse; font-size: 1rem;">
-                <thead>
-                    <tr style="background: linear-gradient(135deg, #1e293b, #0f172a); color: #94a3b8;">
-                        <th style="padding: 1rem; text-align:center; font-weight:600; letter-spacing:0.05em; width:60px;">순위</th>
-                        <th style="padding: 1rem; text-align:left; font-weight:600; letter-spacing:0.05em;">닉네임</th>
-                        <th style="padding: 1rem; text-align:center; font-weight:600; letter-spacing:0.05em;">점수</th>
-                        <th style="padding: 1rem; text-align:center; font-weight:600; letter-spacing:0.05em;">소요시간</th>
-                        <th style="padding: 1rem; text-align:center; font-weight:600; letter-spacing:0.05em;">달성일</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {rows_html}
-                </tbody>
-            </table>
-        </div>
-        """
+        lb_html = f"""<div style="border-radius: 16px; overflow: hidden; border: 1px solid rgba(59,130,246,0.15); box-shadow: 0 8px 32px rgba(0,0,0,0.06);">
+<table style="width:100%; border-collapse: collapse; font-size: 1rem;">
+<thead>
+<tr style="background: linear-gradient(135deg, #1e293b, #0f172a); color: #94a3b8;">
+<th style="padding: 1rem; text-align:center; font-weight:600; letter-spacing:0.05em; width:60px;">순위</th>
+<th style="padding: 1rem; text-align:left; font-weight:600; letter-spacing:0.05em;">닉네임</th>
+<th style="padding: 1rem; text-align:center; font-weight:600; letter-spacing:0.05em;">점수</th>
+<th style="padding: 1rem; text-align:center; font-weight:600; letter-spacing:0.05em;">소요시간</th>
+<th style="padding: 1rem; text-align:center; font-weight:600; letter-spacing:0.05em;">달성일</th>
+</tr>
+</thead>
+<tbody>
+{rows_html}
+</tbody>
+</table>
+</div>"""
         st.markdown(lb_html, unsafe_allow_html=True)
 
 with tabs[3]:
