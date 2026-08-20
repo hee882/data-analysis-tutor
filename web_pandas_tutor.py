@@ -88,7 +88,7 @@ with tabs[0]:
     study_col1, study_col2 = st.columns([1, 1], gap="large")
     
     with study_col1:
-        with st.container(border=True):
+        with st.container(height=650, border=True):
             st.markdown(f"**Q. {q['topic']}** " + ("(객관식 🖱️)" if q['type'] == 'radio' else "(주관식 ⌨️)"))
             st.markdown(f"{q['question']}")
             
@@ -133,39 +133,40 @@ with tabs[0]:
             st.button("제출 완료", disabled=True, use_container_width=True)
 
     with study_col2:
-        if st.session_state.s_show_exp:
-            is_corr = st.session_state.s_correct
-            result_color = "#10b981" if is_corr else "#ef4444"
-            result_bg = "rgba(16,185,129,0.05)" if is_corr else "rgba(239,68,68,0.05)"
-            result_border = "rgba(16,185,129,0.4)" if is_corr else "rgba(239,68,68,0.4)"
-            result_title = f"<h2 style='color: {result_color}; margin: 0 0 1rem 0; font-size: 2.2rem; font-weight: 800;'>{'🎉 정답입니다!' if is_corr else '❌ 오답입니다.'}</h2>"
+        with st.container(height=650, border=False):
+            if st.session_state.s_show_exp:
+                is_corr = st.session_state.s_correct
+                result_color = "#10b981" if is_corr else "#ef4444"
+                result_bg = "rgba(16,185,129,0.05)" if is_corr else "rgba(239,68,68,0.05)"
+                result_border = "rgba(16,185,129,0.4)" if is_corr else "rgba(239,68,68,0.4)"
+                result_title = f"<h2 style='color: {result_color}; margin: 0 0 1rem 0; font-size: 2.2rem; font-weight: 800;'>{'🎉 정답입니다!' if is_corr else '❌ 오답입니다.'}</h2>"
             
-            exp_html = f'''
-            <div style="background: {result_bg}; border: 2px solid {result_border}; border-radius: 20px; padding: 2rem; margin-bottom: 1.5rem; box-shadow: 0 12px 32px rgba(0,0,0,0.05);">
-                {result_title}
-                <h4 style="margin-top:0.5rem; margin-bottom:1rem; color:#3b82f6; font-size:1.2rem;">💡 정답 및 해설</h4>
-                <div style="background:#1e293b; padding:1.2rem; border-radius:12px; margin-bottom:1.2rem; font-family:'JetBrains Mono', monospace; color:#10b981; font-size:1.15rem; font-weight:700; line-height:1.4;">
-                    {q['expected']}
+                exp_html = f'''
+                <div style="background: {result_bg}; border: 2px solid {result_border}; border-radius: 20px; padding: 2rem; margin-bottom: 1.5rem; box-shadow: 0 12px 32px rgba(0,0,0,0.05);">
+                    {result_title}
+                    <h4 style="margin-top:0.5rem; margin-bottom:1rem; color:#3b82f6; font-size:1.2rem;">💡 정답 및 해설</h4>
+                    <div style="background:#1e293b; padding:1.2rem; border-radius:12px; margin-bottom:1.2rem; font-family:'JetBrains Mono', monospace; color:#10b981; font-size:1.15rem; font-weight:700; line-height:1.4;">
+                        {q['expected']}
+                    </div>
+                    <p style="font-weight:600; font-size:1.1rem; color:#1e293b; word-break:keep-all; line-height:1.7;">{q['explanation']}</p>
                 </div>
-                <p style="font-weight:600; font-size:1.1rem; color:#1e293b; word-break:keep-all; line-height:1.7;">{q['explanation']}</p>
-            </div>
-            '''
-            st.markdown(exp_html, unsafe_allow_html=True)
+                '''
+                st.markdown(exp_html, unsafe_allow_html=True)
                 
-            st.markdown('<style>button[kind="primary"] { font-size: 1.3rem !important; padding: 1rem !important; border-radius: 16px !important; box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4) !important; animation: pulse 2s infinite; } @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }</style>', unsafe_allow_html=True)
-            if st.button("✨ 다음 문제 풀기 (Endless) 🚀", type="primary", key="btn_study_next", use_container_width=True):
-                st.session_state.s_current_q = generate_single_quiz(st.session_state.current_strategy, st.session_state.get("s_topic", "전체 랜덤"))
-                st.session_state.s_attempts = 0
-                st.session_state.s_show_exp = False
-                st.session_state.s_correct = False
-                st.rerun()
-        else:
-            st.markdown('''
-            <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; min-height: 250px; opacity: 0.3; background: rgba(0,0,0,0.02); border-radius: 16px; border: 2px dashed rgba(0,0,0,0.1);">
-                <div style="font-size: 4rem; margin-bottom: 1rem; filter: grayscale(1);">🤔</div>
-                <p style="font-weight:700; font-size: 1.2rem; text-align:center;">문제를 풀고 제출하면<br>이곳에 정답과 해설이 나타납니다.</p>
-            </div>
-            ''', unsafe_allow_html=True)
+                st.markdown('<style>button[kind="primary"] { font-size: 1.3rem !important; padding: 1rem !important; border-radius: 16px !important; box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4) !important; animation: pulse 2s infinite; } @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }</style>', unsafe_allow_html=True)
+                if st.button("✨ 다음 문제 풀기 (Endless) 🚀", type="primary", key="btn_study_next", use_container_width=True):
+                    st.session_state.s_current_q = generate_single_quiz(st.session_state.current_strategy, st.session_state.get("s_topic", "전체 랜덤"))
+                    st.session_state.s_attempts = 0
+                    st.session_state.s_show_exp = False
+                    st.session_state.s_correct = False
+                    st.rerun()
+            else:
+                st.markdown('''
+                <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; min-height: 250px; opacity: 0.3; background: rgba(0,0,0,0.02); border-radius: 16px; border: 2px dashed rgba(0,0,0,0.1);">
+                    <div style="font-size: 4rem; margin-bottom: 1rem; filter: grayscale(1);">🤔</div>
+                    <p style="font-weight:700; font-size: 1.2rem; text-align:center;">문제를 풀고 제출하면<br>이곳에 정답과 해설이 나타납니다.</p>
+                </div>
+                ''', unsafe_allow_html=True)
 
 
 with tabs[1]:

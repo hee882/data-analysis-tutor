@@ -97,12 +97,9 @@ header, footer, #MainMenu {{ display: none !important; }}
    LAYOUT
 ------------------------------------------------------------- */
 .block-container {{
-    height: 100vh !important;
-    max-height: 100vh !important;
-    overflow: hidden !important; 
-    padding: 0.5rem 1rem 0rem 1rem !important; margin: 0 !important; 
-    width: 96vw !important; max-width: 96vw !important; 
-    margin: 0 auto !important; 
+    padding: 2rem 1rem !important;
+    max-width: 1300px !important;
+    margin: 0 auto !important;
     overflow-x: hidden !important;
 }}
 div[data-testid="stVerticalBlock"] {{ gap: 1rem !important; }}
@@ -247,10 +244,18 @@ div[role="radiogroup"] {{
     gap: 0.6rem !important; margin-top: 0.5rem !important; width: 100% !important;
 }}
 div[role="radiogroup"] > label {{
-    background: rgba(255, 255, 255, 0.6) !important; backdrop-filter: blur(12px) !important; border: 1px solid rgba(255, 255, 255, 0.9) !important;
-    border-radius: 14px !important; padding: 0.8rem 1rem !important; width: 100% !important; min-height: 3.5rem !important;
-    display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: flex-start !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.02) !important; transition: all 0.2s ease !important; margin: 0 !important;
+    width: 100% !important;
+    display: flex !important;
+    background: rgba(248, 250, 252, 0.6) !important;
+    border: 1px solid rgba(226, 232, 240, 0.8) !important;
+    border-radius: 12px !important;
+    padding: 1rem !important;
+    margin-bottom: 0.5rem !important;
+    transition: all 0.2s ease;
+}}
+div[role="radiogroup"] > label:hover {{
+    background: rgba(241, 245, 249, 1) !important;
+    border-color: #cbd5e1 !important;
 }}
 div[role="radiogroup"] > label:hover {{ background: rgba(255, 255, 255, 0.95) !important; border-color: #cbd5e1 !important; transform: scale(1.01) !important; box-shadow: 0 8px 20px rgba(0,0,0,0.06) !important; }}
 div[role="radiogroup"] > label:has(input:checked) {{ border-color: {active_color} !important; background: #ffffff !important; box-shadow: 0 0 0 2px {active_color}, 0 8px 20px rgba(0,0,0,0.15) !important; font-weight: 800 !important; border: 2px solid {active_color} !important; transform: scale(1.01) !important; }}
@@ -471,22 +476,14 @@ html, body, [data-testid="stAppViewContainer"], .main, .stApp, #root {{
     max-width: 100vw !important;
 }}
 [data-testid="stAppViewContainer"] {{
-    overflow: hidden !important;
+    overflow-y: auto !important;
 }}
 
 
 /* Native tab highlight restored */
 [data-baseweb="tab-border"] {{ display: none !important; }}
 
-/* -------------------------------------------------------------
-   COLUMN SCROLL (Prevent Page Scroll)
-------------------------------------------------------------- */
-[data-testid="column"] {{
-    max-height: 80vh !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    scrollbar-width: none !important; /* Firefox */
-}}
+
 [data-testid="column"]::-webkit-scrollbar {{
     display: none !important; /* Chrome/Safari */
 }}
@@ -494,11 +491,7 @@ html, body, [data-testid="stAppViewContainer"], .main, .stApp, #root {{
 /* -------------------------------------------------------------
    FULL WIDTH OVERRIDE
 ------------------------------------------------------------- */
-[data-testid="stAppViewBlockContainer"] {{
-    max-width: 95vw !important;
-    width: 95vw !important;
-    padding: 1rem 1rem 0 1rem !important;
-}}
+
 </style>
 """
  
