@@ -134,7 +134,7 @@ div[role="radiogroup"] > label > div:nth-child(2) {{ font-family: 'JetBrains Mon
 /* -------------------------------------------------------------
    DESKTOP EXPLANATION BOX (Right Side)
 ------------------------------------------------------------- */
-.floating-exp { 
+.floating-exp {{ 
     position: fixed; 
     top: 15%; 
     right: 3rem; 
@@ -149,7 +149,7 @@ div[role="radiogroup"] > label > div:nth-child(2) {{ font-family: 'JetBrains Mon
     z-index: 9999; 
     text-align: left; 
     animation: slideInRight 0.5s cubic-bezier(0.16, 1, 0.3, 1); 
-}
+}}
 
 /* -------------------------------------------------------------
    MOBILE EXTREME OPTIMIZATION (??)
