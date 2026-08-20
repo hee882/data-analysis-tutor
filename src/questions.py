@@ -470,7 +470,165 @@ def gen_killer_merge_suffixes():
         'force_type': 'radio'
     }
 
-ALL_KILLER = [gen_killer_chained_assignment, gen_killer_merge_suffixes]
+def gen_hard_data_leakage():
+    domain = random.choice(["금융 사기 탐지", "의료 진단", "주택 가격 예측", "고객 이탈 예측"])
+    scaler = random.choice(["StandardScaler", "MinMaxScaler", "RobustScaler"])
+    ans = "테스트 데이터(Test Data)에도 fit_transform()을 적용했다."
+    wrongs = [
+        "학습 데이터(Train Data)에만 fit_transform()을 적용했다.",
+        "테스트 데이터(Test Data)에는 transform()만 적용했다.",
+        f"{scaler} 대신 다른 스케일러를 사용하지 않았다."
+    ]
+    return {
+        'topic': '[8] 머신러닝 기초 - 데이터 누수(Data Leakage)',
+        'question': f"{domain} 모델을 개발하는 과정에서 데이터 누수(Data Leakage)가 발생하여 모델의 성능이 과장되게 측정되었습니다. 다음 중 데이터 누수를 유발한 결정적인 실수로 가장 올바른 것은 무엇입니까?",
+        'expected': ans,
+        'wrongs': wrongs,
+        'explanation': "스케일링 시 훈련 데이터로 기준(fit)을 잡고 변환(transform)해야 하며, 테스트 데이터는 훈련 데이터의 기준을 그대로 사용하여 변환(transform)만 해야 합니다. 테스트 데이터에 fit()을 수행하면 미래의 정보가 모델에 스며드는 데이터 누수(Leakage)가 발생합니다.",
+        'force_type': 'radio'
+    }
+
+def gen_hard_ml_sequence():
+    ans = "데이터 분할(Split) -> 결측치 처리(Imputation) -> 스케일링(Scaling) -> 모델 학습(Fit)"
+    wrongs = [
+        "결측치 처리(Imputation) -> 스케일링(Scaling) -> 데이터 분할(Split) -> 모델 학습(Fit)",
+        "데이터 분할(Split) -> 스케일링(Scaling) -> 결측치 처리(Imputation) -> 모델 학습(Fit)",
+        "결측치 처리(Imputation) -> 데이터 분할(Split) -> 스케일링(Scaling) -> 모델 학습(Fit)"
+    ]
+    return {
+        'topic': '[8] 머신러닝 기초 - 파이프라인 시퀀스',
+        'question': "머신러닝 전처리 및 학습 과정의 올바른 순서(Sequence)로 가장 적절한 것을 고르시오. (Data Leakage를 방지하는 관점)",
+        'expected': ans,
+        'wrongs': wrongs,
+        'explanation': "데이터 누수를 방지하기 위해 가장 먼저 Train/Test 분할을 수행한 뒤, Train 데이터를 기준으로 결측치를 채우고 스케일링 기준을 잡아 Test 데이터에 적용해야 합니다.",
+        'force_type': 'radio'
+    }
+
+def gen_hard_precision_recall():
+    contexts = [
+        ("암 진단", "실제 암 환자를 놓치면(정상으로 오진하면) 치명적이므로", "재현율(Recall)"),
+        ("불량품 검출", "실제 불량품이 시장에 유통되면 큰 손실이 발생하므로", "재현율(Recall)"),
+        ("스팸 메일 필터링", "정상 메일을 스팸으로 분류하여 중요한 연락을 못 받으면 안 되므로", "정밀도(Precision)"),
+        ("무죄 추정 원칙(재판)", "무고한 사람을 범죄자로 판결하는 억울한 상황을 막아야 하므로", "정밀도(Precision)")
+    ]
+    domain, reason, ans = random.choice(contexts)
+    wrongs = ["정밀도(Precision)", "재현율(Recall)", "F1-Score", "정확도(Accuracy)"]
+    wrongs.remove(ans) # Remove correct answer to form wrong list
+    random.shuffle(wrongs)
+    return {
+        'topic': '[8] 머신러닝 기초 - 평가 지표 (Precision vs Recall)',
+        'question': f"{domain} AI 모델을 설계하려고 합니다. {reason} 어떤 평가지표를 최우선으로 높이는(강조하는) 방향으로 모델의 임계값을 조정해야 합니까?",
+        'expected': ans,
+        'wrongs': wrongs[:3],
+        'explanation': "재현율(Recall)은 실제 양성(Positive) 중 모델이 찾아낸 비율로, 암 진단 등 FN(False Negative, 미탐)을 줄이는 것이 중요할 때 봅니다. 정밀도(Precision)는 모델이 양성이라고 예측한 것 중 실제 양성의 비율로, 스팸 메일 등 FP(False Positive, 오탐)를 줄여야 할 때 중요합니다.",
+        'force_type': 'radio'
+    }
+
+def gen_hard_overfitting():
+    ans = "과대적합(Overfitting)"
+    wrongs = ["과소적합(Underfitting)", "일반화(Generalization)", "정상적합(Good fit)"]
+    train_acc = random.randint(97, 100)
+    test_acc = random.randint(60, 75)
+    return {
+        'topic': '[8] 머신러닝 기초 - 과대적합(Overfitting)',
+        'question': f"머신러닝 모델을 평가한 결과, 훈련 데이터(Train data)에서의 정확도는 {train_acc}%로 매우 높게 나타났으나, 검증 데이터(Test data)에서의 정확도는 {test_acc}%로 크게 떨어졌습니다. 이 모델의 현재 상태를 설명하는 가장 정확한 용어는 무엇입니까?",
+        'expected': ans,
+        'wrongs': wrongs,
+        'explanation': "모델이 훈련 데이터에만 지나치게 맞춰져서(노이즈까지 암기함) 새로운 데이터에 대한 예측력이 떨어지는 현상을 과대적합이라고 합니다.",
+        'force_type': 'radio'
+    }
+
+def gen_hard_scaling_necessity():
+    ans = "랜덤 포레스트(Random Forest) 및 결정 트리(Decision Tree) 등 트리 기반 모델"
+    wrongs = [
+        "K-최근접 이웃(KNN, K-Nearest Neighbors)",
+        "서포트 벡터 머신(SVM)",
+        "로지스틱 회귀(Logistic Regression)"
+    ]
+    return {
+        'topic': '[4] 데이터 전처리 - 스케일링 필요성 비교',
+        'question': "머신러닝 알고리즘 중 값의 크기 차이(Scale)에 영향을 덜 받아 데이터 스케일링(Standardization, Normalization 등)이 필수적으로 요구되지 않는 알고리즘 계열은 무엇입니까?",
+        'expected': ans,
+        'wrongs': wrongs,
+        'explanation': "트리 기반 모델들은 각 변수의 값 기준으로 데이터를 분할(split)하기 때문에 변수 간의 크기 척도에 의존하지 않습니다. 반면 거리 기반 연산(KNN, SVM)이나 경사하강법 기반(선형회귀, 로지스틱)은 스케일링이 필수적입니다.",
+        'force_type': 'radio'
+    }
+
+def gen_hard_imputation_strategy():
+    domain = random.choice(["직원들의 연봉", "고객들의 자산", "부동산 주택 가격", "인터넷 쇼핑몰 결제액"])
+    ans = "중앙값(Median)으로 결측치 채우기"
+    wrongs = [
+        "평균값(Mean)으로 결측치 채우기",
+        "최빈값(Mode)으로 결측치 채우기",
+        "0으로 일괄 대체하기"
+    ]
+    return {
+        'topic': '[4] 데이터 전처리 - 결측치 처리 전략',
+        'question': f"'{domain}' 데이터를 분석하던 중 일부 데이터에 결측치가 발견되었습니다. 이 데이터의 분포는 극단적으로 큰 값(초고소득자 등 이상치)이 소수 존재하여 한쪽으로 꼬리가 긴 비대칭 형태(Skewed)를 보입니다. 결측치를 단일 대푯값으로 대체할 때, 평균 왜곡을 방지하기 위한 가장 안전한 대체 방법은 무엇입니까?",
+        'expected': ans,
+        'wrongs': wrongs,
+        'explanation': "데이터에 극단적인 이상치가 포함되어 있을 경우 평균(Mean)은 이상치에 의해 크게 왜곡(상향 편향)되므로, 이럴 때는 중앙값(Median)을 사용하는 것이 데이터의 원래 중심 경향을 가장 잘 보존하는 방법입니다.",
+        'force_type': 'radio'
+    }
+
+def gen_hard_imbalanced_accuracy():
+    fraud_pct = random.randint(1, 5)
+    ans = "데이터의 클래스 불균형(Imbalance) 문제 때문에, 정확도(Accuracy)만으로는 모델의 실제 탐지 능력을 판단할 수 없다."
+    wrongs = [
+        f"모델이 과소적합(Underfitting)되었으므로 훈련을 더 진행하면 정상 사기 탐지가 가능하다.",
+        f"모델 성능이 훌륭하므로 즉시 실무에 배포해도 무방하다.",
+        f"데이터가 {100-fraud_pct}%로 쏠려 있으므로 사기 건수를 삭제하여 양쪽을 모두 0건으로 맞춰야 한다."
+    ]
+    return {
+        'topic': '[8] 머신러닝 기초 - 불균형 데이터 평가지표 (정확도의 역설)',
+        'question': f"전체 결제 데이터 중 정상 결제가 {100-fraud_pct}%, 사기 결제가 {fraud_pct}%인 데이터를 분류하는 모델을 만들었습니다. 이 모델에 테스트 데이터를 넣었더니 정확도(Accuracy)가 {100-fraud_pct}%가 나왔습니다. 이에 대한 설명으로 가장 적절한 방법론적 컨셉은 무엇입니까?",
+        'expected': ans,
+        'wrongs': wrongs,
+        'explanation': "극단적인 불균형 데이터셋에서는 모델이 덮어놓고 '모두 정상 결제'라고만 예측해도 99%의 정확도를 달성합니다. 이를 정확도의 역설(Accuracy Paradox)이라 부르며, 이런 경우 정밀도(Precision), 재현율(Recall), F1-Score를 지표로 삼아야 합니다.",
+        'force_type': 'radio'
+    }
+
+def gen_killer_bagging_boosting():
+    ans = "배깅(Bagging)은 병렬로 독립적인 트리를 학습하여 분산(Variance)을 줄이고, 부스팅(Boosting)은 순차적으로 이전 트리의 오차를 보완하며 편향(Bias)을 줄인다."
+    wrongs = [
+        "배깅(Bagging)은 순차적으로 독립적인 트리를 학습하고, 부스팅(Boosting)은 병렬로 이전 모델을 보완한다.",
+        "배깅(Bagging)과 부스팅(Boosting) 모두 모델의 편향(Bias)을 줄이는 데만 목적이 있다.",
+        "배깅(Bagging)은 가중치를 부여하는 방식이고, 부스팅(Boosting)은 복원 추출(Bootstrap) 방식이다."
+    ]
+    return {
+        'topic': '[8] 머신러닝 기초 - 킬러 - 앙상블 (Bagging vs Boosting)',
+        'question': "대표적인 앙상블(Ensemble) 기법인 배깅(Bagging)과 부스팅(Boosting)의 차이점 및 주된 컨셉을 가장 올바르게 설명한 것을 고르시오.",
+        'expected': ans,
+        'wrongs': wrongs,
+        'explanation': "Random Forest 같은 배깅(Bagging) 기법은 데이터를 복원 추출하여 여러 모델을 병렬로 독립적으로 학습시켜 분산을 줄여 과적합을 방지합니다. 반면 Gradient Boosting 같은 부스팅(Boosting)은 모델을 순차적으로 학습하며 이전 모델이 틀린 오차에 가중치를 부여해 편향을 줄이는 데 집중합니다.",
+        'force_type': 'radio'
+    }
+
+def gen_killer_encoding_strategy():
+    domain_type = random.choice([
+        ("혈액형(A, B, O, AB), 성별", "One-hot Encoding (원핫 인코딩)", "명목형(순서나 우열이 없는) 데이터이기 때문에 숫자 크기에 의미를 부여해선 안 되므로"),
+        ("학력(초졸, 중졸, 고졸, 대졸), 만족도(1~5)", "Label Encoding (라벨 인코딩)", "순서형(Ordinal) 데이터이므로 카테고리 간의 대소(순서) 관계를 보존해야 하므로")
+    ])
+    category_examples, ans, reason = domain_type
+    
+    wrongs = ["One-hot Encoding (원핫 인코딩)", "Label Encoding (라벨 인코딩)", "Scaling (스케일링)", "Mean Encoding (평균 인코딩)"]
+    if ans in wrongs: wrongs.remove(ans)
+    random.shuffle(wrongs)
+    
+    return {
+        'topic': '[4] 데이터 전처리 - 킬러 - 범주형 데이터 인코딩',
+        'question': f"머신러닝 모델 학습을 위해 범주형 변수를 숫자형으로 변환하려고 합니다. 변수의 특성이 '{category_examples}'과 같을 때 가장 권장되는 인코딩 방법론과 그 컨셉적 이유는 무엇입니까?",
+        'expected': f"{ans} : {reason}",
+        'wrongs': [
+            f"{wrongs[0]} : 순서나 의미와 관계없이 가장 계산이 빠르므로",
+            f"{wrongs[1]} : 다중공선성(Multicollinearity)을 완벽히 방지할 수 있으므로",
+            f"{wrongs[2]} : 트리 기반 알고리즘에서는 무조건적으로 이 방식을 강제하므로"
+        ],
+        'explanation': "순서나 우열이 없는 명목형(Nominal) 범주는 One-hot Encoding으로 독립적인 차원을 만들어 숫자의 크기가 모델에 영향을 주지 않도록 해야 합니다. 반면 순서가 있는 순서형(Ordinal) 범주는 Label Encoding으로 변환해도 크기 관계가 의미를 갖습니다.",
+        'force_type': 'radio'
+    }
+
+ALL_KILLER = [gen_killer_chained_assignment, gen_killer_merge_suffixes, gen_killer_bagging_boosting, gen_killer_encoding_strategy]
 
 class QuizStrategy:
     def __init__(self, id, name, description, easy_pool, hard_pool, killer_pool=None):
@@ -568,6 +726,7 @@ def gen_hard_confusion_matrix():
     }
 
 
+
 ALL_EASY = [
     gen_easy_while_loop, gen_easy_list_mutability, gen_easy_scaling_reason, gen_easy_iloc_slicing,
     gen_eda_concept_cat_num,
@@ -579,7 +738,7 @@ ALL_EASY = [
 ]
 
 ALL_HARD = [
-    gen_hard_random_forest_concept, gen_hard_train_predict, gen_hard_confusion_matrix,
+    gen_hard_data_leakage, gen_hard_ml_sequence, gen_hard_precision_recall, gen_hard_overfitting, gen_hard_scaling_necessity, gen_hard_imputation_strategy, gen_hard_imbalanced_accuracy,     gen_hard_random_forest_concept, gen_hard_train_predict, gen_hard_confusion_matrix,
     gen_eda_concept_num_num,
     gen_hard_apply, gen_hard_groupby, gen_hard_merge, gen_hard_pivot,
     gen_ml_knn, gen_ml_split_stratify, gen_ml_cv
