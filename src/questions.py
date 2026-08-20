@@ -169,6 +169,45 @@ def gen_eda_concept_num_num():
         'force_type': 'radio'
     }
 
+
+def gen_easy_fillna():
+    ans = "df['age'].fillna(df['age'].median())"
+    wrongs = ["df['age'].dropna()", "df['age'] = df['age'].median()", "df.fillna()"]
+    return {
+        'topic': '데이터 전처리 (결측치 대체)', 
+        'question': "데이터프레임 `df`의 'age' 컬럼에 있는 결측치(NaN)를 'age' 컬럼의 중앙값(median)으로 채우는(대체하는) 코드를 작성하세요.",
+        'expected': ans, 'wrongs': wrongs, 
+        'explanation': "결측치를 단순히 제거(dropna)하지 않고, 중앙값이나 평균값으로 대체할 때는 `fillna()`를 사용합니다.",
+        'check': lambda x: "fillna" in _prep(x) and "median" in _prep(x)
+    }
+
+def gen_ml_concept():
+    ans = "분류(Classification)"
+    wrongs = ["회귀(Regression)", "군집화(Clustering)", "차원 축소(Dimensionality Reduction)"]
+    return {
+        'topic': '머신러닝 개념 (지도학습 방법론)', 
+        'question': "우리가 예측하려는 타겟(Target) 데이터가 '생존여부(0 또는 1)', '꽃의 종류(Iris-setosa 등)'와 같은 '범주형(Categorical) 데이터'일 때 사용하는 머신러닝 모델링 기법을 무엇이라고 하나요?",
+        'expected': ans, 'wrongs': wrongs, 
+        'explanation': "타겟이 연속된 수치형(예: 주택 가격)이면 회귀(Regression), 딱 떨어지는 범주형(예: 생존/사망)이면 분류(Classification)를 사용합니다.",
+        'check': lambda x: "분류" in x or "class" in x.lower(),
+        'force_type': 'radio'
+    }
+
+def gen_ml_split_basic():
+    ans = "train_test_split(X, y, test_size=0.2, random_state=42)"
+    wrongs = [
+        "train_test_split(X, y, 0.2, 42)", 
+        "split(X, y, test_size=0.2)", 
+        "pd.train_test_split(X, y, test_ratio=0.2)"
+    ]
+    return {
+        'topic': '데이터 분할 (train_test_split)', 
+        'question': "머신러닝 모델 학습과 평가를 위해 특징(X)과 타겟(y) 데이터를 나눕니다. 테스트 데이터 비율(test_size)을 20%로, 난수 고정(random_state)을 42로 설정하여 분할하는 함수 호출 코드를 작성하세요.",
+        'expected': ans, 'wrongs': wrongs, 
+        'explanation': "Scikit-learn의 `train_test_split`은 X와 y를 학습용/테스트용으로 나누어주는 가장 기본적인 데이터 준비 함수입니다.",
+        'check': lambda x: "train_test_split" in _prep(x) and "0.2" in _prep(x) and "42" in _prep(x)
+    }
+
 def gen_py_list_slice():
     ans = "lst[::-1]"
     wrongs = ["lst[-1:]", "lst.reverse()", "reversed(lst)"]
@@ -326,7 +365,8 @@ ALL_EASY = [
     gen_easy_read_excel, gen_easy_head, gen_easy_dtypes, gen_easy_isnull, 
     gen_easy_dropna, gen_easy_filter, gen_easy_loc, gen_easy_value_counts,
     gen_viz_countplot, gen_viz_histplot, gen_viz_scatter, gen_sns_boxplot,
-    gen_py_str_split, gen_py_list_slice, gen_np_log1p
+    gen_py_str_split, gen_py_list_slice, gen_np_log1p,
+    gen_easy_fillna, gen_ml_concept, gen_ml_split_basic
 ]
 
 ALL_HARD = [
