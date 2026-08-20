@@ -51,7 +51,11 @@ with tabs[0]:
     if 's_total_solved' not in st.session_state:
         st.session_state.s_total_solved = 0
         st.session_state.s_total_correct = 0
-        st.session_state.s_current_q = generate_single_quiz(st.session_state.current_strategy, st.session_state.get("s_topic", "전체 랜덤"))
+        if 's_recent_funcs' not in st.session_state:
+            st.session_state.s_recent_funcs = []
+        st.session_state.s_current_q = generate_single_quiz(st.session_state.current_strategy, st.session_state.get("s_topic", "전체 랜덤"), st.session_state.s_recent_funcs)
+        st.session_state.s_recent_funcs.append(st.session_state.s_current_q.get('func_name', ''))
+        st.session_state.s_recent_funcs = st.session_state.s_recent_funcs[-15:] # Keep last 15 to avoid exhausting pool too easily
         st.session_state.s_attempts = 0
         st.session_state.s_show_exp = False
         st.session_state.s_correct = False
@@ -67,7 +71,9 @@ with tabs[0]:
     
     if selected_topic != st.session_state.s_topic:
         st.session_state.s_topic = selected_topic
-        st.session_state.s_current_q = generate_single_quiz(st.session_state.current_strategy, selected_topic)
+        st.session_state.s_recent_funcs = [] # Clear history on topic change
+        st.session_state.s_current_q = generate_single_quiz(st.session_state.current_strategy, selected_topic, st.session_state.s_recent_funcs)
+        st.session_state.s_recent_funcs.append(st.session_state.s_current_q.get('func_name', ''))
         st.session_state.s_attempts = 0
         st.session_state.s_show_exp = False
         st.session_state.s_correct = False
@@ -177,7 +183,10 @@ with tabs[0]:
     with btn_col2:
         if st.session_state.s_show_exp:
             if st.button("다음 문제 풀기 (Endless) 🚀", type="primary", key="btn_study_next", use_container_width=True):
-                st.session_state.s_current_q = generate_single_quiz(st.session_state.current_strategy, st.session_state.get("s_topic", "전체 랜덤"))
+                if 's_recent_funcs' not in st.session_state: st.session_state.s_recent_funcs = []
+                st.session_state.s_current_q = generate_single_quiz(st.session_state.current_strategy, st.session_state.get("s_topic", "전체 랜덤"), st.session_state.s_recent_funcs)
+                st.session_state.s_recent_funcs.append(st.session_state.s_current_q.get('func_name', ''))
+                st.session_state.s_recent_funcs = st.session_state.s_recent_funcs[-20:] # up to 20
                 st.session_state.s_attempts = 0
                 st.session_state.s_show_exp = False
                 st.rerun()

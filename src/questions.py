@@ -898,7 +898,7 @@ def get_available_topics(strategy_id='bootcamp_day1_4'):
         topics.add(f()['topic'])
     return ["전체 랜덤"] + sorted(list(topics))
 
-def generate_single_quiz(strategy_id='bootcamp_day1_4', topic=None):
+def generate_single_quiz(strategy_id='bootcamp_day1_4', topic=None, exclude_funcs=None):
     strategy = get_strategy(strategy_id)
     pool = strategy.easy_pool + strategy.hard_pool
     
@@ -906,9 +906,15 @@ def generate_single_quiz(strategy_id='bootcamp_day1_4', topic=None):
         pool = [f for f in pool if f()['topic'] == topic]
         if not pool:
             pool = strategy.easy_pool + strategy.hard_pool
+            
+    if exclude_funcs:
+        filtered_pool = [f for f in pool if f.__name__ not in exclude_funcs]
+        if filtered_pool:
+            pool = filtered_pool
     
     f = random.choice(pool)
     q = f()
+    q['func_name'] = f.__name__
     
     q['type'] = 'radio'
     opts = [q['expected']] + q['wrongs'][:3]
