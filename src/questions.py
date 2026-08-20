@@ -718,7 +718,6 @@ def gen_killer_apply_lambda_axis():
         'force_type': 'radio'
     }
 
-ALL_KILLER = [gen_killer_chained_assignment, gen_killer_merge_suffixes, gen_killer_bagging_boosting, gen_killer_encoding_strategy, gen_killer_apply_lambda_axis]
 
 class QuizStrategy:
     def __init__(self, id, name, description, easy_pool, hard_pool, killer_pool=None):
@@ -818,8 +817,314 @@ def gen_hard_confusion_matrix():
 
 
 
+
+def gen_py_list_comprehension():
+    limit = random.choice([10, 20, 50])
+    cond = random.choice(['짝수(even)', '홀수(odd)', '3의 배수'])
+    if cond == '짝수(even)':
+        ans = f'[x for x in range({limit}) if x % 2 == 0]'
+    elif cond == '홀수(odd)':
+        ans = f'[x for x in range({limit}) if x % 2 != 0]'
+    else:
+        ans = f'[x for x in range({limit}) if x % 3 == 0]'
+    wrongs = [f'[x if x%2==0 for x in range({limit})]', f'list(filter(lambda x: x%2==0, range({limit})))', f'[x for x in range(1,{limit}) if x%2==0]']
+    return {
+        'topic': '[1] 파이썬 Basic - 리스트 컴프리헨션',
+        'question': f'range(0, {limit}) 중 {cond}만 골라 리스트로 만드는 가장 파이썬다운(Pythonic) 코드를 고르시오.',
+        'expected': ans,
+        'wrongs': wrongs,
+        'explanation': '리스트 컴프리헨션 [표현식 for 변수 in 이터러블 if 조건] 구조. filter()도 가능하지만 컴프리헨션이 더 가독성이 좋습니다.',
+        'force_type': 'radio'
+    }
+
+def gen_py_dict_operations():
+    ops = random.choice([('keys()', '딕셔너리의 모든 키', "dict_keys(['a','b','c'])"), ('values()', '딕셔너리의 모든 값', "dict_values([1,2,3])"), ('items()', '키와 값의 쌍을 튜플로', "dict_items([('a',1),('b',2)])")])
+    return {
+        'topic': '[1] 파이썬 Basic - 딕셔너리 메서드',
+        'question': f'딕셔너리 d = {{"a":1, "b":2, "c":3}}에서 {ops[1]}를 가져오는 메서드와 그 반환 형태로 올바른 것은?',
+        'expected': f'd.{ops[0]} → {ops[2]}',
+        'wrongs': [
+            f'd.{ops[0]} → list',
+            f'd.get_{ops[0]} → {ops[2]}',
+            f'd.{ops[1]} → {ops[2]}'
+        ],
+        'explanation': f'딕셔너리의 {ops[0]} 메서드는 {ops[1]}를 반환하며, 반환형은 {ops[2]} 형태와 같습니다.',
+        'force_type': 'radio'
+    }
+
+def gen_easy_drop_column():
+    col = random.choice(['age','city','memo','unused'])
+    df = random.choice(['df','data','records'])
+    return {
+        'topic': '[2] 데이터 로드 및 탐색 - 컬럼 삭제 (axis)',
+        'question': f'데이터프레임 `{df}`에서 `{col}` 컬럼을 삭제하는 코드로 올바른 것은? (단, axis=1은 열 방향, axis=0은 행 방향을 의미)',
+        'expected': f"{df}.drop('{col}', axis=1)",
+        'wrongs': [f"{df}.drop('{col}', axis=0)", f"{df}.remove('{col}')", f"del {df}['{col}']; {df}"],
+        'explanation': 'DataFrame에서 특정 컬럼(열)을 삭제할 때는 drop 메서드와 함께 axis=1을 지정해야 합니다.',
+        'force_type': 'radio'
+    }
+
+def gen_easy_sort_values():
+    col = random.choice(['score','sales','date','price'])
+    df = random.choice(['df','data','records'])
+    asc = random.choice([True, False])
+    return {
+        'topic': '[3] 데이터 추출 및 확인 - 정렬 (sort_values)',
+        'question': f"데이터프레임 `{df}`을(를) '{col}' 컬럼 기준으로 오름차순={asc}으로 정렬하는 코드를 작성하세요.",
+        'expected': f"{df}.sort_values('{col}', ascending={asc})",
+        'wrongs': [f"{df}.sort('{col}', ascending={asc})", f"{df}.sort_values('{col}')", f"{df}.orderby('{col}', ascending={asc})"],
+        'explanation': 'Pandas에서 데이터를 특정 열 기준으로 정렬할 때는 sort_values() 메서드를 사용하며, ascending 파라미터로 오름차순/내림차순을 지정할 수 있습니다.',
+        'check': lambda x: "sort_values" in x and col in x and str(asc) in x
+    }
+
+def gen_easy_describe():
+    return {
+        'topic': '[2] 데이터 로드 및 탐색 - describe() 통계 탐색',
+        'question': 'df.describe()의 출력에 포함되지 않는 통계량은?',
+        'expected': '최빈값(Mode)',
+        'wrongs': ['표준편차(std)', '중앙값(50%)', '최솟값(min)'],
+        'explanation': 'describe()는 count, mean, std, min, 25%, 50%, 75%, max를 출력하며 최빈값(Mode)은 포함되지 않습니다.',
+        'force_type': 'radio'
+    }
+
+def gen_easy_concat():
+    axis_val = random.choice([0, 1])
+    axis_desc = '행 방향(아래로 이어 붙이기)' if axis_val==0 else '열 방향(옆으로 이어 붙이기)'
+    df1 = random.choice(['df1','left','train'])
+    df2 = random.choice(['df2','right','test'])
+    return {
+        'topic': '[6] 데이터 병합 - pd.concat 기초',
+        'question': f"데이터프레임 `{df1}`와 `{df2}`를 {axis_desc} 위해 결합하는 코드로 올바른 것은?",
+        'expected': f'pd.concat([{df1}, {df2}], axis={axis_val})',
+        'wrongs': [f'pd.merge({df1}, {df2})', f'pd.concat([{df1}, {df2}], axis={1-axis_val})', f'{df1}.append({df2})'],
+        'explanation': 'pd.concat()은 데이터를 행(axis=0) 또는 열(axis=1) 방향으로 이어 붙일 때 사용합니다.',
+        'force_type': 'radio'
+    }
+
+def gen_easy_corr():
+    return {
+        'topic': '[7] EDA 및 시각화 - 상관관계 분석',
+        'question': '두 변수 간의 피어슨 상관계수(Pearson Correlation)에 대한 설명으로 올바른 것은?',
+        'expected': '값의 범위는 -1에서 +1이며, -1에 가까울수록 강한 음의 선형 관계를 의미한다.',
+        'wrongs': ['값의 범위는 0에서 1이며, 0이 완전한 선형 관계를 의미한다.', '두 변수의 인과관계(Causality)를 직접적으로 증명하는 지표다.', '값이 0이면 두 변수 사이에 어떠한 관계도 없음을 확정한다.'],
+        'explanation': '피어슨 상관계수는 -1부터 1 사이의 값을 가지며, 1은 완전한 양의 선형 관계, -1은 완전한 음의 선형 관계를 의미합니다. 인과관계나 비선형 관계는 설명하지 못합니다.',
+        'force_type': 'radio'
+    }
+
+def gen_hard_ml_eda_sequence():
+    return {
+        'topic': '[8] 머신러닝 기초 - ML 프로젝트 전체 시퀀스',
+        'question': 'ML 프로젝트의 올바른 진행 순서',
+        'expected': 'EDA(탐색) → 결측치/이상치 처리 → Feature Engineering → Train/Test 분할 → 모델 학습(fit) → 성능 평가',
+        'wrongs': ['Train/Test 분할 → EDA → 결측치 처리 → 모델 학습 → Feature Engineering → 성능 평가', 'EDA → Feature Engineering → 모델 학습 → Train/Test 분할 → 성능 평가', '결측치 처리 → 모델 학습 → EDA → Train/Test 분할 → Feature Engineering → 성능 평가'],
+        'explanation': '데이터 탐색과 전처리를 거친 후 데이터를 분할하고 모델을 학습시키는 것이 올바른 과정입니다.',
+        'force_type': 'radio'
+    }
+
+def gen_hard_fit_vs_fit_transform():
+    scaler = random.choice(['StandardScaler', 'MinMaxScaler'])
+    return {
+        'topic': '[4] 데이터 전처리 - fit/fit_transform/transform 구분',
+        'question': 'Train 데이터와 Test 데이터에 스케일러를 적용하는 올바른 방법',
+        'expected': f'Train에는 scaler.fit_transform(X_train), Test에는 scaler.transform(X_test)를 사용한다.',
+        'wrongs': ['두 데이터 모두 scaler.fit_transform()을 사용해야 스케일이 정확하게 맞춰진다.', 'Train에는 scaler.fit(), Test에는 scaler.fit_transform()을 사용한다.', '두 데이터 모두 scaler.transform()만 사용하면 자동으로 학습된다.'],
+        'explanation': 'Train 데이터에서만 스케일러의 기준을 찾고(fit) 변환(transform)해야 Data Leakage를 방지할 수 있습니다.',
+        'force_type': 'radio'
+    }
+
+def gen_hard_decision_tree_depth():
+    depth = random.choice([1, 2, 3])
+    return {
+        'topic': '[8] 머신러닝 기초 - Decision Tree max_depth 트레이드오프',
+        'question': f'max_depth=None(기본값)인 Decision Tree와 max_depth={depth}인 경우의 차이',
+        'expected': 'max_depth=None이면 모든 리프 노드의 불순도(Impurity)가 0이 될 때까지 분기하여 훈련 데이터에 과적합(Overfitting)된다.',
+        'wrongs': ['max_depth=None이면 분기를 전혀 하지 않아 항상 최빈 클래스만 예측한다.', f'max_depth={depth}이면 항상 더 높은 정확도를 보장한다.', 'max_depth 값이 클수록 과소적합(Underfitting)에 가까워진다.'],
+        'explanation': 'max_depth 제한이 없으면 트리가 끝까지 깊어져 훈련 데이터에 과적합됩니다.',
+        'force_type': 'radio'
+    }
+
+def gen_hard_knn_k_tradeoff():
+    k_val = random.choice([1, 3])
+    return {
+        'topic': '[8] 머신러닝 기초 - KNN K값 과적합/과소적합',
+        'question': f'K={k_val}로 설정한 KNN 모델에 대한 설명으로 올바른 것은?',
+        'expected': f'K={k_val}은 매우 작은 값으로, 훈련 데이터의 노이즈에 민감하게 반응하여 과적합(Overfitting)이 발생한다.',
+        'wrongs': [f'K={k_val}은 매우 작아서 과소적합(Underfitting)이 발생하며 결정 경계가 지나치게 단순해진다.', f'K={k_val}일 때 항상 최적의 성능을 보장한다.', 'KNN에서 K값은 모델 성능에 영향을 주지 않는다.'],
+        'explanation': 'KNN에서 K가 너무 작으면 이웃의 노이즈까지 학습하여 과적합이 발생합니다.',
+        'force_type': 'radio'
+    }
+
+def gen_hard_pipeline_why():
+    return {
+        'topic': '[8] 머신러닝 기초 - sklearn Pipeline 사용 이유',
+        'question': 'sklearn Pipeline을 사용하는 핵심 이유',
+        'expected': '전처리 단계를 파이프라인에 묶으면, Cross Validation 시 매 Fold마다 훈련 데이터 기준으로만 fit이 적용되어 데이터 누수(Data Leakage)를 원천 차단할 수 있다.',
+        'wrongs': ['코드를 짧게 쓸 수 있어 가독성만 높아진다.', 'Pipeline 없이는 sklearn 모델을 사용할 수 없다.', '모델의 정확도를 자동으로 향상시켜 주는 최적화 기능이 있다.'],
+        'explanation': '파이프라인은 교차 검증 시 각 fold별로 전처리와 모델 학습을 묶어서 실행해주어 데이터 누수를 방지합니다.',
+        'force_type': 'radio'
+    }
+
+def gen_hard_feature_importance_concept():
+    return {
+        'topic': '[8] 머신러닝 기초 - Feature Importance 해석',
+        'question': '트리 기반 모델의 feature_importances_ 속성에 대한 설명으로 옳은 것은?',
+        'expected': '각 변수가 불순도(Gini/Entropy) 감소에 기여한 정도를 나타내며, 스케일(Scale)에 독립적이다.',
+        'wrongs': ['수치가 클수록 해당 변수가 타겟과 인과관계(Causality)가 있음을 증명한다.', '스케일링을 적용한 후에만 의미 있는 값을 반환한다.', '모든 변수의 feature importance 합은 100이 된다.'],
+        'explanation': '트리 모델의 특성 중요도는 불순도를 얼마나 감소시켰는지를 나타내며, 스케일링 여부에 영향을 받지 않습니다.',
+        'force_type': 'radio'
+    }
+
+def gen_hard_classification_report():
+    tp = random.randint(40, 80)
+    fp = random.randint(10, 30)
+    fn = random.randint(10, 30)
+    precision = round(tp/(tp+fp)*100)
+    return {
+        'topic': '[8] 머신러닝 기초 - Precision/Recall 수치 계산',
+        'question': f'TP={tp}, FP={fp}, FN={fn}일 때 Precision(정밀도)는?',
+        'expected': f'{precision}% (모델이 Positive로 예측한 {tp+fp}건 중 실제 Positive {tp}건)',
+        'wrongs': [
+            f'{round(tp/(tp+fn)*100)}% (모델이 Positive로 예측한 {tp+fn}건 중 실제 Positive {tp}건)',
+            f'{round((tp+fp)/(tp+fp+fn)*100)}% (전체 예측 건수 대비 Positive)',
+            f'{round(fp/(tp+fp)*100)}% (모델이 Positive로 예측한 {tp+fp}건 중 오답 {fp}건)'
+        ],
+        'explanation': '정밀도(Precision)는 TP / (TP + FP)로 계산되며, 모델이 Positive로 예측한 것 중 실제 Positive의 비율입니다.',
+        'force_type': 'radio'
+    }
+
+def gen_hard_logistic_vs_linear():
+    scenarios = [('주택 가격 예측', '연속형 수치', '선형 회귀(Linear Regression)'), ('고객 이탈 여부 예측', '이진 범주형(0 또는 1)', '로지스틱 회귀(Logistic Regression)'), ('꽃의 종류 분류(3종)', '다중 범주형', '의사결정나무(Decision Tree) 또는 KNN')]
+    scenario = random.choice(scenarios)
+    ans = scenario[2]
+    wrongs = [s[2] for s in scenarios if s[2] != ans]
+    wrongs.append("K-Means 군집화")
+    return {
+        'topic': '[8] 머신러닝 기초 - 모델 유형 선택 (회귀 vs 분류)',
+        'question': f'타겟 변수가 "{scenario[1]}"인 경우 가장 적합한 모델 유형은? (예: {scenario[0]})',
+        'expected': ans,
+        'wrongs': wrongs,
+        'explanation': '연속형 예측은 회귀, 범주형 예측은 분류 모델을 사용해야 합니다.',
+        'force_type': 'radio'
+    }
+
+def gen_hard_get_dummies_drop_first():
+    return {
+        'topic': '[4] 데이터 전처리 - get_dummies drop_first 이유',
+        'question': 'pd.get_dummies(df, drop_first=True)에서 drop_first=True를 사용하는 이유',
+        'expected': '범주의 수가 k개인 변수를 원핫 인코딩하면 k개 컬럼이 생성되는데, k-1개만으로 정보가 완전히 표현 가능하므로 나머지 1개 제거로 다중공선성(Multicollinearity) 함정을 방지한다.',
+        'wrongs': ['첫 번째 컬럼은 무조건 결측치를 의미하기 때문에 모델 학습 시 방해가 되므로 제거한다.', '메모리 사용량을 절반으로 줄여서 학습 속도를 기하급수적으로 높이기 위해서다.', '첫 번째 데이터 포인트(행)를 버려서 아웃라이어를 제거하기 위함이다.'],
+        'explanation': '원핫 인코딩 시 발생하는 다중공선성(Dummy Variable Trap)을 방지하기 위해 k-1개의 가변수를 사용합니다.',
+        'force_type': 'radio'
+    }
+
+def gen_hard_model_selection_scenario():
+    scenarios = [('고객 구매 여부 예측(구매함/안함)', '분류(Classification)', 'Logistic Regression, Decision Tree, KNN'), ('내일 주가 예측(숫자 값)', '회귀(Regression)', 'Linear Regression, Random Forest Regressor'), ('비슷한 고객 군끼리 그룹화(레이블 없음)', '군집화(Clustering)', 'K-Means, DBSCAN')]
+    scenario = random.choice(scenarios)
+    ans = scenario[2]
+    wrongs = [s[2] for s in scenarios if s[2] != ans]
+    wrongs.append("PCA, t-SNE")
+    return {
+        'topic': '[8] 머신러닝 기초 - 실전 시나리오 모델 선택',
+        'question': f'"{scenario[0]}" 문제 해결을 위해 가장 적절한 머신러닝 알고리즘 조합은?',
+        'expected': ans,
+        'wrongs': wrongs,
+        'explanation': f'해당 문제는 {scenario[1]} 문제에 속하므로 관련된 모델을 선택해야 합니다.',
+        'force_type': 'radio'
+    }
+
+def gen_hard_cross_val_purpose():
+    cv = random.choice([5, 10])
+    return {
+        'topic': '[8] 머신러닝 기초 - K-Fold Cross Validation 목적',
+        'question': f'{cv}-Fold Cross Validation을 단순 Train/Test Split 대신 사용하는 핵심 이유',
+        'expected': f'데이터를 {cv}번 다르게 분할하여 모델을 반복 평가함으로써, 특정 분할 방식에 의한 우연적 편향 없이 더 신뢰할 수 있는 일반화 성능 추정치를 얻기 위해서',
+        'wrongs': ['데이터셋의 크기를 물리적으로 늘려주어 데이터가 적을 때 오버샘플링(Oversampling) 효과를 내기 위해서', '하이퍼파라미터 튜닝 없이도 모델의 정확도를 자동으로 100%에 가깝게 끌어올려 주기 위해서', 'Train 데이터의 노이즈를 완벽하게 제거해주는 전처리 기법이기 때문'],
+        'explanation': '교차 검증은 모델 성능의 분산을 줄이고 일반화 성능을 더 신뢰성 있게 평가하기 위해 사용합니다.',
+        'force_type': 'radio'
+    }
+
+def gen_hard_scaling_method_choice():
+    return {
+        'topic': '[4] 데이터 전처리 - 스케일러 선택 기준',
+        'question': 'MinMaxScaler를 사용했을 때 이상치(Outlier) 1개가 끼치는 영향',
+        'expected': '이상치가 min 또는 max 기준점이 되어 나머지 정상 데이터 값이 극단적으로 0 또는 1에 몰리게 된다. 이상치가 많은 경우 RobustScaler가 더 적합하다.',
+        'wrongs': ['이상치 여부와 무관하게 모든 데이터가 완벽한 정규분포를 따르게 된다.', '이상치 하나가 스케일링 전체 공식을 망가뜨려 에러를 발생시킨다.', '이상치도 다른 데이터와 동일한 간격으로 축소되어 전혀 문제가 되지 않는다.'],
+        'explanation': 'MinMaxScaler는 최솟값과 최댓값에 의존하므로 이상치에 매우 취약합니다.',
+        'force_type': 'radio'
+    }
+
+def gen_hard_random_state_purpose():
+    val = random.choice([0, 42, 123])
+    return {
+        'topic': '[8] 머신러닝 기초 - random_state 재현성',
+        'question': f'train_test_split(..., random_state={val})을 설정하는 이유',
+        'expected': '셔플 과정의 난수 시드(Seed)를 고정하여, 코드를 다시 실행해도 동일한 Train/Test 분할이 재현(Reproducibility)되도록 보장한다.',
+        'wrongs': ['무작위 분할 대신 정렬된 상태로 데이터를 순서대로 자르기 위함이다.', '모델의 학습 속도를 높이기 위한 최적화 옵션이다.', '학습할 때마다 다른 데이터를 사용하도록 무작위성을 무한으로 증가시킨다.'],
+        'explanation': 'random_state를 고정하면 매 실행마다 동일한 분할 결과를 얻을 수 있어 실험의 재현성이 확보됩니다.',
+        'force_type': 'radio'
+    }
+
+def gen_hard_confusion_matrix_reading():
+    tp = random.randint(50, 90)
+    tn = random.randint(50, 90)
+    fp = random.randint(5, 20)
+    fn = random.randint(5, 20)
+    accuracy = round((tp+tn)/(tp+tn+fp+fn)*100, 1)
+    precision = round(tp/(tp+fp)*100, 1)
+    return {
+        'topic': '[8] 머신러닝 기초 - Confusion Matrix 수치 해석',
+        'question': f'TP={tp}, TN={tn}, FP={fp}, FN={fn}일 때 다음 중 올바른 것은?',
+        'expected': f'정확도(Accuracy) = {accuracy}%, 정밀도(Precision) = {precision}%',
+        'wrongs': [
+            f'정확도(Accuracy) = {round(tp/(tp+fp)*100, 1)}%, 정밀도(Precision) = {round(tn/(tn+fn)*100, 1)}%',
+            f'정확도(Accuracy) = {round((tp+fn)/(tp+tn+fp+fn)*100, 1)}%, 정밀도(Precision) = {round((tp+tn)/(tp+fp)*100, 1)}%',
+            f'정확도(Accuracy) = {round(tn/(tp+tn+fp+fn)*100, 1)}%, 정밀도(Precision) = {round(tp/(tp+fn)*100, 1)}%'
+        ],
+        'explanation': 'Accuracy = (TP+TN) / (TP+TN+FP+FN), Precision = TP / (TP+FP) 입니다.',
+        'force_type': 'radio'
+    }
+
+def gen_hard_multi_condition_filter():
+    return {
+        'topic': '[3] 데이터 추출 및 확인 - 다중 조건 필터링 함정',
+        'question': 'Pandas에서 다중 조건 필터링 시 `and` 대신 `&`를 써야 하는 이유',
+        'expected': 'Pandas Boolean Indexing에서 `and`는 Python 스칼라 논리 연산자라 Series에 사용 불가. `&`는 원소별(element-wise) 비트 연산자이며, 조건마다 반드시 ()로 감싸야 한다.',
+        'wrongs': ['`and`를 사용하면 에러는 나지 않지만 결과가 항상 False로 나온다.', '`&`는 SQL 문법을 차용한 것으로 `and`와 기능은 완벽히 동일하나 속도가 빠르다.', '`and`는 문자열 필터링에만 사용하고 `&`는 숫자 필터링에만 사용하기 때문이다.'],
+        'explanation': 'Pandas의 Series(배열) 객체 간의 논리 연산은 원소별 연산을 지원하는 `&`, `|` 등을 사용해야 합니다.',
+        'force_type': 'radio'
+    }
+
+def gen_killer_pipeline_order():
+    return {
+        'topic': '[8] 머신러닝 기초 - 킬러 - Pipeline 순서',
+        'question': 'sklearn Pipeline을 구성할 때 다음 보기 중 올바른 순서를 고르시오.',
+        'expected': "Pipeline([('scaler', StandardScaler()), ('pca', PCA(n_components=2)), ('clf', DecisionTreeClassifier())])",
+        'wrongs': ["Pipeline([('clf', DecisionTreeClassifier()), ('scaler', StandardScaler()), ('pca', PCA())])", "Pipeline([('pca', PCA()), ('clf', DecisionTreeClassifier()), ('scaler', StandardScaler())])", "Pipeline([('pca', PCA()), ('scaler', StandardScaler()), ('clf', DecisionTreeClassifier())])"],
+        'explanation': '일반적인 파이프라인은 전처리(스케일러), 차원 축소(PCA 등), 그리고 마지막에 모델(분류기 등)이 와야 합니다.',
+        'force_type': 'radio'
+    }
+
+def gen_killer_target_leakage():
+    return {
+        'topic': '[0] 기타 - 킬러 - 타겟 누수(Target Leakage)',
+        'question': 'ML 모델 개발 중 Test 정확도가 비현실적으로 99.8%가 나왔습니다. 원인으로 가장 의심해야 할 것은?',
+        'expected': '학습 피처 중에 타겟 변수(미래 정보)가 결정된 이후에야 생성되는 데이터가 포함되어 있을 가능성이 높다. (타겟 누수: Target Leakage)',
+        'wrongs': ['하이퍼파라미터가 너무 완벽하게 튜닝되었기 때문이다.', '데이터의 크기가 너무 작아서 발생한 정상적인 현상이다.', 'Cross Validation을 여러 번 반복해서 모델이 테스트 셋을 완벽히 암기했기 때문이다.'],
+        'explanation': '모델 성능이 100%에 비정상적으로 가깝다면, 주로 예측 시점에는 알 수 없는 미래의 정보(타겟 누수)가 특징(Feature)에 포함되었기 때문입니다.',
+        'force_type': 'radio'
+    }
+
+def gen_killer_class_imbalance_strategy():
+    return {
+        'topic': '[8] 머신러닝 기초 - 킬러 - 클래스 불균형 전략',
+        'question': '클래스 불균형(Class Imbalance) 해결 전략에 대한 설명 중 가장 올바른 것은?',
+        'expected': 'SMOTE는 소수 클래스를 합성 생성하는 오버샘플링 기법으로, 데이터가 충분하지 않을 때 유용하지만 과적합 위험이 있다. class_weight는 모델 자체에 패널티를 부여하는 방식으로 데이터 변형 없이 빠르게 적용 가능하다.',
+        'wrongs': ['SMOTE는 다수 클래스의 데이터를 삭제하여 균형을 맞추는 언더샘플링 기법이다.', 'class_weight는 데이터 셋의 소수 클래스 데이터를 실제로 2배 복제해 주는 강력한 파라미터다.', '클래스 불균형 시에는 무조건 오버샘플링을 사용하는 것이 가장 빠르고 완벽한 방법이다.'],
+        'explanation': 'SMOTE는 K-NN 기반 합성 데이터를 생성하는 오버샘플링이고, class_weight는 학습 시 손실 함수에서 소수 클래스에 더 큰 가중치(패널티)를 부여합니다.',
+        'force_type': 'radio'
+    }
 ALL_EASY = [
-    gen_easy_while_loop, gen_easy_list_mutability, gen_easy_scaling_reason, gen_easy_iloc_slicing,
+    gen_py_list_comprehension, gen_py_dict_operations, gen_easy_drop_column, gen_easy_sort_values, gen_easy_describe, gen_easy_concat, gen_easy_corr,     gen_easy_while_loop, gen_easy_list_mutability, gen_easy_scaling_reason, gen_easy_iloc_slicing,
     gen_eda_concept_cat_num,
     gen_easy_read_excel, gen_easy_head, gen_easy_dtypes, gen_easy_isnull, 
     gen_easy_dropna, gen_easy_filter, gen_easy_loc, gen_easy_value_counts,
@@ -829,11 +1134,13 @@ ALL_EASY = [
 ]
 
 ALL_HARD = [
-    gen_hard_return_type_series_df, gen_hard_scaler_return_type, gen_hard_groupby_as_index, gen_hard_drop_duplicates_keep, gen_hard_data_leakage, gen_hard_ml_sequence, gen_hard_precision_recall, gen_hard_overfitting, gen_hard_scaling_necessity, gen_hard_imputation_strategy, gen_hard_imbalanced_accuracy,     gen_hard_random_forest_concept, gen_hard_train_predict, gen_hard_confusion_matrix,
+    gen_hard_ml_eda_sequence, gen_hard_fit_vs_fit_transform, gen_hard_decision_tree_depth, gen_hard_knn_k_tradeoff, gen_hard_pipeline_why, gen_hard_feature_importance_concept, gen_hard_classification_report, gen_hard_logistic_vs_linear, gen_hard_get_dummies_drop_first, gen_hard_model_selection_scenario, gen_hard_cross_val_purpose, gen_hard_scaling_method_choice, gen_hard_random_state_purpose, gen_hard_confusion_matrix_reading, gen_hard_multi_condition_filter,     gen_hard_return_type_series_df, gen_hard_scaler_return_type, gen_hard_groupby_as_index, gen_hard_drop_duplicates_keep, gen_hard_data_leakage, gen_hard_ml_sequence, gen_hard_precision_recall, gen_hard_overfitting, gen_hard_scaling_necessity, gen_hard_imputation_strategy, gen_hard_imbalanced_accuracy,     gen_hard_random_forest_concept, gen_hard_train_predict, gen_hard_confusion_matrix,
     gen_eda_concept_num_num,
     gen_hard_apply, gen_hard_groupby, gen_hard_merge, gen_hard_pivot,
     gen_ml_knn, gen_ml_split_stratify, gen_ml_cv
 ]
+
+ALL_KILLER = [gen_killer_pipeline_order, gen_killer_target_leakage, gen_killer_class_imbalance_strategy, gen_killer_chained_assignment, gen_killer_merge_suffixes, gen_killer_bagging_boosting, gen_killer_encoding_strategy, gen_killer_apply_lambda_axis]
 
 STRATEGIES = {
     'bootcamp_day1_4': QuizStrategy(

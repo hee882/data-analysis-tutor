@@ -1,4 +1,4 @@
-﻿import streamlit as st
+import streamlit as st
 import time
 import pandas as pd
 from datetime import datetime
@@ -136,18 +136,13 @@ with tabs[0]:
                 ''', unsafe_allow_html=True)
 
     st.markdown("<div style='margin-top: 1.5rem;'></div>", unsafe_allow_html=True)
-    
-    # Dedicated button row for perfect horizontal alignment
+
+    # 2-button row: left transitions Submit→Next in same position/size, right is always Pass
     btn_col1, btn_col2 = st.columns([1, 1], gap="large")
-    
+
     with btn_col1:
         if not st.session_state.s_show_exp:
-            sub_col1, sub_col2 = st.columns(2)
-            with sub_col1:
-                submit_clicked = st.button("정답 제출", type="primary", key="btn_study_submit", use_container_width=True)
-            with sub_col2:
-                pass_clicked = st.button("패스 (정답 보기)", key="btn_study_pass", use_container_width=True)
-                
+            submit_clicked = st.button("✅ 정답 제출하기", type="primary", key="btn_study_submit", use_container_width=True)
             if submit_clicked:
                 if not user_ans:
                     st.warning("보기를 선택해주세요.")
@@ -166,7 +161,25 @@ with tabs[0]:
                             st.session_state.s_show_exp = True
                             st.session_state.s_total_solved += 1
                 st.rerun()
-                
+        else:
+            # Same slot, same size — submit transforms into next
+            if st.button("➡️ 다음 문제 풀기", type="primary", key="btn_study_next", use_container_width=True):
+                if 's_recent_funcs' not in st.session_state:
+                    st.session_state.s_recent_funcs = []
+                st.session_state.s_current_q = generate_single_quiz(
+                    st.session_state.current_strategy,
+                    st.session_state.get("s_topic", "전체 랜덤"),
+                    st.session_state.s_recent_funcs
+                )
+                st.session_state.s_recent_funcs.append(st.session_state.s_current_q.get('func_name', ''))
+                st.session_state.s_recent_funcs = st.session_state.s_recent_funcs[-20:]
+                st.session_state.s_attempts = 0
+                st.session_state.s_show_exp = False
+                st.rerun()
+
+    with btn_col2:
+        if not st.session_state.s_show_exp:
+            pass_clicked = st.button("⏭️ 패스 (정답 보기)", key="btn_study_pass", use_container_width=True)
             if pass_clicked:
                 st.session_state.s_correct = False
                 st.session_state.s_show_exp = True
@@ -174,22 +187,7 @@ with tabs[0]:
                 st.session_state.s_attempts += 1
                 st.rerun()
         else:
-            sub_col1, sub_col2 = st.columns(2)
-            with sub_col1:
-                st.button("제출 완료", disabled=True, use_container_width=True)
-            with sub_col2:
-                st.button("결과 확인", disabled=True, use_container_width=True)
-
-    with btn_col2:
-        if st.session_state.s_show_exp:
-            if st.button("다음 문제 풀기 (Endless) 🚀", type="primary", key="btn_study_next", use_container_width=True):
-                if 's_recent_funcs' not in st.session_state: st.session_state.s_recent_funcs = []
-                st.session_state.s_current_q = generate_single_quiz(st.session_state.current_strategy, st.session_state.get("s_topic", "전체 랜덤"), st.session_state.s_recent_funcs)
-                st.session_state.s_recent_funcs.append(st.session_state.s_current_q.get('func_name', ''))
-                st.session_state.s_recent_funcs = st.session_state.s_recent_funcs[-20:] # up to 20
-                st.session_state.s_attempts = 0
-                st.session_state.s_show_exp = False
-                st.rerun()
+            st.button("⏭️ 패스 (정답 보기)", key="btn_study_pass_done", disabled=True, use_container_width=True)
 
 
 with tabs[1]:
@@ -292,10 +290,10 @@ with tabs[1]:
 
 with tabs[2]:
     remove_timer()
-    st.markdown("<h3 style='text-align: center; margin-bottom: 1rem;'>🏆 명예의 전당</h3>", unsafe_allow_html=True)
-    
+    st.markdown("<h3 style='text-align: center; margin-bottom: 1.5rem;'>🏆 명예의 전당</h3>", unsafe_allow_html=True)
+
     lb = load_leaderboard()
-    
+
     filtered_lb = []
     for row in lb:
         raw_name = row['name']
@@ -303,44 +301,71 @@ with tabs[2]:
             parsed_name, strategy = raw_name.split("###", 1)
         else:
             parsed_name, strategy = raw_name, "bootcamp_day1_4"
-            
+
         if strategy == st.session_state.current_strategy:
             row['display_name'] = parsed_name
             filtered_lb.append(row)
-            
+
     if not filtered_lb:
         st.info("해당 과정의 랭킹이 없습니다. 첫 번째 랭커에 도전하세요!")
     else:
         df_lb = pd.DataFrame(filtered_lb)
         df_lb = df_lb.sort_values(by='score', ascending=False).reset_index(drop=True)
-        
         df_lb.index = df_lb.index + 1
-        
-        # 날짜 포맷
+
         if 'created_at' in df_lb.columns:
-            df_lb['date_str'] = pd.to_datetime(df_lb['created_at']).dt.strftime('%m-%d %H:%M')
+            df_lb['date_str'] = pd.to_datetime(df_lb['created_at']).dt.strftime('%m/%d %H:%M')
         elif 'date' in df_lb.columns:
-            df_lb['date_str'] = pd.to_datetime(df_lb['date']).dt.strftime('%m-%d %H:%M')
+            df_lb['date_str'] = pd.to_datetime(df_lb['date']).dt.strftime('%m/%d %H:%M')
         else:
             df_lb['date_str'] = "-"
-            
+
         if 'time_sec' not in df_lb.columns:
             df_lb['time_sec'] = 0
-        df_lb['time_sec'] = df_lb['time_sec'].fillna(0).astype(int).astype(str) + "초"
-        
-        display_df = df_lb[['display_name', 'score', 'time_sec', 'date_str']]
-        display_df.columns = ['유저 닉네임', '획득 점수 (점)', '소요 시간', '달성일']
-        
-        st.dataframe(
-            display_df,
-            use_container_width=True,
-            column_config={
-                "유저 닉네임": st.column_config.TextColumn("유저 닉네임", width="medium"),
-                "획득 점수 (점)": st.column_config.NumberColumn("획득 점수 (점)", format="%d 점"),
-                "소요 시간": st.column_config.TextColumn("소요 시간", width="small"),
-                "달성일": st.column_config.TextColumn("달성일", width="medium")
-            }
-        )
+        df_lb['time_sec'] = df_lb['time_sec'].fillna(0).astype(int)
+
+        rank_medals = {1: "🥇", 2: "🥈", 3: "🥉"}
+        rank_colors = {
+            1: ("rgba(255,215,0,0.08)", "rgba(255,215,0,0.5)"),
+            2: ("rgba(192,192,192,0.08)", "rgba(192,192,192,0.5)"),
+            3: ("rgba(205,127,50,0.08)", "rgba(205,127,50,0.5)"),
+        }
+
+        rows_html = ""
+        for rank, row_data in df_lb.iterrows():
+            medal = rank_medals.get(rank, f"#{rank}")
+            bg, border = rank_colors.get(rank, ("transparent", "transparent"))
+            time_disp = f"{row_data['time_sec']}초" if row_data['time_sec'] > 0 else "-"
+            bold = "font-weight: 700;" if rank <= 3 else ""
+            rows_html += f"""
+            <tr style="background: {bg}; border-left: 3px solid {border};">
+                <td style="text-align:center; font-size:1.3rem; padding: 0.75rem 1rem;">{medal}</td>
+                <td style="padding: 0.75rem 1rem; {bold}">{row_data['display_name']}</td>
+                <td style="text-align:center; padding: 0.75rem 1rem; {bold} color:#3b82f6; font-size:1.1rem;">{int(row_data['score'])} 점</td>
+                <td style="text-align:center; padding: 0.75rem 1rem; color:#64748b;">{time_disp}</td>
+                <td style="text-align:center; padding: 0.75rem 1rem; color:#94a3b8; font-size:0.9rem;">{row_data['date_str']}</td>
+            </tr>"""
+
+        lb_html = f"""
+        <div style="border-radius: 16px; overflow: hidden; border: 1px solid rgba(59,130,246,0.15); box-shadow: 0 8px 32px rgba(0,0,0,0.06);">
+            <table style="width:100%; border-collapse: collapse; font-size: 1rem;">
+                <thead>
+                    <tr style="background: linear-gradient(135deg, #1e293b, #0f172a); color: #94a3b8;">
+                        <th style="padding: 1rem; text-align:center; font-weight:600; letter-spacing:0.05em; width:60px;">순위</th>
+                        <th style="padding: 1rem; text-align:left; font-weight:600; letter-spacing:0.05em;">닉네임</th>
+                        <th style="padding: 1rem; text-align:center; font-weight:600; letter-spacing:0.05em;">점수</th>
+                        <th style="padding: 1rem; text-align:center; font-weight:600; letter-spacing:0.05em;">소요시간</th>
+                        <th style="padding: 1rem; text-align:center; font-weight:600; letter-spacing:0.05em;">달성일</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {rows_html}
+                </tbody>
+            </table>
+        </div>
+        """
+        st.markdown(lb_html, unsafe_allow_html=True)
+
 with tabs[3]:
     remove_timer()
     with st.container(border=False):
