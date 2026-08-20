@@ -34,14 +34,27 @@ def gen_easy_read_excel():
 def gen_easy_head():
     df_name = random.choice(["df", "sales", "customers", "records"])
     n = random.randint(3, 8)
-    ans = f"{df_name}.head({n})"
-    wrongs = [f"{df_name}.head(rows={n})", f"{df_name}.show({n})", f"{df_name}.top({n})", f"{df_name}.iloc[:{n}, :].head()"]
+    task_type = random.choice(["head", "tail", "sample"])
+    
+    if task_type == "head":
+        ans = f"{df_name}.head({n})"
+        q_text = f"데이터프레임 {df_name}의 처음 {n}개 행을 출력하는 코드를 작성하세요."
+        wrongs = [f"{df_name}.tail({n})", f"{df_name}.show({n})", f"{df_name}.iloc[:-{n}]"]
+    elif task_type == "tail":
+        ans = f"{df_name}.tail({n})"
+        q_text = f"데이터프레임 {df_name}의 마지막 {n}개 행을 출력하는 코드를 작성하세요."
+        wrongs = [f"{df_name}.head({n})", f"{df_name}.last({n})", f"{df_name}.iloc[:{n}]"]
+    else:
+        ans = f"{df_name}.sample({n})"
+        q_text = f"데이터프레임 {df_name}에서 무작위로 {n}개의 행을 추출(샘플링)하는 코드를 작성하세요."
+        wrongs = [f"{df_name}.random({n})", f"{df_name}.take({n})", f"{df_name}.choice({n})"]
+        
     return {
-        'topic': '[2] 데이터 로드 및 탐색 - 데이터 탐색 (앞부분)', 
-        'question': f"데이터프레임 `{df_name}`의 처음 {n}개 행을 출력하는 코드를 작성하세요.",
+        'topic': '[2] 데이터 로드 및 탐색 - 데이터 탐색 (head/tail/sample)', 
+        'question': q_text,
         'expected': ans, 'wrongs': wrongs, 
-        'explanation': f"{df_name}.head(N)은 데이터의 첫 N개 행만 빠르게 미리보기 위한 탐색 도구입니다. 실제 데이터 분석에서는 수백만 건의 데이터를 다루기 때문에 전체를 출력하면 커널이 멈추거나 메모리가 터질 수 있습니다. head()로 먼저 컬럼 구조, 데이터 타입, 값의 형태를 확인하는 것이 EDA(탐색적 데이터 분석)의 첫 번째 습관입니다. 반대로 마지막 N개를 보려면 tail(N)을 사용합니다.",
-        'check': lambda x: "head" in _prep(x) and str(n) in _prep(x)
+        'explanation': f"head()는 처음, tail()은 마지막, sample()은 무작위 데이터를 추출합니다. 실무에서는 head만 보지 않고 tail()을 통해 끝부분에 쓰레기 데이터나 총계(Total) 행이 섞여 있는지, sample()을 통해 데이터 전반의 패턴이 고른지 확인하는 것이 필수입니다.",
+        'check': lambda x: task_type in _prep(x) and str(n) in _prep(x)
     }
 
 def gen_easy_dtypes():
@@ -58,62 +71,118 @@ def gen_easy_dtypes():
 
 def gen_easy_isnull():
     df_name = random.choice(["df", "dataset", "table"])
-    ans = f"{df_name}.isna().sum()"
-    wrongs = [f"{df_name}.isna().count()", f"{df_name}.nulls()", f"{df_name}.count_na()"]
+    task_type = random.choice(['sum', 'mean', 'any'])
+    
+    if task_type == 'sum':
+        ans = f"{df_name}.isna().sum()"
+        q_text = f"데이터프레임 `{df_name}`의 각 컬럼별 결측치(NaN) '총 개수'를 구하는 코드를 작성하세요."
+        wrongs = [f"{df_name}.isna().count()", f"{df_name}.nulls()", f"{df_name}.count_na()"]
+        check_str = "sum"
+    elif task_type == 'mean':
+        ans = f"{df_name}.isna().mean()"
+        q_text = f"데이터프레임 `{df_name}`의 각 컬럼별 결측치(NaN) '비율(평균)'을 구하는 코드를 작성하세요."
+        wrongs = [f"{df_name}.isna().sum() / len({df_name})", f"{df_name}.isna().ratio()", f"{df_name}.na_mean()"]
+        check_str = "mean"
+    else:
+        ans = f"{df_name}.isna().any()"
+        q_text = f"데이터프레임 `{df_name}`의 각 컬럼별 결측치(NaN)가 '하나라도 존재하는지(True/False)' 여부를 확인하는 코드를 작성하세요."
+        wrongs = [f"{df_name}.isna().exist()", f"{df_name}.has_na()", f"{df_name}.isna().all()"]
+        check_str = "any"
+
     return {
-        'topic': '[3] 데이터 추출 및 확인 - 결측치 개수 확인', 
-        'question': f"데이터프레임 `{df_name}`의 각 컬럼별 결측치(NaN) 총 개수를 구하는 코드를 작성하세요.",
+        'topic': '[3] 데이터 추출 및 확인 - 결측치 확인', 
+        'question': q_text,
         'expected': ans, 'wrongs': wrongs, 
-        'explanation': f"{df_name}.isna().sum() (또는 isnull().sum())은 각 컬럼의 결측치 개수를 한 번에 확인합니다. 결측치를 그냥 방치하면 대부분의 ML 모델이 에러를 발생시키거나 해당 행을 무시합니다. 특히 결측 비율이 높은 컬럼(예: 80% 이상)은 그 컬럼 자체를 삭제하는 게 나을 수 있고, 낮은 비율(5% 이하)이면 평균/중앙값으로 채우는(fillna) 전략을 씁니다.",
-        'check': lambda x: ("isnull" in _prep(x) or "isna" in _prep(x)) and "sum" in _prep(x)
+        'explanation': "isna().sum()은 결측치 총 개수, isna().mean()은 결측치 비율, isna().any()는 결측치 존재 여부를 파악할 때 유용합니다.",
+        'check': lambda x: ("isnull" in _prep(x) or "isna" in _prep(x)) and check_str in _prep(x)
     }
+
 
 def gen_easy_dropna():
     df_name = random.choice(["df", "clean_df", "data"])
-    add_param = random.random() < 0.15
-    ans = f"{df_name}.dropna(inplace=True)" if add_param else f"{df_name}.dropna()"
-    wrongs = [f"{df_name}.drop_na()", f"{df_name}.remove_na()", f"{df_name}.delete_nulls()"]
-    q_add = " 단, inplace 속성을 사용하여 원본 객체를 직접 변경하세요." if add_param else ""
+    task_type = random.choice(['axis0', 'axis1', 'thresh'])
+    
+    if task_type == 'axis0':
+        ans = f"{df_name}.dropna(axis=0)"
+        q_text = f"데이터프레임 `{df_name}`에서 결측치가 하나라도 있는 '행(row)'을 모두 제거하는 코드를 작성하세요."
+        wrongs = [f"{df_name}.dropna(axis=1)", f"{df_name}.drop_na()", f"{df_name}.dropna(how='all')"]
+        check_str = "axis=0"
+    elif task_type == 'axis1':
+        ans = f"{df_name}.dropna(axis=1)"
+        q_text = f"데이터프레임 `{df_name}`에서 결측치가 하나라도 있는 '열(column)'을 모두 제거하는 코드를 작성하세요."
+        wrongs = [f"{df_name}.dropna(axis=0)", f"{df_name}.drop_cols()", f"{df_name}.dropna()"]
+        check_str = "axis=1"
+    else:
+        n = random.randint(3, 10)
+        ans = f"{df_name}.dropna(thresh={n})"
+        q_text = f"데이터프레임 `{df_name}`에서 정상 데이터가 {n}개 미만인 행만 제거하는 코드를 작성하세요."
+        wrongs = [f"{df_name}.dropna(min={n})", f"{df_name}.dropna(axis=0)", f"{df_name}.dropna(limit={n})"]
+        check_str = f"thresh={n}"
+
     return {
-        'topic': '[4] 데이터 전처리 - 결측치 삭제', 
-        'question': f"데이터프레임 `{df_name}`에서 결측치가 하나라도 포함된 행을 모두 삭제하는 코드를 작성하세요.{q_add}",
+        'topic': '[4] 데이터 전처리 - 결측치 삭제 (dropna)', 
+        'question': q_text,
         'expected': ans, 'wrongs': wrongs, 
-        'explanation': "dropna()는 결측치가 있는 행을 제거합니다. 단, 무조건 사용하면 안 됩니다 — 데이터가 적을 때 많은 행을 삭제하면 학습 데이터 자체가 부족해져 모델 성능이 오히려 떨어집니다. 결측치가 전체 데이터의 5~10% 이하일 때만 dropna()를 권장하고, 그 이상이면 fillna()로 대체하거나, 결측 여부 자체를 새 피처(is_missing 컬럼)로 만드는 전략을 씁니다.",
-        'check': lambda x: "dropna" in _prep(x)
+        'explanation': "dropna()는 axis=0(행), axis=1(열) 단위로 결측치를 삭제하며, thresh=N 옵션으로 정상 데이터 최소 개수 기준을 정할 수 있습니다.",
+        'check': lambda x: "dropna" in _prep(x) and check_str in _prep(x)
     }
+
 
 def gen_easy_filter():
     df_name = random.choice(["df", "people", "items"])
     col = random.choice(["age", "score", "price", "count"])
     threshold = random.randint(10, 100)
     op = random.choice([">=", "<=", ">", "<", "=="])
-    ans = f"{df_name}[{df_name}['{col}'] {op} {threshold}]"
-    wrongs = [
-        f"{df_name}.filter({col} {op} {threshold})", 
-        f"{df_name}.where({col} {op} {threshold})", 
-        f"{df_name}[{col} {op} {threshold}]"
-    ]
+    task_type = random.choice(['single', 'multiple'])
+
+    if task_type == 'single':
+        ans = f"{df_name}[{df_name}['{col}'] {op} {threshold}]"
+        q_text = f"데이터프레임 `{df_name}`에서 '{col}' 컬럼의 값이 {threshold} {op} 인 행만 필터링하는 코드를 작성하세요."
+        wrongs = [f"{df_name}.filter({col} {op} {threshold})", f"{df_name}.where({col} {op} {threshold})", f"{df_name}[{col} {op} {threshold}]"]
+        check_str = str(threshold)
+    else:
+        col2 = random.choice(["status", "grade", "category"])
+        val2 = random.choice(["'A'", "'B'", "'Active'"])
+        ans = f"{df_name}[({df_name}['{col}'] {op} {threshold}) & ({df_name}['{col2}'] == {val2})]"
+        q_text = f"데이터프레임 `{df_name}`에서 '{col}' 컬럼의 값이 {threshold} {op} 이고(AND), '{col2}' 컬럼이 {val2}와 같은 두 조건을 '모두' 만족하는 행만 필터링하는 코드를 작성하세요."
+        wrongs = [f"{df_name}[{df_name}['{col}'] {op} {threshold} and {df_name}['{col2}'] == {val2}]", f"{df_name}.query('{col} {op} {threshold} & {col2} == {val2}')", f"{df_name}[{col} {op} {threshold} & {col2} == {val2}]"]
+        check_str = "&"
+
     return {
         'topic': '[3] 데이터 추출 및 확인 - 조건부 필터링', 
-        'question': f"데이터프레임 `{df_name}`에서 '{col}' 컬럼의 값이 {threshold} {op} 인 행만 필터링하는 코드를 작성하세요.",
+        'question': q_text,
         'expected': ans, 'wrongs': wrongs, 
-        'explanation': "Pandas의 Boolean Indexing은 조건식이 True인 행만 추출하는 방법입니다. `df[df['col'] > 값]` 형태로 쓰며, 중요한 점은 조건식을 df 안에 다시 넣어줘야 한다는 구조입니다. 여러 조건을 동시에 쓸 때는 `and` 대신 `&`(AND), `|`(OR)를 사용하며, 각 조건을 반드시 괄호로 묶어야 합니다 — 예: `(df['나이'] > 20) & (df['성별'] == '남')`.",
-        'check': lambda x: df_name in _prep(x) and op in _prep(x) and str(threshold) in _prep(x) and col in _prep(x)
+        'explanation': "Pandas의 Boolean Indexing은 조건식이 True인 행만 추출하며, 복수 조건일 때는 & (AND) 또는 | (OR) 기호를 사용하고 각 조건을 괄호()로 묶어야 합니다.",
+        'check': lambda x: df_name in _prep(x) and op in _prep(x) and check_str in _prep(x)
     }
+
 
 def gen_easy_loc():
     df_name = random.choice(["df", "matrix", "records"])
     idx = random.randint(0, 10)
     col = random.choice(["name", "title", "address", "status"])
-    ans = f"{df_name}.loc[{idx}, '{col}']"
-    wrongs = [f"{df_name}.iloc[{idx}, '{col}']", f"{df_name}[{idx}, '{col}']", f"{df_name}.loc['{col}', {idx}]"]
+    col_idx = random.randint(0, 5)
+    task_type = random.choice(['loc', 'iloc'])
+
+    if task_type == 'loc':
+        ans = f"{df_name}.loc[{idx}, '{col}']"
+        q_text = f"데이터프레임 `{df_name}`에서 인덱스 라벨(Label) 이름이 {idx}이고 컬럼명이 '{col}'인 곳의 특정 행 데이터를 가져오는 코드를 작성하세요."
+        wrongs = [f"{df_name}.iloc[{idx}, '{col}']", f"{df_name}[{idx}, '{col}']", f"{df_name}.loc['{col}', {idx}]"]
+        check_str = f"loc[{idx},"
+    else:
+        ans = f"{df_name}.iloc[{idx}, {col_idx}]"
+        q_text = f"데이터프레임 `{df_name}`에서 인덱스 순서(Integer Position) 번호가 {idx}번째이고 컬럼 순서가 {col_idx}번째인 특정 행 데이터를 가져오는 코드를 작성하세요."
+        wrongs = [f"{df_name}.loc[{idx}, {col_idx}]", f"{df_name}[{idx}, {col_idx}]", f"{df_name}.iloc[{col_idx}, {idx}]"]
+        check_str = f"iloc[{idx},"
+        
     return {
-        'topic': '[3] 데이터 추출 및 확인 - 특정 데이터 접근 (loc)', 
-        'question': f"데이터프레임 `{df_name}`에서 인덱스 이름이 {idx}이고 컬럼명이 '{col}'인 곳의 데이터를 가져오는 `.loc` 코드를 작성하세요.",
+        'topic': '[3] 데이터 추출 및 확인 - 특정 데이터 접근 (loc/iloc)', 
+        'question': q_text,
         'expected': ans, 'wrongs': wrongs, 
-        'explanation': ".loc[]은 '라벨(Label) 기반' 인덱싱입니다. df.loc[행 라벨, 열 이름] 형태로 사용합니다. 반면 .iloc[]은 '정수 위치(Integer Location) 기반'으로, 실제 인덱스 번호가 아닌 몇 번째 행인지로 접근합니다. 혼동하기 쉬운 케이스: 인덱스가 0, 1, 2...가 아닌 'a', 'b', 'c'이거나, reset_index 후 번호가 뒤섞인 상태라면 loc과 iloc의 결과가 완전히 달라집니다.",
-        'check': lambda x: f"loc[{idx}," in _prep(x) and col in _prep(x)
+        'explanation': ".loc[]은 '라벨(Label) 기반' 인덱싱, .iloc[]은 '정수 위치(Integer Position) 기반' 인덱싱입니다.",
+        'check': lambda x: check_str in _prep(x)
     }
+
 
 def gen_easy_value_counts():
     df_name = random.choice(["df", "survey", "logs"])
@@ -133,28 +202,53 @@ def gen_easy_value_counts():
 def gen_viz_countplot():
     df_name = random.choice(["df", "data", "events"])
     col = random.choice(["day", "month", "season", "weather"])
-    ans = f"sns.countplot(data={df_name}, x='{col}')"
-    wrongs = [f"sns.bar({df_name}, '{col}')", f"plt.countplot({df_name}['{col}'])", f"{df_name}.plot(kind='count', x='{col}')"]
+    task_type = random.choice(['basic', 'hue'])
+    
+    if task_type == 'basic':
+        ans = f"sns.countplot(data={df_name}, x='{col}')"
+        q_text = f"Seaborn을 사용하여 데이터프레임 `{df_name}`의 '{col}' 컬럼별 데이터 개수를 막대 그래프로 시각화하는 코드를 작성하세요."
+        wrongs = [f"sns.bar({df_name}, '{col}')", f"plt.countplot({df_name}['{col}'])", f"{df_name}.plot(kind='count', x='{col}')"]
+        check_str = f"x='{col}'"
+    else:
+        hue_col = random.choice(["sex", "smoker", "group"])
+        ans = f"sns.countplot(data={df_name}, x='{col}', hue='{hue_col}')"
+        q_text = f"Seaborn을 사용하여 데이터프레임 `{df_name}`의 '{col}' 컬럼별 데이터 개수를 구하되, '{hue_col}' 기준으로 색상을 나누어 시각화하는 코드를 작성하세요."
+        wrongs = [f"sns.countplot({df_name}, x='{col}', color='{hue_col}')", f"sns.bar(data={df_name}, x='{col}', hue='{hue_col}')", f"plt.countplot({df_name}['{col}'], hue='{hue_col}')"]
+        check_str = f"hue='{hue_col}'"
+
     return {
         'topic': '[7] EDA 및 시각화 - Seaborn 시각화 (Countplot)', 
-        'question': f"Seaborn을 사용하여 데이터프레임 `{df_name}`의 '{col}' 컬럼별 데이터 개수를 막대 그래프로 시각화하는 코드를 작성하세요.",
+        'question': q_text,
         'expected': ans, 'wrongs': wrongs, 
-        'explanation': "sns.countplot()은 범주형 변수의 각 카테고리별 개수(빈도)를 막대 그래프로 보여줍니다. 단순한 bar chart와의 차이점은, countplot은 별도의 y값 계산 없이 데이터 자체를 세어준다는 것입니다. hue 파라미터를 추가하면 (예: hue='성별') 카테고리 안에서 또 다른 범주로 세분화하여 시각화할 수 있어, 두 범주형 변수 간의 관계를 동시에 파악하는 데 강력합니다.",
-        'check': lambda x: "countplot" in _prep(x) and col in _prep(x)
+        'explanation': "sns.countplot()은 범주형 변수의 각 카테고리별 개수를 시각화하며, hue 파라미터로 또 다른 범주를 색상별로 나눌 수 있습니다.",
+        'check': lambda x: "countplot" in _prep(x) and check_str in _prep(x)
     }
+
 
 def gen_viz_histplot():
     df_name = random.choice(["df", "measurements", "stats"])
     col = random.choice(["tip", "height", "weight", "length"])
-    ans = f"sns.histplot(data={df_name}, x='{col}')"
-    wrongs = [f"sns.histogram({df_name}, '{col}')", f"plt.histplot({df_name}['{col}'])", f"sns.hist({df_name}['{col}'])"]
+    task_type = random.choice(['basic', 'kde'])
+    
+    if task_type == 'basic':
+        ans = f"sns.histplot(data={df_name}, x='{col}')"
+        q_text = f"Seaborn을 사용하여 데이터프레임 `{df_name}`의 연속형 숫자 컬럼인 '{col}'의 분포를 '히스토그램'으로 그리는 코드를 작성하세요."
+        wrongs = [f"sns.histogram({df_name}, '{col}')", f"plt.histplot({df_name}['{col}'])", f"sns.hist({df_name}['{col}'])"]
+        check_str = "histplot"
+    else:
+        ans = f"sns.histplot(data={df_name}, x='{col}', kde=True)"
+        q_text = f"Seaborn을 사용하여 데이터프레임 `{df_name}`의 연속형 숫자 컬럼인 '{col}'의 분포를 히스토그램으로 그리고, '커널 밀도 추정(KDE) 곡선'도 함께 표시하는 코드를 작성하세요."
+        wrongs = [f"sns.histplot({df_name}, '{col}', line=True)", f"sns.kdeplot(data={df_name}, x='{col}')", f"plt.histplot({df_name}['{col}'], kde=True)"]
+        check_str = "kde=true"
+
     return {
         'topic': '[7] EDA 및 시각화 - Seaborn 시각화 (Histplot)', 
-        'question': f"Seaborn을 사용하여 데이터프레임 `{df_name}`의 연속형 숫자 컬럼인 '{col}'의 분포를 히스토그램으로 그리는 코드를 작성하세요.",
+        'question': q_text,
         'expected': ans, 'wrongs': wrongs, 
-        'explanation': "sns.histplot()은 연속형(수치형) 데이터의 분포를 구간(bin)으로 나누어 히스토그램으로 보여줍니다. 이 그래프를 먼저 확인해야 하는 이유는, 데이터가 정규분포(종 모양)인지, 한쪽으로 치우친 왜도(Skew)가 있는지, 이상치(Outlier)가 존재하는지를 한눈에 볼 수 있기 때문입니다. 분포가 심하게 치우쳐 있다면 np.log1p() 로그 변환을 통해 정규분포에 가깝게 만들어 모델 성능을 높일 수 있습니다.",
-        'check': lambda x: "histplot" in _prep(x) and col in _prep(x)
+        'explanation': "sns.histplot()은 연속형 데이터 분포를 나타내며, kde=True 옵션을 추가하면 부드러운 확률 밀도 곡선도 함께 그려줍니다.",
+        'check': lambda x: "histplot" in _prep(x) and check_str in _prep(x)
     }
+
 
 def gen_viz_scatter():
     df_name = random.choice(["df", "scatter_data", "points"])
@@ -172,19 +266,38 @@ def gen_viz_scatter():
 
 def gen_py_str_split():
     text_var = random.choice(["text", "sentence", "words"])
-    sep = random.choice([",", " ", "-", "|"])
-    items = ["사과", "바나나", "포도"]
-    random.shuffle(items)
-    sample_text = sep.join(items)
-    ans = f"{text_var}.split('{sep}')"
-    wrongs = [f"{text_var}.slice('{sep}')", f"{text_var}.divide('{sep}')", f"split({text_var}, '{sep}')"]
+    task_type = random.choice(['split', 'replace', 'strip'])
+    
+    if task_type == 'split':
+        sep = random.choice([",", "-", "|"])
+        sample_text = f"사과{sep}바나나{sep}포도"
+        ans = f"{text_var}.split('{sep}')"
+        q_text = f"문자열 `{text_var} = '{sample_text}'`가 주어졌을 때, 특정 구분자 '{sep}' 문자를 기준으로 분리하여 리스트로 만드는 코드를 작성하세요."
+        wrongs = [f"{text_var}.replace('{sep}', '')", f"{text_var}.strip('{sep}')", f"split({text_var}, '{sep}')"]
+        check_str = "split"
+    elif task_type == 'replace':
+        old_str = "사과"
+        new_str = "오렌지"
+        sample_text = "나는 사과가 좋아"
+        ans = f"{text_var}.replace('{old_str}', '{new_str}')"
+        q_text = f"문자열 `{text_var} = '{sample_text}'`가 주어졌을 때, 특정 문자열 '{old_str}'를 다른 문자열 '{new_str}'로 치환하는 코드를 작성하세요."
+        wrongs = [f"{text_var}.split('{old_str}')", f"{text_var}.sub('{old_str}', '{new_str}')", f"replace({text_var}, '{old_str}', '{new_str}')"]
+        check_str = "replace"
+    else:
+        sample_text = "  hello world  "
+        ans = f"{text_var}.strip()"
+        q_text = f"문자열 `{text_var} = '{sample_text}'`가 주어졌을 때, 문자열 앞뒤 공백을 제거하는 코드를 작성하세요."
+        wrongs = [f"{text_var}.trim()", f"{text_var}.replace(' ', '')", f"{text_var}.split()"]
+        check_str = "strip"
+
     return {
-        'topic': '[1] 파이썬 Basic - 파이썬 기초 (문자열 분리)', 
-        'question': f"문자열 `{text_var} = '{sample_text}'`가 주어졌을 때, '{sep}' 문자를 기준으로 분리하여 리스트로 만드는 코드를 작성하세요.",
+        'topic': '[1] 파이썬 Basic - 파이썬 기초 (문자열 처리)', 
+        'question': q_text,
         'expected': ans, 'wrongs': wrongs, 
-        'explanation': ".split('구분자')는 문자열을 특정 구분자 기준으로 나눠 리스트로 반환합니다. 반환 결과가 리스트임을 기억하세요 — '사과,바나나,포도'.split(',')의 결과는 ['사과', '바나나', '포도']입니다. 실무에서는 주소 데이터를 '시/구/동'으로 분리하거나, CSV 파싱, 로그 파일에서 특정 값만 추출할 때 자주 쓰입니다. 구분자 없이 split()만 쓰면 공백 기준으로 분리합니다.",
-        'check': lambda x: "split" in _prep(x) and sep in _prep(x)
+        'explanation': "문자열 처리 메서드: split(구분자)는 분리, replace(기존, 새값)은 치환, strip()은 앞뒤 공백을 제거합니다.",
+        'check': lambda x: check_str in _prep(x)
     }
+
 
 def gen_eda_concept_cat_num():
     ans = "sns.boxplot() 또는 sns.barplot()"
@@ -213,19 +326,39 @@ def gen_eda_concept_num_num():
 def gen_easy_fillna():
     df_name = random.choice(["df", "base_df", "train"])
     col = random.choice(["age", "salary", "score"])
-    method = random.choice(["mean", "median"])
+    task_type = random.choice(['mean', 'median', 'ffill', 'constant'])
     add_param = random.random() < 0.15
-    ans = f"{df_name}['{col}'].fillna({df_name}['{col}'].{method}(), inplace=True)" if add_param else f"{df_name}['{col}'].fillna({df_name}['{col}'].{method}())"
-    wrongs = [f"{df_name}['{col}'].dropna()", f"{df_name}['{col}'] = {df_name}['{col}'].{method}()", f"{df_name}.fillna()"]
+    
+    if task_type == 'mean':
+        ans = f"{df_name}['{col}'].fillna({df_name}['{col}'].mean(), inplace=True)" if add_param else f"{df_name}['{col}'].fillna({df_name}['{col}'].mean())"
+        korean_method = "평균값(mean)으로"
+        wrongs = [f"{df_name}['{col}'].dropna()", f"{df_name}['{col}'] = {df_name}['{col}'].mean()", f"{df_name}.fillna()"]
+        check_str = "mean"
+    elif task_type == 'median':
+        ans = f"{df_name}['{col}'].fillna({df_name}['{col}'].median(), inplace=True)" if add_param else f"{df_name}['{col}'].fillna({df_name}['{col}'].median())"
+        korean_method = "중앙값(median)으로"
+        wrongs = [f"{df_name}['{col}'].dropna()", f"{df_name}['{col}'] = {df_name}['{col}'].median()", f"{df_name}.fillna()"]
+        check_str = "median"
+    elif task_type == 'ffill':
+        ans = f"{df_name}['{col}'].fillna(method='ffill', inplace=True)" if add_param else f"{df_name}['{col}'].fillna(method='ffill')"
+        korean_method = "이전 행의 값(ffill)으로"
+        wrongs = [f"{df_name}['{col}'].fillna(method='bfill')", f"{df_name}['{col}'].dropna()", f"{df_name}.fillna('ffill')"]
+        check_str = "ffill"
+    else:
+        ans = f"{df_name}['{col}'].fillna(0, inplace=True)" if add_param else f"{df_name}['{col}'].fillna(0)"
+        korean_method = "특정 숫자 0으로"
+        wrongs = [f"{df_name}['{col}'].fillna('0')", f"{df_name}['{col}'].dropna()", f"{df_name}.replace(np.nan, 0)"]
+        check_str = "0"
+
     q_add = " 단, inplace 속성을 사용하여 원본 객체를 직접 변경하세요." if add_param else ""
-    korean_method = "평균값(mean)" if method == "mean" else "중앙값(median)"
     return {
         'topic': '[4] 데이터 전처리 - 데이터 전처리 (결측치 대체)', 
-        'question': f"데이터프레임 `{df_name}`의 '{col}' 컬럼에 있는 결측치(NaN)를 '{col}' 컬럼의 {korean_method}으로 채우는 코드를 작성하세요.{q_add}",
+        'question': f"데이터프레임 `{df_name}`의 '{col}' 컬럼에 있는 결측치(NaN)를 {korean_method} 채우는 코드를 작성하세요.{q_add}",
         'expected': ans, 'wrongs': wrongs, 
-        'explanation': f"fillna()는 결측치를 특정 값으로 채우는 함수입니다. 평균(mean)은 데이터 분포가 정규분포에 가깝고 이상치가 없을 때 사용합니다. 반면 '연봉', '집값' 같이 소수의 초고값(이상치)이 있어 분포가 한쪽으로 치우친 경우엔 평균이 실제 중심보다 크게 왜곡되므로, 이상치에 영향받지 않는 중앙값(median)을 사용하는 것이 더 안전합니다. fillna 후에는 반드시 isna().sum()으로 결측치가 사라졌는지 재검증해야 합니다.",
-        'check': lambda x: "fillna" in _prep(x) and method in _prep(x)
+        'explanation': "fillna()는 결측치를 특정 값으로 채우는 함수입니다. 평균, 중앙값, 이전 값(ffill), 혹은 상수(0 등)로 채울 수 있습니다.",
+        'check': lambda x: "fillna" in _prep(x) and check_str in _prep(x)
     }
+
 
 def gen_ml_concept():
     ans = "분류(Classification)"
@@ -292,19 +425,27 @@ def gen_sns_boxplot():
 def gen_np_log1p():
     df_name = random.choice(["df", "data", "records"])
     col = random.choice(['price', 'spc_R', 'population', 'sales'])
-    ans = f"np.log1p({df_name}['{col}'])"
-    wrongs = [
-        f"np.log({df_name}['{col}'])", 
-        f"np.log10({df_name}['{col}'])", 
-        f"{df_name}['{col}'].log1p()"
-    ]
+    task_type = random.choice(['log1p', 'expm1'])
+    
+    if task_type == 'log1p':
+        ans = f"np.log1p({df_name}['{col}'])"
+        q_text = f"데이터프레임 `{df_name}`의 '{col}' 열에 0 값 오류를 방지하기 위해 1을 더한 후 '로그 변환'을 취하는 Numpy 함수를 적용하는 코드를 작성하세요."
+        wrongs = [f"np.log({df_name}['{col}'])", f"np.log10({df_name}['{col}'])", f"{df_name}['{col}'].log1p()"]
+        check_str = "log1p"
+    else:
+        ans = f"np.expm1({df_name}['{col}'])"
+        q_text = f"데이터프레임 `{df_name}`의 '{col}' 열에 대해 이미 `log1p` 변환이 된 값을 원래의 스케일로 '역변환(지수 변환 후 1을 뺌)'하는 Numpy 함수를 적용하는 코드를 작성하세요."
+        wrongs = [f"np.exp({df_name}['{col}'])", f"np.expm({df_name}['{col}'])", f"{df_name}['{col}'].expm1()"]
+        check_str = "expm1"
+
     return {
-        'topic': '[4] 데이터 전처리 - Numpy 로그 변환 (log1p)', 
-        'question': f"데이터프레임 `{df_name}`의 '{col}' 열에 0 값 오류를 방지하기 위해 1을 더한 후 로그를 취하는 Numpy 함수를 적용하는 코드를 작성하세요.",
+        'topic': '[4] 데이터 전처리 - Numpy 로그/지수 변환 (log1p/expm1)', 
+        'question': q_text,
         'expected': ans, 'wrongs': wrongs, 
-        'explanation': "np.log1p()는 log(1+x)를 계산합니다. 단순 np.log()를 쓰면 값이 0일 때 log(0)=-∞가 되어 오류 또는 무한대 값이 발생합니다. +1을 먼저 더함으로써 0인 값도 안전하게 처리합니다. 로그 변환을 하는 이유: '가격', '인구' 같이 한쪽으로 심하게 치우친(Skewed) 분포를 정규분포에 가깝게 만들어 선형 모델의 성능을 높이기 위해서입니다. 로그 변환한 값으로 예측한 뒤에는 반드시 np.expm1()로 역변환해야 원래 스케일의 예측값을 얻습니다.",
-        'check': lambda x: "log1p" in _prep(x) and col in _prep(x)
+        'explanation': "np.log1p()는 log(1+x)를 계산하여 0 값에서의 로그 변환 오류를 막고, np.expm1()은 exp(x)-1을 계산하여 로그 변환된 값을 역변환할 때 씁니다.",
+        'check': lambda x: check_str in _prep(x) and col in _prep(x)
     }
+
 
 # =====================================================================
 # [HARD POOL] - 심화 개념, 함정 문제 (총 4문제 출제용)
@@ -328,33 +469,61 @@ def gen_hard_groupby():
     df_name = random.choice(["df", "sales", "logs"])
     g_col = random.choice(["sido", "department", "region"])
     t_col = random.choice(["spc_R", "revenue", "profit"])
-    agg = random.choice(["mean", "sum", "max", "min"])
-    add_param = random.random() < 0.15
-    ans = f"{df_name}.groupby('{g_col}', observed=False)['{t_col}'].{agg}()" if add_param else f"{df_name}.groupby('{g_col}')['{t_col}'].{agg}()"
-    wrongs = [f"{df_name}.groupby('{g_col}').{agg}('{t_col}')", f"{df_name}['{t_col}'].groupby('{g_col}').{agg}()", f"pd.groupby({df_name}, '{g_col}')['{t_col}'].{agg}()"]
-    q_add = " (단, observed=False 파라미터를 사용하세요.)" if add_param else ""
+    task_type = random.choice(['mean', 'sum', 'max', 'count'])
+    
+    if task_type == 'mean':
+        ans = f"{df_name}.groupby('{g_col}')['{t_col}'].mean()"
+        korean_agg = "평균"
+        wrongs = [f"{df_name}.groupby('{g_col}').mean('{t_col}')", f"{df_name}['{t_col}'].groupby('{g_col}').mean()"]
+    elif task_type == 'sum':
+        ans = f"{df_name}.groupby('{g_col}')['{t_col}'].sum()"
+        korean_agg = "총합"
+        wrongs = [f"{df_name}.groupby('{g_col}').sum('{t_col}')", f"{df_name}['{t_col}'].groupby('{g_col}').sum()"]
+    elif task_type == 'max':
+        ans = f"{df_name}.groupby('{g_col}')['{t_col}'].max()"
+        korean_agg = "최댓값"
+        wrongs = [f"{df_name}.groupby('{g_col}').max('{t_col}')", f"{df_name}['{t_col}'].groupby('{g_col}').max()"]
+    else:
+        ans = f"{df_name}.groupby('{g_col}')['{t_col}'].count()"
+        korean_agg = "데이터 개수"
+        wrongs = [f"{df_name}.groupby('{g_col}').count('{t_col}')", f"{df_name}['{t_col}'].groupby('{g_col}').count()"]
+
     return {
         'topic': '[5] 데이터 집계 - 그룹화 집계 (groupby)', 
-        'question': f"데이터프레임 `{df_name}`에서 '{g_col}' 별로 그룹을 묶은 뒤, '{t_col}'의 '{agg}'(을)를 구하는 Series 반환 코드를 작성하세요.{q_add}",
+        'question': f"데이터프레임 `{df_name}`에서 '{g_col}' 별로 그룹을 묶은 뒤, '{t_col}'의 {korean_agg}을(를) 구하는 코드를 작성하세요.",
         'expected': ans, 'wrongs': wrongs, 
-        'explanation': "groupby()는 SQL의 GROUP BY와 같은 개념입니다. df.groupby('기준컬럼')['대상컬럼'].통계함수() 순서로 작성합니다. 기준컬럼 기준으로 데이터를 묶은 뒤, 대상컬럼에 mean/sum/max 등의 집계를 수행합니다. 결과는 기본적으로 Series로 반환되며, 기준컬럼이 인덱스가 됩니다. as_index=False를 주면 기준컬럼이 인덱스가 아닌 일반 컬럼으로 유지되어 DataFrame으로 반환됩니다.",
-        'check': lambda x: "groupby" in _prep(x) and g_col in _prep(x) and t_col in _prep(x) and agg in _prep(x)
+        'explanation': "groupby()로 그룹화 후 선택한 컬럼에 대해 mean(), sum(), max(), count() 등의 집계 함수를 적용합니다.",
+        'check': lambda x: "groupby" in _prep(x) and g_col in _prep(x) and t_col in _prep(x)
     }
+
 
 def gen_hard_merge():
     df1 = random.choice(["df1", "users", "left_df"])
     df2 = random.choice(["df2", "orders", "right_df"])
     on_col = random.choice(["code", "user_id", "key"])
-    how = random.choice(["left", "right", "outer", "inner"])
-    ans = f"pd.merge({df1}, {df2}, on='{on_col}', how='{how}')"
-    wrongs = [f"{df1}.join({df2}, on='{on_col}', type='{how}')", f"pd.concat([{df1}, {df2}], axis=1)", f"{df1}.merge_{how}({df2}, '{on_col}')"]
+    task_type = random.choice(['inner', 'left', 'outer'])
+    
+    if task_type == 'inner':
+        ans = f"pd.merge({df1}, {df2}, on='{on_col}', how='inner')"
+        q_text = f"데이터프레임 `{df1}`와 `{df2}`를 '{on_col}' 컬럼 기준으로, 두 데이터프레임의 공통 키만 남기도록 병합(Inner Join)하는 코드를 작성하세요."
+        wrongs = [f"pd.merge({df1}, {df2}, on='{on_col}', how='left')", f"{df1}.join({df2}, on='{on_col}', type='inner')"]
+    elif task_type == 'left':
+        ans = f"pd.merge({df1}, {df2}, on='{on_col}', how='left')"
+        q_text = f"데이터프레임 `{df1}`와 `{df2}`를 '{on_col}' 컬럼 기준으로, 왼쪽 데이터프레임(`{df1}`)의 데이터를 모두 보존하도록 병합(Left Join)하는 코드를 작성하세요."
+        wrongs = [f"pd.merge({df1}, {df2}, on='{on_col}', how='inner')", f"{df1}.join({df2}, on='{on_col}', type='left')"]
+    else:
+        ans = f"pd.merge({df1}, {df2}, on='{on_col}', how='outer')"
+        q_text = f"데이터프레임 `{df1}`와 `{df2}`를 '{on_col}' 컬럼 기준으로, 두 데이터프레임의 모든 데이터를 보존하도록(합집합) 병합(Outer Join)하는 코드를 작성하세요."
+        wrongs = [f"pd.merge({df1}, {df2}, on='{on_col}', how='inner')", f"pd.concat([{df1}, {df2}], axis=1)"]
+
     return {
-        'topic': '[6] 데이터 병합 - 데이터 병합 (Left Merge)', 
-        'question': f"데이터프레임 `{df1}`(과)와 `{df2}`(을)를 '{on_col}' 컬럼 기준으로 {how} Merge 하는 코드를 작성하세요.",
+        'topic': '[6] 데이터 병합 - 데이터 병합 (Merge)', 
+        'question': q_text,
         'expected': ans, 'wrongs': wrongs, 
-        'explanation': "pd.merge()는 두 DataFrame을 특정 키(on) 컬럼을 기준으로 합칩니다. how 파라미터가 핵심: inner(기본값)는 양쪽에 모두 있는 것만 남기고, left는 왼쪽 DataFrame은 모두 유지, right는 오른쪽 모두 유지, outer는 양쪽 합집합입니다. how를 잘못 선택하면 행 수가 예상치 못하게 줄거나 NaN이 대량 발생합니다. 병합 후에는 결과 df의 shape을 꼭 확인하는 습관을 가지세요.",
-        'check': lambda x: "merge" in _prep(x) and how in _prep(x) and on_col in _prep(x)
+        'explanation': "pd.merge()에서 how='inner'는 교집합, 'left'는 왼쪽 기준, 'outer'는 합집합을 의미합니다.",
+        'check': lambda x: "merge" in _prep(x) and task_type in _prep(x) and on_col in _prep(x)
     }
+
 
 def gen_hard_pivot():
     df_name = random.choice(["df", "sales_df", "records"])
@@ -865,17 +1034,29 @@ def gen_easy_drop_column():
     }
 
 def gen_easy_sort_values():
-    col = random.choice(['score','sales','date','price'])
-    df = random.choice(['df','data','records'])
-    asc = random.choice([True, False])
+    df_name = random.choice(["df", "sales", "records"])
+    col = random.choice(["price", "age", "score"])
+    task_type = random.choice(['asc', 'desc'])
+    
+    if task_type == 'asc':
+        ans = f"{df_name}.sort_values(by='{col}', ascending=True)"
+        q_text = f"데이터프레임 `{df_name}`을 '{col}' 컬럼 기준으로 '오름차순' 정렬하는 코드를 작성하세요."
+        wrongs = [f"{df_name}.sort('{col}')", f"{df_name}.sort_values('{col}', descending=False)", f"{df_name}.order_by('{col}')"]
+        check_str = "ascending=true"
+    else:
+        ans = f"{df_name}.sort_values(by='{col}', ascending=False)"
+        q_text = f"데이터프레임 `{df_name}`을 '{col}' 컬럼 기준으로 '내림차순' 정렬하는 코드를 작성하세요."
+        wrongs = [f"{df_name}.sort_values('{col}')", f"{df_name}.sort_values('{col}', descending=True)", f"{df_name}.order_by('{col}', desc=True)"]
+        check_str = "ascending=false"
+
     return {
-        'topic': '[3] 데이터 추출 및 확인 - 정렬 (sort_values)',
-        'question': f"데이터프레임 `{df}`을(를) '{col}' 컬럼 기준으로 오름차순={asc}으로 정렬하는 코드를 작성하세요.",
-        'expected': f"{df}.sort_values('{col}', ascending={asc})",
-        'wrongs': [f"{df}.sort('{col}', ascending={asc})", f"{df}.sort_values('{col}')", f"{df}.orderby('{col}', ascending={asc})"],
-        'explanation': "sort_values()는 특정 컬럼 기준으로 DataFrame을 정렬합니다. ascending=True(기본값)는 오름차순, ascending=False는 내림차순입니다. 여러 컬럼 기준으로 정렬하려면 리스트로 전달합니다: df.sort_values(['부서', '연봉'], ascending=[True, False]). 주의: 정렬 후 인덱스가 뒤섞이므로, 이후 iloc 접근이 필요하다면 .reset_index(drop=True)로 인덱스를 재정렬해야 합니다.",
-        'check': lambda x: "sort_values" in x and col in x and str(asc) in x
+        'topic': '[4] 데이터 전처리 - 정렬 (sort_values)', 
+        'question': q_text,
+        'expected': ans, 'wrongs': wrongs, 
+        'explanation': "sort_values(by=컬럼, ascending=True/False)로 오름차순 또는 내림차순 정렬을 수행할 수 있습니다.",
+        'check': lambda x: "sort_values" in _prep(x) and col in _prep(x)
     }
+
 
 def gen_easy_describe():
     return {
@@ -888,18 +1069,29 @@ def gen_easy_describe():
     }
 
 def gen_easy_concat():
-    axis_val = random.choice([0, 1])
-    axis_desc = '행 방향(아래로 이어 붙이기)' if axis_val==0 else '열 방향(옆으로 이어 붙이기)'
-    df1 = random.choice(['df1','left','train'])
-    df2 = random.choice(['df2','right','test'])
+    df1 = random.choice(["df1", "train_data"])
+    df2 = random.choice(["df2", "test_data"])
+    task_type = random.choice(['axis0', 'axis1'])
+    
+    if task_type == 'axis0':
+        ans = f"pd.concat([{df1}, {df2}], axis=0)"
+        q_text = f"두 데이터프레임 `{df1}`와 `{df2}`를 '위아래(행 방향, axis=0)'로 이어 붙이는 코드를 작성하세요."
+        wrongs = [f"pd.concat({df1}, {df2})", f"pd.append([{df1}, {df2}])", f"pd.concat([{df1}, {df2}], axis=1)"]
+        check_str = "axis=0"
+    else:
+        ans = f"pd.concat([{df1}, {df2}], axis=1)"
+        q_text = f"두 데이터프레임 `{df1}`와 `{df2}`를 '좌우(열 방향, axis=1)'로 이어 붙이는 코드를 작성하세요."
+        wrongs = [f"pd.concat({df1}, {df2}, axis=1)", f"pd.merge([{df1}, {df2}])", f"pd.concat([{df1}, {df2}], axis=0)"]
+        check_str = "axis=1"
+
     return {
-        'topic': '[6] 데이터 병합 - pd.concat 기초',
-        'question': f"데이터프레임 `{df1}`와 `{df2}`를 {axis_desc} 위해 결합하는 코드로 올바른 것은?",
-        'expected': f'pd.concat([{df1}, {df2}], axis={axis_val})',
-        'wrongs': [f'pd.merge({df1}, {df2})', f'pd.concat([{df1}, {df2}], axis={1-axis_val})', f'{df1}.append({df2})'],
-        'explanation': "pd.concat()은 DataFrame을 이어 붙입니다. axis=0(기본값)은 행 방향으로 아래에 이어 붙이기(행 수 증가), axis=1은 열 방향으로 옆에 붙이기(컬럼 수 증가)입니다. pd.merge()와의 차이: merge는 공통 키 컬럼을 기준으로 관계형 조인을 수행하고, concat은 그냥 물리적으로 이어 붙입니다. 주의: axis=0으로 합칠 때 컬럼명이 다르면 NaN이 채워지므로, 합치기 전 양쪽 컬럼명이 동일한지 확인이 필요합니다.",
-        'force_type': 'radio'
+        'topic': '[6] 데이터 병합 - 단순 병합 (concat)', 
+        'question': q_text,
+        'expected': ans, 'wrongs': wrongs, 
+        'explanation': "pd.concat()은 두 개 이상의 DataFrame을 이어붙입니다. axis=0은 위아래(행), axis=1은 좌우(열) 방향입니다.",
+        'check': lambda x: "concat" in _prep(x) and check_str in _prep(x)
     }
+
 
 def gen_easy_corr():
     return {
@@ -1044,14 +1236,29 @@ def gen_hard_cross_val_purpose():
     }
 
 def gen_hard_scaling_method_choice():
+    task_type = random.choice(['standard', 'minmax', 'robust'])
+    if task_type == 'standard':
+        ans = "StandardScaler"
+        q_text = "평균을 0, 표준편차를 1로 만드는 스케일러(분포가 정규분포에 가까울 때 유리)를 선택하세요."
+        wrongs = ["MinMaxScaler", "RobustScaler", "MaxAbsScaler"]
+    elif task_type == 'minmax':
+        ans = "MinMaxScaler"
+        q_text = "데이터의 최솟값을 0, 최댓값을 1로 변환하여 0과 1 사이로 정규화하는 스케일러를 선택하세요."
+        wrongs = ["StandardScaler", "RobustScaler", "MaxAbsScaler"]
+    else:
+        ans = "RobustScaler"
+        q_text = "이상치가 매우 많을 때, 중앙값(Median)과 IQR을 사용하여 스케일링하는 스케일러를 선택하세요."
+        wrongs = ["StandardScaler", "MinMaxScaler", "MaxAbsScaler"]
+
     return {
-        'topic': '[4] 데이터 전처리 - 스케일러 선택 기준',
-        'question': 'MinMaxScaler를 사용했을 때 이상치(Outlier) 1개가 끼치는 영향',
-        'expected': '이상치가 min 또는 max 기준점이 되어 나머지 정상 데이터 값이 극단적으로 0 또는 1에 몰리게 된다. 이상치가 많은 경우 RobustScaler가 더 적합하다.',
-        'wrongs': ['이상치 여부와 무관하게 모든 데이터가 완벽한 정규분포를 따르게 된다.', '이상치 하나가 스케일링 전체 공식을 망가뜨려 에러를 발생시킨다.', '이상치도 다른 데이터와 동일한 간격으로 축소되어 전혀 문제가 되지 않는다.'],
-        'explanation': "MinMaxScaler는 데이터를 [min, max] 범위로 정규화합니다 — 공식: (x - min) / (max - min). 이상치(Outlier)가 하나라도 있으면 그것이 새 min 또는 max가 되어, 나머지 모든 정상 데이터가 0과 1 사이의 아주 좁은 범위로 눌려버립니다. StandardScaler는 평균을 0, 표준편차를 1로 만들지만 이상치에 영향을 받습니다. 이상치가 많을 때 최선의 선택은 중앙값과 IQR을 사용하는 RobustScaler입니다 — 이상치를 무시하고 중간 범위 데이터를 기준으로 스케일링합니다.",
+        'topic': '[8] 머신러닝 기초 - 스케일링 기법 선택', 
+        'question': q_text,
+        'expected': ans, 'wrongs': wrongs, 
+        'explanation': "StandardScaler는 평균 0, 분산 1로 스케일링하고, MinMaxScaler는 0~1 사이로 정규화, RobustScaler는 이상치 영향에 강한 중앙값/IQR 기반 스케일링입니다.",
+        'check': lambda x: task_type[:3] in x.lower(),
         'force_type': 'radio'
     }
+
 
 def gen_hard_random_state_purpose():
     val = random.choice([0, 42, 123])
