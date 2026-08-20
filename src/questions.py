@@ -628,7 +628,97 @@ def gen_killer_encoding_strategy():
         'force_type': 'radio'
     }
 
-ALL_KILLER = [gen_killer_chained_assignment, gen_killer_merge_suffixes, gen_killer_bagging_boosting, gen_killer_encoding_strategy]
+def gen_hard_return_type_series_df():
+    col = random.choice(["'age'", "'salary'", "'score'"])
+    ans = f"df[{col}]는 Series, df[[{col}]]는 DataFrame을 반환한다."
+    wrongs = [
+        f"둘 다 DataFrame을 반환한다.",
+        f"둘 다 Series를 반환한다.",
+        f"df[{col}]는 DataFrame, df[[{col}]]는 Series를 반환한다."
+    ]
+    return {
+        'topic': '[3] 데이터 추출 및 확인 - Series vs DataFrame 반환 타입',
+        'question': f"Pandas 데이터프레임 df에서 단일 컬럼을 추출할 때, df[{col}] 구문과 df[[{col}]] 구문의 반환(Return) 데이터 타입 차이에 대한 설명으로 올바른 것은?",
+        'expected': ans,
+        'wrongs': wrongs,
+        'explanation': "대괄호 1개([])를 사용하면 1차원 구조인 Series로 반환되며, 대괄호 2개([[]])를 사용하면 2차원 구조인 DataFrame으로 반환됩니다.",
+        'force_type': 'radio'
+    }
+
+def gen_hard_scaler_return_type():
+    scaler = random.choice(["StandardScaler", "MinMaxScaler", "RobustScaler"])
+    ans = "Numpy ndarray 타입으로 반환되어, 기존 DataFrame의 컬럼명과 인덱스 정보가 모두 사라진다."
+    wrongs = [
+        "입력된 DataFrame의 컬럼명과 인덱스를 그대로 유지한 채 DataFrame으로 반환된다.",
+        "데이터는 DataFrame으로 유지되지만, 컬럼명이 'scaled_1', 'scaled_2' 등으로 자동 변경된다.",
+        "Python 기본 리스트(List) 타입의 중첩 구조로 반환된다."
+    ]
+    return {
+        'topic': '[4] 데이터 전처리 - Scikit-learn 스케일러 반환 타입',
+        'question': f"Scikit-learn의 {scaler}() 객체를 생성하고, 데이터프레임 df에 .fit_transform(df)를 적용했을 때 출력되는 결과물의 데이터 타입(Type)과 구조적 특징으로 올바른 것은?",
+        'expected': ans,
+        'wrongs': wrongs,
+        'explanation': "Scikit-learn의 스케일러와 전처리기들은 결과를 Numpy 배열(ndarray)로 반환합니다. 따라서 이후 시각화나 Pandas 연산을 하려면 pd.DataFrame(scaled_data, columns=df.columns) 형태로 다시 감싸주어야 합니다.",
+        'force_type': 'radio'
+    }
+
+def gen_hard_groupby_as_index():
+    col1 = random.choice(["department", "region", "category"])
+    col2 = random.choice(["salary", "sales", "price"])
+    ans = f"그룹화 기준이 된 '{col1}' 컬럼이 인덱스로 들어가지 않고 일반 컬럼(Column)으로 그대로 유지된다."
+    wrongs = [
+        f"'{col1}' 컬럼이 인덱스로 지정되며, 기존 인덱스는 모두 초기화된다.",
+        f"통계 집계 결과인 '{col2}'의 값이 DataFrame의 인덱스로 지정된다.",
+        f"출력 결과가 DataFrame이 아닌 Series로 강제 변환된다."
+    ]
+    return {
+        'topic': '[5] 데이터 집계 - groupby as_index 파라미터',
+        'question': f"Pandas에서 df.groupby('{col1}', as_index=False)['{col2}'].mean() 코드를 실행했을 때, 파라미터 s_index=False가 출력 결과에 미치는 구조적 컨셉은 무엇입니까?",
+        'expected': ans,
+        'wrongs': wrongs,
+        'explanation': "groupby의 기본값은 s_index=True이며 그룹핑 기준 열을 인덱스로 만듭니다. False로 설정하면 SQL의 GROUP BY처럼 기준 열이 인덱스가 아닌 일반 열(Column)로 유지되며 DataFrame 형식으로 예쁘게 반환됩니다.",
+        'force_type': 'radio'
+    }
+
+def gen_hard_drop_duplicates_keep():
+    keep_param, effect = random.choice([
+        ("keep='last'", "마지막으로 발견된 중복 행만 남기고 이전 행들을 모두 삭제한다."),
+        ("keep=False", "중복이 한 번이라도 발생한 모든 행을 남김없이 전부 삭제한다.")
+    ])
+    ans = effect
+    wrongs = [
+        "가장 처음에 발견된 중복 행만 남기고 이후 행들을 모두 삭제한다.",
+        "결측치(NaN)가 포함된 행만 우선적으로 검색하여 삭제한다."
+    ]
+    if "마지막으로 발견된" not in effect: wrongs.append("마지막으로 발견된 중복 행만 남기고 이전 행들을 모두 삭제한다.")
+    if "남김없이 전부 삭제" not in effect: wrongs.append("중복이 한 번이라도 발생한 모든 행을 남김없이 전부 삭제한다.")
+    random.shuffle(wrongs)
+    return {
+        'topic': '[4] 데이터 전처리 - drop_duplicates 파라미터 컨셉',
+        'question': f"Pandas의 중복 데이터 제거 함수인 df.drop_duplicates({keep_param})를 호출했을 때, 이 파라미터 설정이 의미하는 동작 방식은 무엇입니까?",
+        'expected': ans,
+        'wrongs': wrongs[:3],
+        'explanation': "keep='first'(기본값)는 첫 번째 행을 보존, keep='last'는 마지막 행을 보존, keep=False는 중복된 모든 데이터를 남김없이 삭제하는 강력한 옵션입니다.",
+        'force_type': 'radio'
+    }
+
+def gen_killer_apply_lambda_axis():
+    ans = "각 '행(Row)' 단위로 데이터를 순회하며, 변수 x에는 하나의 행(Row)에 속한 모든 컬럼 값들이 Series 형태로 담겨 전달된다."
+    wrongs = [
+        "각 '열(Column)' 단위로 데이터를 순회하며, 변수 x에는 하나의 열(Column) 전체 데이터가 배열로 전달된다.",
+        "데이터프레임의 '모든 단일 셀(Cell)'을 하나씩 순회하며, 변수 x에는 개별 스칼라(Scalar) 값이 전달된다.",
+        "각 '행(Row)' 단위로 순회하지만, 반환 결과는 원본 데이터프레임을 덮어쓰는 inplace 형태로 동작한다."
+    ]
+    return {
+        'topic': '[4] 데이터 전처리 - 킬러 - apply 함수와 axis 컨셉',
+        'question': "Pandas에서 여러 컬럼의 값을 동시에 활용하여 새로운 파생 변수를 만들기 위해 df.apply(lambda x: x['A'] + x['B'], axis=1) 코드를 실행했습니다. 이때 파라미터 xis=1이 의미하는 동작 컨셉으로 가장 정확한 것은 무엇입니까?",
+        'expected': ans,
+        'wrongs': wrongs,
+        'explanation': "일반적인 통계 함수(mean, sum)에서 xis=1은 '열 방향(가로) 연산'을 의미하지만, pply(..., axis=1)에서는 함수(lambda)가 적용되는 순회 단위가 '각 행(Row) 한 줄씩'임을 의미합니다. 즉 x는 하나의 행(Series)을 통째로 받으므로 x['컬럼명']으로 접근이 가능합니다.",
+        'force_type': 'radio'
+    }
+
+ALL_KILLER = [gen_killer_chained_assignment, gen_killer_merge_suffixes, gen_killer_bagging_boosting, gen_killer_encoding_strategy, gen_killer_apply_lambda_axis]
 
 class QuizStrategy:
     def __init__(self, id, name, description, easy_pool, hard_pool, killer_pool=None):
@@ -727,6 +817,7 @@ def gen_hard_confusion_matrix():
 
 
 
+
 ALL_EASY = [
     gen_easy_while_loop, gen_easy_list_mutability, gen_easy_scaling_reason, gen_easy_iloc_slicing,
     gen_eda_concept_cat_num,
@@ -738,7 +829,7 @@ ALL_EASY = [
 ]
 
 ALL_HARD = [
-    gen_hard_data_leakage, gen_hard_ml_sequence, gen_hard_precision_recall, gen_hard_overfitting, gen_hard_scaling_necessity, gen_hard_imputation_strategy, gen_hard_imbalanced_accuracy,     gen_hard_random_forest_concept, gen_hard_train_predict, gen_hard_confusion_matrix,
+    gen_hard_return_type_series_df, gen_hard_scaler_return_type, gen_hard_groupby_as_index, gen_hard_drop_duplicates_keep, gen_hard_data_leakage, gen_hard_ml_sequence, gen_hard_precision_recall, gen_hard_overfitting, gen_hard_scaling_necessity, gen_hard_imputation_strategy, gen_hard_imbalanced_accuracy,     gen_hard_random_forest_concept, gen_hard_train_predict, gen_hard_confusion_matrix,
     gen_eda_concept_num_num,
     gen_hard_apply, gen_hard_groupby, gen_hard_merge, gen_hard_pivot,
     gen_ml_knn, gen_ml_split_stratify, gen_ml_cv
