@@ -146,8 +146,8 @@ div[role="radiogroup"] > label > div:nth-child(2) {{ font-family: 'JetBrains Mon
 .floating-exp {{ 
     position: fixed; 
     top: 15%; 
-    right: 2rem; 
-    width: 400px; 
+    right: 2%; 
+    width: 380px; 
     max-height: 80vh;
     overflow-y: auto;
     overflow-x: hidden;
@@ -211,6 +211,11 @@ div[role="radiogroup"] > label > div:nth-child(2) {{ font-family: 'JetBrains Mon
     
     .floating-exp {{ position: static; width: 100%; margin-top: 1rem !important; animation: none; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 1rem !important; border-radius: 16px !important; }}
 }}
+
+/* 글로벌 가로 스크롤 완전 차단 (데스크탑 와이드 모니터 이슈 방어) */
+html, body, [data-testid="stAppViewContainer"], .main, .stApp {
+    overflow-x: hidden !important;
+}
 </style>
 """
  
