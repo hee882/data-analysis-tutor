@@ -11,13 +11,12 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report, mean_absolute_error, mean_squared_error, r2_score
 
 def render_ml_lab():
-    st.title("🧪 Machine Learning Lab")
-    st.markdown("인터랙티브하게 머신러닝 모델의 동작 방식을 실험해보세요!")
+    st.markdown("<p style='color: #64748b; font-size: 0.95rem; margin-bottom: 0.5rem;'>🧪 <strong>머신러닝 실험실:</strong> 데이터를 조작하며 분류, 회귀, EDA의 원리를 시각적으로 학습합니다.</p>", unsafe_allow_html=True)
 
     tab1, tab2, tab3 = st.tabs(["분류 (Classification)", "회귀 (Regression)", "데이터 탐색 (EDA)"])
 
     with tab1:
-        st.header("꽃의 종류 분류하기 (Iris Dataset)")
+        st.subheader("🌷 꽃의 종류 분류하기 (Iris Dataset)")
         st.markdown("K-Nearest Neighbors (KNN) 알고리즘을 사용하여 붓꽃의 종류를 분류합니다.")
 
         st.info('''
@@ -105,7 +104,7 @@ def render_ml_lab():
                     st.pyplot(fig_k)
 
     with tab2:
-        st.header("팁 금액 예측하기 (Tips Dataset)")
+        st.subheader("💰 팁 금액 예측하기 (Tips Dataset)")
         st.markdown("단순 선형 회귀 (Linear Regression)를 사용하여 팁 금액을 예측합니다.")
 
         st.info('''
@@ -168,7 +167,7 @@ def render_ml_lab():
                     st.pyplot(fig_reg)
                     
     with tab3:
-        st.header("상호작용 데이터 탐색 (동적 시각화)")
+        st.subheader("📊 상호작용 데이터 탐색 (동적 시각화)")
         st.markdown("데이터의 형태(범주형/수치형)에 따라 적합한 시각화 라이브러리(Seaborn) 함수를 선택하고 코드를 확인해보세요.")
         
         col_ds, col_plot = st.columns(2)

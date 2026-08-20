@@ -40,6 +40,33 @@ h1, h2, h3, h4, h5, strong {{ color: #0f172a !important; letter-spacing: -0.03em
 header, footer, #MainMenu {{ display: none !important; }}
 
 /* -------------------------------------------------------------
+   HUD CONTAINER (Stats)
+------------------------------------------------------------- */
+.hud-container {
+    flex-wrap: nowrap !important;
+    white-space: nowrap !important;{
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+}}
+.hud-badge {{
+    background: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: blur(8px) !important;
+    border: 1px solid rgba(0,0,0,0.1) !important;
+    padding: 0.4rem 1rem !important;
+    border-radius: 99px !important;
+    font-size: 0.9rem !important;
+    font-weight: 700 !important;
+    color: #475569 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05) !important;
+}}
+.hud-badge span {{
+    color: {active_color} !important;
+    font-size: 1.05rem !important;
+}}
+
+/* -------------------------------------------------------------
    MODERN SCROLLBAR (Sleek & Clean)
 ------------------------------------------------------------- */
 ::-webkit-scrollbar {{
@@ -67,8 +94,8 @@ header, footer, #MainMenu {{ display: none !important; }}
    LAYOUT
 ------------------------------------------------------------- */
 .block-container {{ 
-    padding: 1rem 1rem 6rem 1rem !important; 
-    max-width: 800px !important; 
+    padding: 1rem 2rem 0.5rem 2rem !important; 
+    max-width: 98% !important; 
     margin: 0 auto !important; 
     overflow-x: hidden !important;
 }}
@@ -88,7 +115,14 @@ div[data-testid="stVerticalBlock"] {{ gap: 1rem !important; }}
 
 /* 글로벌 스위처 (Toggle) 좌우 텍스트 추가 및 중앙 정렬 */
 div[data-testid="stToggle"] {{
-    display: flex !important; justify-content: center !important; align-items: center !important; margin-bottom: 1rem !important;
+    position: absolute !important;
+    top: 1.5rem !important;
+    right: 2rem !important;
+    display: flex !important; 
+    justify-content: flex-end !important; 
+    align-items: center !important; 
+    margin: 0 !important;
+    z-index: 100 !important;
 }}
 div[data-testid="stToggle"]::before {{
     content: "🌱 베이직 버전";
@@ -102,23 +136,77 @@ div[data-testid="stToggle"] label {{
 }}
 
 /* -------------------------------------------------------------
-   TAB BAR (PC: Floating, Mobile: Docked)
+   TAB BAR (PC: Standard Header Style, Mobile: iOS Bottom Dock)
 ------------------------------------------------------------- */
 [data-baseweb="tab-list"] {{
-    position: fixed !important; bottom: 1.5rem !important; left: 50% !important; transform: translateX(-50%) !important;
-    width: 95% !important; max-width: 700px !important;
-    background: rgba(255, 255, 255, 0.8) !important; backdrop-filter: blur(24px) saturate(200%) !important; -webkit-backdrop-filter: blur(24px) saturate(200%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.9) !important; border-radius: 99px !important;
-    padding: 0.4rem !important; margin: 0 !important; z-index: 9999 !important;
-    display: flex !important; justify-content: space-between !important; gap: 0.2rem !important;
-    box-shadow: 0 12px 32px rgba(0,0,0,0.1), inset 0 2px 4px rgba(255,255,255,1) !important;
+    position: relative !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: none !important;
+    border-bottom: 1px solid rgba(0,0,0,0.1) !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin: 0 0 1rem 0 !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    gap: 0 !important;
+    box-shadow: none !important;
+    bottom: auto !important;
+    left: auto !important;
+    transform: none !important;
 }}
-[data-baseweb="tab"] {{ 
-    flex: 1 !important; border-radius: 99px !important; font-size: 0.95rem !important; font-weight: 700 !important; 
-    padding: 0.6rem 0.2rem !important; color: #64748b !important; background: transparent !important; border: none !important;
+[data-baseweb="tab"] {{
+    flex: 1 !important;
+    text-align: center !important;
+    font-size: 1.05rem !important;
+    font-weight: 600 !important;
+    padding: 0.8rem 0 !important;
+    background: transparent !important;
+    color: #64748b !important;
+    border: none !important;
+    border-radius: 0 !important;
+    /* Removed border */
 }}
-[aria-selected="true"] {{ background: {active_color} !important; color: #ffffff !important; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important; border: none !important; }}
-[aria-selected="false"]:hover {{ background: rgba(255, 255, 255, 0.5) !important; color: #0f172a !important; }}
+[aria-selected="true"] {{
+    color: {active_color} !important;
+    /* Removed border */
+    background: transparent !important;
+    box-shadow: none !important;
+}}
+[aria-selected="false"]:hover {{
+    color: #1e293b !important;
+    background: transparent !important;
+}}
+
+
+/* -------------------------------------------------------------
+   SUB-TAB BAR (Depth 2: ML Lab Inner Tabs)
+------------------------------------------------------------- */
+[data-baseweb="tab-panel"] [data-baseweb="tab-list"] {{
+    background: rgba(0,0,0,0.03) !important;
+    border-radius: 12px !important;
+    padding: 0.3rem !important;
+    gap: 0.5rem !important;
+    border-bottom: none !important;
+    margin-bottom: 1.5rem !important;
+    width: 100% !important;
+    display: flex !important;
+}}
+[data-baseweb="tab-panel"] [data-baseweb="tab"] {{
+    border-radius: 8px !important;
+    border-bottom: none !important;
+    font-size: 0.95rem !important;
+    padding: 0.5rem 1rem !important;
+    background: transparent !important;
+}}
+[data-baseweb="tab-panel"] [aria-selected="true"] {{
+    background: #ffffff !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05) !important;
+    border-bottom: none !important;
+}}
 
 /* -------------------------------------------------------------
    TAB TRANSITION ANIMATION
@@ -150,7 +238,7 @@ div[role="radiogroup"] > label {{
     box-shadow: 0 4px 12px rgba(0,0,0,0.02) !important; transition: all 0.2s ease !important; margin: 0 !important;
 }}
 div[role="radiogroup"] > label:hover {{ background: rgba(255, 255, 255, 0.95) !important; border-color: #cbd5e1 !important; transform: scale(1.01) !important; box-shadow: 0 8px 20px rgba(0,0,0,0.06) !important; }}
-div[role="radiogroup"] > label[data-checked="true"] {{ border-color: {active_color} !important; background: #ffffff !important; box-shadow: 0 0 0 2px {active_color}, 0 8px 20px rgba(0,0,0,0.1) !important; transform: scale(1.01) !important; }}
+div[role="radiogroup"] > label:has(input:checked) {{ border-color: {active_color} !important; background: #ffffff !important; box-shadow: 0 0 0 2px {active_color}, 0 8px 20px rgba(0,0,0,0.15) !important; font-weight: 800 !important; border: 2px solid {active_color} !important; transform: scale(1.01) !important; }}
 div[role="radiogroup"] > label > div:first-child {{ display: none !important; }} 
 div[role="radiogroup"] > label > div:nth-child(2) {{ font-family: 'JetBrains Mono', 'D2Coding', monospace !important; font-size: 1rem !important; color: #1e293b !important; font-weight: 600 !important; margin-left: 0 !important; text-align: left !important; width: 100% !important; }}
 
@@ -163,6 +251,33 @@ div[role="radiogroup"] > label > div:nth-child(2) {{ font-family: 'JetBrains Mon
 [data-testid="stButton"] button[kind="primary"] {{ background-color: {active_color} !important; box-shadow: 0 6px 16px rgba(0,0,0,0.2) !important; }}
 [data-testid="stButton"] button[kind="primary"]:hover {{ filter: brightness(0.9); box-shadow: 0 8px 24px rgba(0,0,0,0.3) !important; }}
 
+
+
+/* -------------------------------------------------------------
+   RADIO BUTTON FULL WIDTH FIX (Prevent jumping)
+------------------------------------------------------------- */
+div[data-testid="stRadio"], div[data-testid="stRadio"] > div {
+    width: 100% !important;
+}
+
+/* -------------------------------------------------------------
+   SELECTBOX / DROPDOWN MENU FIX (Crisp resolution)
+------------------------------------------------------------- */
+div[data-baseweb="popover"], div[data-baseweb="popover"] * {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+ul[role="listbox"] {
+    background-color: #ffffff !important;
+    border: 1px solid rgba(0,0,0,0.1) !important;
+    border-radius: 8px !important;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.12) !important;
+}
+ul[role="listbox"] li {
+    font-family: 'Pretendard Variable', -apple-system, sans-serif !important;
+    font-size: 0.95rem !important;
+    color: #1e293b !important;
+}
 
 /* -------------------------------------------------------------
    DESKTOP EXPLANATION BOX (Right Side)
@@ -206,7 +321,8 @@ div[role="radiogroup"] > label > div:nth-child(2) {{ font-family: 'JetBrains Mon
    MOBILE EXTREME OPTIMIZATION
 ------------------------------------------------------------- */
 @media screen and (max-width: 768px) {{
-    .block-container {{ padding: 0.5rem 0.8rem 4rem 0.8rem !important; margin: 0 auto !important; }}
+    /* 1. Forbidden Zone: 하단 여백을 6rem으로 강제하여 컨텐츠가 탭바에 안가려지게 함 */
+    .block-container {{ padding: 0.5rem 0.8rem 6rem 0.8rem !important; margin: 0 auto !important; }}
     
     .custom-header {{ flex-direction: row !important; align-items: center !important; justify-content: flex-start !important; gap: 0.5rem !important; margin-bottom: 0.5rem !important; padding: 0 !important; text-align: left !important; }}
     .header-top-row {{ margin: 0 !important; gap: 0.5rem !important; justify-content: flex-start !important; }}
@@ -214,7 +330,7 @@ div[role="radiogroup"] > label > div:nth-child(2) {{ font-family: 'JetBrains Mon
     .header-title {{ font-size: 1.1rem !important; }}
     .header-subtitle {{ display: none !important; }}
     
-    div[data-testid="stToggle"] {{ margin-bottom: 0.5rem !important; justify-content: center !important; }}
+    div[data-testid="stToggle"] {{ position: relative !important; top: 0 !important; right: 0 !important; margin-bottom: 0.5rem !important; justify-content: flex-start !important; }}
     div[data-testid="stToggle"]::before {{ font-size: 0.95rem; }}
     div[data-testid="stToggle"] label {{ font-size: 0.95rem !important; }}
     
@@ -223,24 +339,98 @@ div[role="radiogroup"] > label > div:nth-child(2) {{ font-family: 'JetBrains Mon
     div[role="radiogroup"] > label {{ padding: 0.6rem 0.8rem !important; min-height: 2.8rem !important; border-radius: 10px !important; margin-bottom: 0 !important; }}
     div[role="radiogroup"] > label > div:nth-child(2) {{ font-size: 0.9rem !important; line-height: 1.3 !important; }}
     
-    .hud-container {{ margin-bottom: 0.5rem !important; justify-content: flex-start !important; gap: 0.4rem !important; }}
+    .hud-container {
+    flex-wrap: nowrap !important;
+    white-space: nowrap !important;{ margin-bottom: 0.5rem !important; justify-content: flex-start !important; gap: 0.4rem !important; }}
     .hud-badge {{ padding: 0.2rem 0.5rem !important; font-size: 0.75rem !important; }}
     
-    /* 모바일 탭 디자인 최적화 (하단 고정 찌꺼기 제거) */
+    /* 2. iOS Style Bottom Dock for Tabs */
     [data-baseweb="tab-list"] {{ 
-        margin-bottom: 1rem !important;
-        padding: 0.2rem !important; 
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        max-width: 100vw !important;
+        background: rgba(255, 255, 255, 0.95) !important;
+        backdrop-filter: blur(24px) saturate(200%) !important;
+        -webkit-backdrop-filter: blur(24px) saturate(200%) !important;
+        border-top: 1px solid rgba(0,0,0,0.1) !important;
+        border-bottom: none !important;
+        padding: 0.5rem 0.5rem calc(0.5rem + env(safe-area-inset-bottom)) 0.5rem !important;
+        margin: 0 !important;
+        display: flex !important;
+        justify-content: space-around !important;
+        gap: 0 !important;
+        z-index: 99999 !important;
+        box-shadow: 0 -4px 16px rgba(0,0,0,0.08) !important;
     }}
-    [data-baseweb="tab"] {{ font-size: 0.85rem !important; padding: 0.5rem 0.1rem !important; }}
+    
+    [data-baseweb="tab"] {{ 
+        flex: 1 !important;
+        font-size: 0.8rem !important;
+        font-weight: 700 !important;
+        padding: 0.5rem 0 !important;
+        border: none !important;
+        border-bottom: none !important;
+        background: transparent !important;
+        border-radius: 12px !important;
+    }}
+    
+    [aria-selected="true"] {{ 
+        color: {active_color} !important; 
+        border-bottom: none !important;
+        background: rgba(0,0,0,0.04) !important; 
+        box-shadow: none !important;
+    }}
+    
+    [aria-selected="false"]:hover {{
+        background: transparent !important;
+    }}
+    
+    /* 3. Sub-tabs (Depth 2) Reset (Do NOT dock to bottom!) */
+    [data-baseweb="tab-panel"] [data-baseweb="tab-list"] {{
+        position: relative !important;
+        bottom: auto !important;
+        left: auto !important;
+        width: 100% !important;
+        background: rgba(0,0,0,0.03) !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        border-top: none !important;
+        padding: 0.3rem !important;
+        margin-bottom: 1.5rem !important;
+        z-index: 1 !important;
+        box-shadow: none !important;
+        border-radius: 12px !important;
+    }}
+    
+    [data-baseweb="tab-panel"] [data-baseweb="tab"] {{
+        flex: 1 !important;
+        font-size: 0.85rem !important;
+        padding: 0.4rem !important;
+        background: transparent !important;
+        border-radius: 8px !important;
+    }}
+    [data-baseweb="tab-panel"] [aria-selected="true"] {{
+        background: #ffffff !important;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05) !important;
+    }}
     
     .floating-exp {{ position: static; width: 100%; margin-top: 1rem !important; animation: none; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 1rem !important; border-radius: 16px !important; }}
 }}
 
-/* 글로벌 가로 스크롤 완전 차단 (데스크탑 와이드 모니터 이슈 방어) */
+/* 글로벌 가로 스크롤 완전 차단 (데스크탑 와이드 모니터 이슈 방어) 및 세로 스크롤바 시프트 방지 */
 html, body, [data-testid="stAppViewContainer"], .main, .stApp, #root {{
     overflow-x: hidden !important;
     max-width: 100vw !important;
 }}
+[data-testid="stAppViewContainer"] {{
+    overflow-y: scroll !important; /* 항상 세로 스크롤바 트랙을 유지하여 컴포넌트 흔들림(Shift) 방지 */
+}}
+
+
+/* Native tab highlight restored */
+[data-baseweb="tab-border"] {{ display: none !important; }}
 </style>
 """
  

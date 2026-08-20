@@ -30,7 +30,7 @@ st.markdown(f'''
 
 # 상단 글로벌 모드 스위처
 # 심플한 토글 스위치로 모드 변경 (st.radio 충돌 원천 차단)
-is_comp_mode = st.toggle("🔥 심화 마스터 버전", value=(st.session_state.current_strategy == "comprehensive"))
+is_comp_mode = st.toggle("🔥 심화 마스터 버전", value=(st.session_state.current_strategy == "comprehensive"), help="심화 마스터 버전: Pandas, Scikit-learn의 핵심 개념과 고급 테크닉, 시각화를 모두 포함하는 확장 스터디 모드입니다.")
 selected_mode = "comprehensive" if is_comp_mode else "bootcamp_day1_4"
 
 if st.session_state.current_strategy != selected_mode:
@@ -61,7 +61,10 @@ with tabs[0]:
         st.session_state.s_topic = "전체 랜덤"
 
     available_topics = get_available_topics(st.session_state.current_strategy)
-    selected_topic = st.selectbox("🎯 집중 학습할 주제 선택", available_topics, index=available_topics.index(st.session_state.s_topic) if st.session_state.s_topic in available_topics else 0)
+    
+    tool_col1, tool_col2 = st.columns([6, 4], vertical_alignment="bottom")
+    with tool_col1:
+        selected_topic = st.selectbox("🎯 집중 학습할 주제 선택", available_topics, index=available_topics.index(st.session_state.s_topic) if st.session_state.s_topic in available_topics else 0)
     
     if selected_topic != st.session_state.s_topic:
         st.session_state.s_topic = selected_topic
@@ -71,84 +74,99 @@ with tabs[0]:
         st.session_state.s_correct = False
         st.rerun()
 
-    acc = (st.session_state.s_total_correct / st.session_state.s_total_solved * 100) if st.session_state.s_total_solved > 0 else 0
-    
-    st.markdown(f'''
-    <div class="hud-container">
-        <div class="hud-badge">✅ 누적 완료: <span>{st.session_state.s_total_solved}</span> 개</div>
-        <div class="hud-badge">🎯 1트 정답률: <span>{acc:.1f}</span> %</div>
-    </div>
-    ''', unsafe_allow_html=True)
+    with tool_col2:
+        acc = (st.session_state.s_total_correct / st.session_state.s_total_solved * 100) if st.session_state.s_total_solved > 0 else 0
+        st.markdown(f'''
+        <div class="hud-container" style="margin-top: 0; margin-bottom: 1.5rem; justify-content: flex-end;">
+            <div class="hud-badge">✅ 누적 완료: <span>{st.session_state.s_total_solved}</span> 개</div>
+            <div class="hud-badge">🎯 1트 정답률: <span>{acc:.1f}</span> %</div>
+        </div>
+        ''', unsafe_allow_html=True)
     
     q = st.session_state.s_current_q
     
-    with st.container(border=True):
-        st.markdown(f"**Q. {q['topic']}** " + ("(주관식 ⌨️)" if q['type'] == 'text' else "(객관식 🖱️)"))
-        st.markdown(f"{q['question']}")
-        
-        if q['type'] == 'radio':
-            user_ans = st.radio("보기 선택", options=q['choices'], label_visibility="hidden", key=f"s_ans_endless", index=None)
-        else:
-            user_ans = st.text_input("직접 타이핑하여 코드를 완성하세요", placeholder="코드를 입력하세요", label_visibility="hidden", key=f"s_ans_endless")
-
-    if not st.session_state.s_show_exp:
-        if st.button("제출 및 채점", type="primary", key="btn_study_submit", use_container_width=True):
-            if not user_ans:
-                st.warning("답안을 입력하거나 보기를 선택해 주세요.")
+    study_col1, study_col2 = st.columns([1, 1], gap="large")
+    
+    with study_col1:
+        with st.container(border=True):
+            st.markdown(f"**Q. {q['topic']}** " + ("(객관식 🖱️)" if q['type'] == 'radio' else "(주관식 ⌨️)"))
+            st.markdown(f"{q['question']}")
+            
+            if q['type'] == 'radio':
+                user_ans = st.radio("정답 선택", options=q['choices'], label_visibility="hidden", key=f"s_ans_endless", index=None)
             else:
-                if q['type'] == 'radio':
+                user_ans = st.text_input("빈 칸이나 코드를 작성하세요", placeholder="코드를 입력하세요", label_visibility="hidden", key=f"s_ans_endless")
+    
+        if not st.session_state.s_show_exp:
+            if st.button("제출 및 채점", type="primary", key="btn_study_submit", use_container_width=True):
+                if not user_ans:
+                    st.warning("정답을 입력하거나 선택해 주세요.")
+                else:
                     is_correct = (user_ans == q['expected'])
-                else:
-                    is_correct = q['check'](user_ans)
-
-                if is_correct:
-                    st.session_state.s_correct = True
-                    st.session_state.s_show_exp = True
-                    st.session_state.s_total_solved += 1
-                    if st.session_state.s_attempts == 0:
-                        st.session_state.s_total_correct += 1
-                else:
-                    st.session_state.s_attempts += 1
-                    if st.session_state.s_attempts >= 3:
-                        st.session_state.s_correct = False
+    
+                    if is_correct:
+                        st.session_state.s_correct = True
                         st.session_state.s_show_exp = True
                         st.session_state.s_total_solved += 1
-            st.rerun()
-            
-        if st.session_state.s_attempts > 0 and not st.session_state.s_show_exp:
-            st.error(f"❌ 오답입니다. (남은 기회: {3 - st.session_state.s_attempts}번)")
-            
-            # Progressive Hints
-            exp_text = q['explanation']
-            if st.session_state.s_attempts == 1:
-                hint = exp_text[:max(10, len(exp_text)//4)] + "..."
-                st.warning(f"💡 [힌트 1단계] {hint}")
-            elif st.session_state.s_attempts == 2:
-                hint = exp_text[:max(20, len(exp_text)*2//3)] + "..."
-                st.warning(f"💡 [힌트 2단계] {hint}")
-    else:
-        if st.session_state.s_correct:
-            st.success("✅ 정답입니다!")
+                        if st.session_state.s_attempts == 0:
+                            st.session_state.s_total_correct += 1
+                    else:
+                        st.session_state.s_attempts += 1
+                        if st.session_state.s_attempts >= 3:
+                            st.session_state.s_correct = False
+                            st.session_state.s_show_exp = True
+                            st.session_state.s_total_solved += 1
+                st.rerun()
+                
+            if st.session_state.s_attempts > 0 and not st.session_state.s_show_exp:
+                st.error(f"오답입니다. (남은 기회: {3 - st.session_state.s_attempts}번)")
+                
+                # Progressive Hints
+                exp_text = q['explanation']
+                if st.session_state.s_attempts == 1:
+                    hint = exp_text[:max(10, len(exp_text)//4)] + "..."
+                    st.warning(f"💡 [힌트 1단계] {hint}")
+                elif st.session_state.s_attempts == 2:
+                    hint = exp_text[:max(20, len(exp_text)*2//3)] + "..."
+                    st.warning(f"💡 [힌트 2단계] {hint}")
         else:
-            st.error("❌ 3회 오답. 해설 공개.")
+            st.button("제출 완료", disabled=True, use_container_width=True)
+
+    with study_col2:
+        if st.session_state.s_show_exp:
+            is_corr = st.session_state.s_correct
+            result_color = "#10b981" if is_corr else "#ef4444"
+            result_bg = "rgba(16,185,129,0.05)" if is_corr else "rgba(239,68,68,0.05)"
+            result_border = "rgba(16,185,129,0.4)" if is_corr else "rgba(239,68,68,0.4)"
+            result_title = f"<h2 style='color: {result_color}; margin: 0 0 1rem 0; font-size: 2.2rem; font-weight: 800;'>{'🎉 정답입니다!' if is_corr else '❌ 오답입니다.'}</h2>"
             
-        exp_html = f'''
-        <div class="floating-exp">
-            <h4 style="margin-top:0; margin-bottom:0.8rem; color:#3b82f6;">💡 해설 및 모범 답안</h4>
-            <div style="background:#1e293b; padding:1rem; border-radius:12px; margin-bottom:1rem; font-family:'JetBrains Mono', monospace; color:#e2e8f0; font-size:0.95rem; line-height:1.4;">
-                {q['expected']}
+            exp_html = f'''
+            <div style="background: {result_bg}; border: 2px solid {result_border}; border-radius: 20px; padding: 2rem; margin-bottom: 1.5rem; box-shadow: 0 12px 32px rgba(0,0,0,0.05);">
+                {result_title}
+                <h4 style="margin-top:0.5rem; margin-bottom:1rem; color:#3b82f6; font-size:1.2rem;">💡 정답 및 해설</h4>
+                <div style="background:#1e293b; padding:1.2rem; border-radius:12px; margin-bottom:1.2rem; font-family:'JetBrains Mono', monospace; color:#10b981; font-size:1.15rem; font-weight:700; line-height:1.4;">
+                    {q['expected']}
+                </div>
+                <p style="font-weight:600; font-size:1.1rem; color:#1e293b; word-break:keep-all; line-height:1.7;">{q['explanation']}</p>
             </div>
-            <p style="font-weight:600; font-size:1rem; color:#334155; word-break:keep-all;">{q['explanation']}</p>
-        </div>
-        '''
-        st.markdown(exp_html, unsafe_allow_html=True)
-            
-        if st.button("⏭️ 다음 문제 (Endless)", type="primary", key="btn_study_next", use_container_width=True):
-            st.session_state.s_current_q = generate_single_quiz(st.session_state.current_strategy, st.session_state.get("s_topic", "전체 랜덤"))
-            st.session_state.s_attempts = 0
-            st.session_state.s_show_exp = False
-            st.session_state.s_correct = False
-            st.rerun()
+            '''
+            st.markdown(exp_html, unsafe_allow_html=True)
+                
+            st.markdown('<style>button[kind="primary"] { font-size: 1.3rem !important; padding: 1rem !important; border-radius: 16px !important; box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4) !important; animation: pulse 2s infinite; } @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }</style>', unsafe_allow_html=True)
+            if st.button("✨ 다음 문제 풀기 (Endless) 🚀", type="primary", key="btn_study_next", use_container_width=True):
+                st.session_state.s_current_q = generate_single_quiz(st.session_state.current_strategy, st.session_state.get("s_topic", "전체 랜덤"))
+                st.session_state.s_attempts = 0
+                st.session_state.s_show_exp = False
+                st.session_state.s_correct = False
+                st.rerun()
+        else:
+            st.markdown('''
+            <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; min-height: 250px; opacity: 0.3; background: rgba(0,0,0,0.02); border-radius: 16px; border: 2px dashed rgba(0,0,0,0.1);">
+                <div style="font-size: 4rem; margin-bottom: 1rem; filter: grayscale(1);">🤔</div>
+                <p style="font-weight:700; font-size: 1.2rem; text-align:center;">문제를 풀고 제출하면<br>이곳에 정답과 해설이 나타납니다.</p>
+            </div>
+            ''', unsafe_allow_html=True)
+
 
 with tabs[1]:
     if 'exam_state' not in st.session_state:
@@ -204,13 +222,8 @@ with tabs[1]:
                 st.session_state.exam_end_time = time.time()
                 score = 0
                 for i, q in enumerate(st.session_state.e_quizzes):
-                    if user_answers[i]:
-                        if q['type'] == 'radio':
-                            if user_answers[i] == q['expected']:
-                                score += 1
-                        else:
-                            if q['check'](user_answers[i]):
-                                score += 1
+                    if user_answers[i] and user_answers[i] == q['expected']:
+                        score += 1
                 st.session_state.e_score = score
                 st.session_state.e_user_answers = user_answers
                 save_score(st.session_state.exam_name, st.session_state.e_score, st.session_state.current_strategy)
@@ -235,10 +248,8 @@ with tabs[1]:
                 u_ans = st.session_state.e_user_answers[i]
                 if not u_ans:
                     is_cor = False
-                elif q['type'] == 'radio':
-                    is_cor = (u_ans == q['expected'])
                 else:
-                    is_cor = q['check'](u_ans)
+                    is_cor = (u_ans == q['expected'])
                     
                 css_class = "report-correct" if is_cor else "report-wrong"
                 st.markdown(f'''<div class="{css_class}">

@@ -352,15 +352,136 @@ def gen_ml_cv():
 # PLUGIN SYSTEM / STRATEGY REGISTRY
 # -------------------------------------------------------------------
 
+
+def gen_killer_chained_assignment():
+    ans = "df.loc[df['A'] > 5, 'B'] = 10"
+    wrongs = [
+        "df[df['A'] > 5]['B'] = 10",
+        "df.query('A > 5')['B'] = 10",
+        "df.where(df['A'] > 5)['B'] = 10"
+    ]
+    return {
+        'topic': '킬러 - Pandas 인덱싱 (Chained Assignment)',
+        'question': "데이터프레임 `df`에서 'A' 컬럼의 값이 5보다 큰 행들의 'B' 컬럼 값을 10으로 변경하려고 합니다. `SettingWithCopyWarning`을 피하면서 원본 데이터를 안전하게 수정하는 올바른 코드는 무엇입니까?",
+        'expected': ans,
+        'wrongs': wrongs,
+        'explanation': "마스킹 조건으로 데이터를 필터링한 후 다시 컬럼에 접근하여 값을 할당하는 행위(`df[...][...] = ...`)는 Chained Assignment를 발생시켜 원본 데이터가 변경되지 않을 수 있습니다. 반드시 `.loc[행조건, 열이름]`을 사용하여 단일 연산으로 값을 할당해야 합니다.",
+        'force_type': 'radio'
+    }
+
+def gen_killer_merge_suffixes():
+    ans = "df1과 df2에 공통된 이름의 컬럼이 병합 키가 아닌 경우, 구분을 위해 '_left', '_right' 접미사가 붙는다."
+    wrongs = [
+        "merge는 기본적으로 outer join으로 수행되며, 누락된 값은 0으로 채워진다.",
+        "on 파라미터를 지정하지 않으면 에러가 발생하므로 반드시 지정해야 한다.",
+        "인덱스를 기준으로 병합할 때는 merge 함수 대신 반드시 join 함수만 사용해야 한다."
+    ]
+    return {
+        'topic': '킬러 - Pandas 데이터 병합 (Merge)',
+        'question': "Pandas의 `pd.merge(df1, df2)` 동작 방식에 대한 설명으로 올바른 것은 무엇입니까?",
+        'expected': ans,
+        'wrongs': wrongs,
+        'explanation': "`merge`의 기본 동작은 `inner join`이며, `on`을 생략하면 이름이 겹치는 모든 컬럼을 병합 키로 자동 사용합니다. 인덱스 병합은 `left_index=True`, `right_index=True` 옵션으로 `merge`에서도 가능합니다. 공통 컬럼이 병합 키가 아닐 경우 자동으로 접미사(_x, _y)가 붙습니다.",
+        'force_type': 'radio'
+    }
+
+ALL_KILLER = [gen_killer_chained_assignment, gen_killer_merge_suffixes]
+
 class QuizStrategy:
-    def __init__(self, id, name, description, easy_pool, hard_pool):
+    def __init__(self, id, name, description, easy_pool, hard_pool, killer_pool=None):
         self.id = id
         self.name = name
         self.description = description
         self.easy_pool = easy_pool
         self.hard_pool = hard_pool
+        self.killer_pool = killer_pool or []
+
+
+def gen_easy_while_loop():
+    ans = "012"
+    wrongs = ["0123", "12", "123", "01"]
+    return {
+        'topic': '파이썬 기초 (반복문)', 
+        'question': "다음 코드의 실행 결과로 올바른 것을 고르시오.\n\n`python\ncount = 0\nwhile count < 3:\n    print(count, end='')\n    count += 1\n`",
+        'expected': ans, 'wrongs': wrongs, 
+        'explanation': "while 반복문은 count가 0, 1, 2일 때 실행되며, end='' 옵션으로 인해 줄바꿈 없이 012가 연속 출력됩니다.",
+        'force_type': 'radio'
+    }
+
+def gen_easy_list_mutability():
+    ans = "리스트는 수정이 가능하며, 문자열은 새로운 객체가 생성된다."
+    wrongs = ["문자열은 수정이 가능하며, 리스트는 새로운 객체가 생성된다.", "리스트와 문자열 모두 수정할 수 있다.", "리스트와 문자열 모두 수정할 수 없다.", "리스트는 수정이 불가능하며, 문자열만 수정할 수 있다."]
+    return {
+        'topic': '파이썬 기초 (자료형)', 
+        'question': "다음 코드를 실행했을 때, 리스트와 문자열의 결과 처리에 대한 설명으로 옳은 것을 고르시오.\n\n`python\nmy_list = [1, 2, 3]\nmy_string = 'hello'\nmy_list[0] = 10\nmy_string = 'H' + my_string[1:]\n`",
+        'expected': ans, 'wrongs': wrongs, 
+        'explanation': "리스트(List)는 가변(Mutable) 객체이므로 값 수정이 가능하지만, 문자열(String)은 불변(Immutable) 객체이므로 재할당 시 새로운 객체가 생성됩니다.",
+        'force_type': 'radio'
+    }
+
+def gen_easy_scaling_reason():
+    ans = "변수들의 범위를 일정하게 맞추기 위해서"
+    wrongs = ["변수들의 상관관계를 파악하기 위해서", "변수들의 선형 관계를 파악하기 위해서", "학습시간을 줄이기 위해서", "이상치를 자동으로 제거하기 위해서"]
+    return {
+        'topic': '데이터 전처리 (스케일링)', 
+        'question': "데이터 분석 및 머신러닝 학습 시, 변수들의 스케일링(Scaling)이 필요한 이유를 가장 잘 설명한 것을 고르시오.",
+        'expected': ans, 'wrongs': wrongs, 
+        'explanation': "스케일링(StandardScaler, MinMaxScaler 등)은 서로 다른 단위와 범위를 가진 변수(특성)들의 범위를 일정하게 맞추어, 모델 학습 시 특정 변수가 과도한 영향을 미치는 것을 방지하기 위해 수행합니다.",
+        'force_type': 'radio'
+    }
+
+def gen_easy_iloc_slicing():
+    ans = "df.iloc[0:2]"
+    wrongs = ["df.loc[0:2]", "df.iloc[0:1]", 'df.loc["A"]']
+    return {
+        'topic': '데이터프레임 슬라이싱 (iloc)', 
+        'question': "데이터프레임 df에서 첫 번째 행과 두 번째 행(0번과 1번 위치)만 정확히 선택하는 코드로 올바른 것을 고르시오.\n\n(단, 인덱스는 기본 RangeIndex를 사용함)",
+        'expected': ans, 'wrongs': wrongs, 
+        'explanation': "iloc[0:2]는 위치 기반 인덱싱으로 0번째와 1번째 행(마지막 인덱스 2는 포함 안 함)을 선택합니다. loc[0:2]는 0, 1, 2행까지 총 3개의 행을 가져오게 되므로 주의해야 합니다.",
+        'force_type': 'radio'
+    }
+
+def gen_hard_random_forest_concept():
+    ans = "Random Forest는 주로 선형 회귀 문제에 사용된다."
+    wrongs = [
+        "Random Forest는 Decision Tree 모델에 앙상블 학습을 적용한 모델이다.",
+        "Random Forest에서 bagging은 분산을 줄이기 위해 사용된다.",
+        "Random Forest는 overfitting 문제를 완화한다.",
+        "Random Forest는 여러 개의 Decision Tree를 생성하고, 그 예측 결과들을 통해 최종 예측을 만든다."
+    ]
+    return {
+        'topic': '머신러닝 개념 (앙상블)', 
+        'question': "다음 중 Random Forest 알고리즘에 대한 설명으로 틀린 것을 고르시오.",
+        'expected': ans, 'wrongs': wrongs, 
+        'explanation': "Random Forest는 트리 기반의 앙상블 모델로, 분류(Classification)와 비선형 회귀(Regression) 문제 모두에 널리 사용됩니다. 단순히 선형 회귀에만 사용된다는 것은 틀린 설명입니다.",
+        'force_type': 'radio'
+    }
+
+def gen_hard_train_predict():
+    ans = "X_test"
+    wrongs = ["X_train", "y_test", "X", "Y"]
+    return {
+        'topic': '모델 예측 API', 
+        'question': "다음 코드에서 결정 트리 모델을 학습시키고, 테스트 데이터에 대한 예측을 수행하려고 합니다. 빈칸에 들어갈 코드로 가장 적절한 것을 고르시오.\n\n`python\ntree = DecisionTreeClassifier()\ntree.fit(X_train, y_train)\n\ny_pred = tree.predict(________)\n`",
+        'expected': ans, 'wrongs': wrongs, 
+        'explanation': "모델 학습(fit)에는 훈련 데이터(X_train, y_train)가 사용되고, 새로운 데이터에 대한 예측(predict)을 수행할 때는 테스트 데이터의 피처(X_test)를 입력으로 제공해야 합니다.",
+        'force_type': 'radio'
+    }
+
+def gen_hard_confusion_matrix():
+    ans = "Confusion Matrix"
+    wrongs = ["Feature Importance", "Hyperparameter Tuning", "Data Scaling", "Normalization"]
+    return {
+        'topic': '모델 평가 지표', 
+        'question': "Scikit-Learn에서 분류 모델의 학습 성능을 평가하기 위해 사용할 수 있는 방법 중 하나로 가장 적절한 것을 고르시오.",
+        'expected': ans, 'wrongs': wrongs, 
+        'explanation': "Confusion Matrix(혼동 행렬)는 분류 모델의 정답과 오답 패턴(TP, FP, FN, TN)을 파악하여 정확도, 정밀도, 재현율 등을 도출하는 핵심적인 평가 도구입니다.",
+        'force_type': 'radio'
+    }
+
 
 ALL_EASY = [
+    gen_easy_while_loop, gen_easy_list_mutability, gen_easy_scaling_reason, gen_easy_iloc_slicing,
     gen_eda_concept_cat_num,
     gen_easy_read_excel, gen_easy_head, gen_easy_dtypes, gen_easy_isnull, 
     gen_easy_dropna, gen_easy_filter, gen_easy_loc, gen_easy_value_counts,
@@ -370,6 +491,7 @@ ALL_EASY = [
 ]
 
 ALL_HARD = [
+    gen_hard_random_forest_concept, gen_hard_train_predict, gen_hard_confusion_matrix,
     gen_eda_concept_num_num,
     gen_hard_apply, gen_hard_groupby, gen_hard_merge, gen_hard_pivot,
     gen_ml_knn, gen_ml_split_stratify, gen_ml_cv
@@ -381,14 +503,16 @@ STRATEGIES = {
         name='Day 1~2 Bootcamp (시험 대비)',
         description='단기 부트캠프 진도에 맞춰, 쉬운 문제 16개와 심화/응용 문제 4개가 출제됩니다.',
         easy_pool=ALL_EASY,  
-        hard_pool=ALL_HARD
+        hard_pool=ALL_HARD,
+        killer_pool=ALL_KILLER
     ),
     'comprehensive': QuizStrategy(
         id='comprehensive',
         name='종합 마스터 (전범위 딥다이브)',
         description='전 범위를 다루는 하드코어 모드입니다. 응용 문제의 비율이 높아집니다.',
         easy_pool=ALL_EASY,
-        hard_pool=ALL_HARD
+        hard_pool=ALL_HARD,
+        killer_pool=ALL_KILLER
     )
 }
 
@@ -399,34 +523,33 @@ def generate_exam_quizzes(strategy_id='bootcamp_day1_4'):
     strategy = get_strategy(strategy_id)
     easy_pool = strategy.easy_pool
     hard_pool = strategy.hard_pool
+    killer_pool = strategy.killer_pool
     
     quizzes = []
-    # 20개 중 16개는 베이직(Easy) 풀에서 출제
-    for _ in range(16):
-        f = random.choice(easy_pool)
-        q = f()
-        if random.random() < 0.1:
-            q['type'] = 'text'
-        else:
+    
+    def add_questions(pool, count):
+        for _ in range(count):
+            f = random.choice(pool)
+            q = f()
             q['type'] = 'radio'
             opts = [q['expected']] + q['wrongs'][:3]
             random.shuffle(opts)
             q['choices'] = opts
-        quizzes.append(q)
-        
-    # 20개 중 4개는 꼬아놓은 심화(Hard) 풀에서 출제
-    for _ in range(4):
-        f = random.choice(hard_pool)
-        q = f()
-        if random.random() < 0.1:
-            q['type'] = 'text'
-        else:
-            q['type'] = 'radio'
-            opts = [q['expected']] + q['wrongs'][:3]
-            random.shuffle(opts)
-            q['choices'] = opts
-        quizzes.append(q)
-        
+            quizzes.append(q)
+            
+    if strategy_id == 'bootcamp_day1_4':
+        # 모의고사는 20개 중 16개 베이직, 2개 심화, 2개 킬러
+        add_questions(easy_pool, 16)
+        add_questions(hard_pool, 2)
+        add_questions(killer_pool, 2)
+    else:
+        # 종합 마스터는 비율을 8:8:4 로 더욱 어렵게
+        add_questions(easy_pool, 8)
+        add_questions(hard_pool, 8)
+        if killer_pool:
+            add_questions(killer_pool, 4)
+            
+    random.shuffle(quizzes)
     return quizzes
 
 
@@ -450,13 +573,8 @@ def generate_single_quiz(strategy_id='bootcamp_day1_4', topic=None):
     f = random.choice(pool)
     q = f()
     
-    if q.get('force_type') == 'radio':
-        q['type'] = 'radio'
-    elif random.random() < 0.1:
-        q['type'] = 'text'
-    else:
-        q['type'] = 'radio'
-        opts = [q['expected']] + q['wrongs'][:3]
-        random.shuffle(opts)
-        q['choices'] = opts
+    q['type'] = 'radio'
+    opts = [q['expected']] + q['wrongs'][:3]
+    random.shuffle(opts)
+    q['choices'] = opts
     return q
