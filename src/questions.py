@@ -144,6 +144,31 @@ def gen_py_str_split():
         'check': lambda x: "split" in _prep(x) and "," in _prep(x)
     }
 
+
+def gen_eda_concept_cat_num():
+    ans = "sns.boxplot() 또는 sns.barplot()"
+    wrongs = ["sns.scatterplot()", "sns.histplot()", "sns.lineplot()"]
+    return {
+        'topic': 'EDA 개념 (범주형+수치형 시각화)', 
+        'question': "탐색적 데이터 분석(EDA) 과정에서 '범주형 데이터(예: 요일, 성별)'에 따른 '수치형 데이터(예: 매출액, 나이)'의 차이나 분포를 비교하려고 합니다. 다음 중 가장 적절한 Seaborn 시각화 함수는 무엇일까요?",
+        'expected': ans, 'wrongs': wrongs, 
+        'explanation': "범주형(Categorical)과 수치형(Numerical) 데이터를 동시에 분석할 때는 분포를 보여주는 boxplot이나 평균을 보여주는 barplot이 가장 적절합니다. scatterplot은 수치+수치 조합에 주로 사용됩니다.",
+        'check': lambda x: "box" in _prep(x) or "bar" in _prep(x),
+        'force_type': 'radio'
+    }
+
+def gen_eda_concept_num_num():
+    ans = "sns.scatterplot() 또는 sns.pairplot()"
+    wrongs = ["sns.countplot()", "sns.pie()", "sns.boxplot()"]
+    return {
+        'topic': 'EDA 개념 (다중 수치형 시각화)', 
+        'question': "여러 개의 '수치형 변수'들 간의 상관관계(선형성, 군집 등)를 한눈에 파악하기 위해 산점도 행렬을 그리려고 합니다. 가장 적합한 함수 조합은 무엇일까요?",
+        'expected': ans, 'wrongs': wrongs, 
+        'explanation': "두 수치형 변수의 관계는 scatterplot을 사용하며, 데이터프레임 내 여러 수치형 변수 간의 관계를 한 번에 조망할 때는 pairplot을 사용합니다. countplot은 단일 범주형 빈도수에 사용됩니다.",
+        'check': lambda x: "scatter" in _prep(x) or "pair" in _prep(x),
+        'force_type': 'radio'
+    }
+
 def gen_py_list_slice():
     ans = "lst[::-1]"
     wrongs = ["lst[-1:]", "lst.reverse()", "reversed(lst)"]
@@ -297,6 +322,7 @@ class QuizStrategy:
         self.hard_pool = hard_pool
 
 ALL_EASY = [
+    gen_eda_concept_cat_num,
     gen_easy_read_excel, gen_easy_head, gen_easy_dtypes, gen_easy_isnull, 
     gen_easy_dropna, gen_easy_filter, gen_easy_loc, gen_easy_value_counts,
     gen_viz_countplot, gen_viz_histplot, gen_viz_scatter, gen_sns_boxplot,
@@ -304,6 +330,7 @@ ALL_EASY = [
 ]
 
 ALL_HARD = [
+    gen_eda_concept_num_num,
     gen_hard_apply, gen_hard_groupby, gen_hard_merge, gen_hard_pivot,
     gen_ml_knn, gen_ml_split_stratify, gen_ml_cv
 ]
@@ -383,7 +410,9 @@ def generate_single_quiz(strategy_id='bootcamp_day1_4', topic=None):
     f = random.choice(pool)
     q = f()
     
-    if random.random() < 0.1:
+    if q.get('force_type') == 'radio':
+        q['type'] = 'radio'
+    elif random.random() < 0.1:
         q['type'] = 'text'
     else:
         q['type'] = 'radio'
