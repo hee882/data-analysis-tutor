@@ -491,6 +491,33 @@ html, body, [data-testid="stAppViewContainer"], .main, .stApp, #root {{
    FULL WIDTH OVERRIDE
 ------------------------------------------------------------- */
 
+
+/* --- Equal Height Columns --- */
+[data-testid="column"] {{
+    display: flex;
+    flex-direction: column;
+}}
+[data-testid="column"] > [data-testid="stVerticalBlock"] {{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}}
+[data-testid="column"] > [data-testid="stVerticalBlock"] > [data-testid="stVerticalBlockBorderWrapper"] {{
+    flex: 1;
+}}
+/* Ensure the markdown container inside column can also stretch */
+[data-testid="column"] > [data-testid="stVerticalBlock"] > .element-container {{
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+}}
+[data-testid="column"] > [data-testid="stVerticalBlock"] > .element-container > .stMarkdown,
+[data-testid="column"] > [data-testid="stVerticalBlock"] > .element-container > .stMarkdown > div {{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}}
+
 </style>
 
 

@@ -107,7 +107,7 @@ with tabs[0]:
             result_title = f"<h2 style='color: {result_color}; margin: 0 0 1rem 0; font-size: 2.2rem; font-weight: 800;'>{'정답입니다!' if is_corr else '틀렸습니다.'}</h2>"
         
             exp_html = f'''
-            <div style="background: {result_bg}; border: 2px solid {result_border}; border-radius: 20px; padding: 2rem; margin-bottom: 0; box-shadow: 0 12px 32px rgba(0,0,0,0.05);">
+            <div style="height: 100%; background: {result_bg}; border: 2px solid {result_border}; border-radius: 20px; padding: 2rem; margin-bottom: 0; box-shadow: 0 12px 32px rgba(0,0,0,0.05);">
                 {result_title}
                 <div style="font-size: 0.95rem; font-weight: 700; color: #64748b; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">
                     <span style="background: #e2e8f0; padding: 0.3rem 0.6rem; border-radius: 6px;">출제 주제</span> {q['topic']}
