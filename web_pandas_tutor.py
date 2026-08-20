@@ -88,24 +88,9 @@ with tabs[0]:
     
     with study_col1:
         with st.container(border=True):
-            st.markdown(f"**Q. {q['topic']}** " + ("(객관식 선택)" if q['type'] == 'radio' else "(주관식 입력)"))
+            st.markdown(f"**Q. {q['topic']}** (객관식 4지선다)")
             st.markdown(f"{q['question']}")
-            
-            if q['type'] == 'radio':
-                user_ans = st.radio("정답 선택", options=q['choices'], label_visibility="hidden", key=f"s_ans_endless", index=None)
-            else:
-                user_ans = st.text_input("빈 칸이나 코드를 작성하세요", placeholder="코드를 입력하세요", label_visibility="hidden", key=f"s_ans_endless")
-    
-        # Hints display just under the card but inside the column
-        if st.session_state.s_attempts > 0 and not st.session_state.s_show_exp:
-            st.error(f"틀렸습니다. (남은 기회: {3 - st.session_state.s_attempts}번)")
-            exp_text = q['explanation']
-            if st.session_state.s_attempts == 1:
-                hint = exp_text[:max(10, len(exp_text)//4)] + "..."
-                st.warning(f"💡 [힌트 1단계] {hint}")
-            elif st.session_state.s_attempts == 2:
-                hint = exp_text[:max(20, len(exp_text)*2//3)] + "..."
-                st.warning(f"💡 [힌트 2단계] {hint}")
+            user_ans = st.radio("보기 선택", options=q['choices'], label_visibility="hidden", key=f"s_ans_endless", index=None)
 
     with study_col2:
         if st.session_state.s_show_exp:
@@ -118,7 +103,7 @@ with tabs[0]:
             exp_html = f'''
             <div style="background: {result_bg}; border: 2px solid {result_border}; border-radius: 20px; padding: 2rem; margin-bottom: 0; box-shadow: 0 12px 32px rgba(0,0,0,0.05);">
                 {result_title}
-                <h4 style="margin-top:0.5rem; margin-bottom:1rem; color:#3b82f6; font-size:1.2rem;">📝 정답 및 해설</h4>
+                <h4 style="margin-top:0.5rem; margin-bottom:1rem; color:#3b82f6; font-size:1.2rem;">💡 정답 및 해설</h4>
                 <div style="background:#1e293b; padding:1.2rem; border-radius:12px; margin-bottom:1.2rem; font-family:'JetBrains Mono', monospace; color:#10b981; font-size:1.15rem; font-weight:700; line-height:1.4;">
                     {q['expected']}
                 </div>
@@ -126,14 +111,23 @@ with tabs[0]:
             </div>
             '''
             st.markdown(exp_html, unsafe_allow_html=True)
-            st.markdown('<style>button[kind="primary"] { font-size: 1.3rem !important; padding: 1rem !important; border-radius: 16px !important; box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4) !important; animation: pulse 2s infinite; } @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }</style>', unsafe_allow_html=True)
         else:
-            st.markdown('''
-            <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; min-height: 250px; opacity: 0.3; background: rgba(0,0,0,0.02); border-radius: 16px; border: 2px dashed rgba(0,0,0,0.1);">
-                <div style="font-size: 4rem; margin-bottom: 1rem; filter: grayscale(1);">🔒</div>
-                <p style="font-weight:700; font-size: 1.2rem; text-align:center;">문제를 풀고 제출하면<br>이곳에 정답과 해설이 나타납니다.</p>
-            </div>
-            ''', unsafe_allow_html=True)
+            if st.session_state.s_attempts > 0:
+                st.error(f"❌ 틀렸습니다. (남은 기회: {3 - st.session_state.s_attempts}회)")
+                exp_text = q['explanation']
+                if st.session_state.s_attempts == 1:
+                    hint = exp_text[:max(10, len(exp_text)//4)] + "..."
+                    st.warning(f"💡 [힌트 1단계] {hint}")
+                elif st.session_state.s_attempts == 2:
+                    hint = exp_text[:max(20, len(exp_text)*2//3)] + "..."
+                    st.warning(f"💡 [힌트 2단계] {hint}")
+            else:
+                st.markdown('''
+                <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; min-height: 250px; opacity: 0.3; background: rgba(0,0,0,0.02); border-radius: 16px; border: 2px dashed rgba(0,0,0,0.1);">
+                    <div style="font-size: 4rem; margin-bottom: 1rem; filter: grayscale(1);">🙈</div>
+                    <p style="font-weight:700; font-size: 1.2rem; text-align:center;">문제를 풀고 나면<br>이곳에 정답과 해설이 나타납니다.</p>
+                </div>
+                ''', unsafe_allow_html=True)
 
     st.markdown("<div style='margin-top: 1.5rem;'></div>", unsafe_allow_html=True)
     
@@ -142,9 +136,15 @@ with tabs[0]:
     
     with btn_col1:
         if not st.session_state.s_show_exp:
-            if st.button("✅ 정답 제출하기", type="primary", key="btn_study_submit", use_container_width=True):
+            sub_col1, sub_col2 = st.columns(2)
+            with sub_col1:
+                submit_clicked = st.button("정답 제출", type="primary", key="btn_study_submit", use_container_width=True)
+            with sub_col2:
+                pass_clicked = st.button("패스 (정답 보기)", key="btn_study_pass", use_container_width=True)
+                
+            if submit_clicked:
                 if not user_ans:
-                    st.warning("정답을 입력하거나 선택해주세요.")
+                    st.warning("보기를 선택해주세요.")
                 else:
                     is_correct = (user_ans == q['expected'])
                     if is_correct:
@@ -160,19 +160,28 @@ with tabs[0]:
                             st.session_state.s_show_exp = True
                             st.session_state.s_total_solved += 1
                 st.rerun()
+                
+            if pass_clicked:
+                st.session_state.s_correct = False
+                st.session_state.s_show_exp = True
+                st.session_state.s_total_solved += 1
+                st.session_state.s_attempts += 1
+                st.rerun()
         else:
-            st.button("✅ 제출 완료", disabled=True, use_container_width=True)
+            sub_col1, sub_col2 = st.columns(2)
+            with sub_col1:
+                st.button("제출 완료", disabled=True, use_container_width=True)
+            with sub_col2:
+                st.button("결과 확인", disabled=True, use_container_width=True)
 
     with btn_col2:
         if st.session_state.s_show_exp:
-            if st.button("🚀 다음 문제 풀기 (Endless) 🚀", type="primary", key="btn_study_next", use_container_width=True):
+            if st.button("다음 문제 풀기 (Endless) 🚀", type="primary", key="btn_study_next", use_container_width=True):
                 st.session_state.s_current_q = generate_single_quiz(st.session_state.current_strategy, st.session_state.get("s_topic", "전체 랜덤"))
                 st.session_state.s_attempts = 0
                 st.session_state.s_show_exp = False
-                st.session_state.s_correct = False
                 st.rerun()
-        else:
-            st.button("🚀 다음 문제 풀기 (Endless) 🚀", disabled=True, use_container_width=True)
+
 
 with tabs[1]:
     if 'exam_state' not in st.session_state:
@@ -190,7 +199,7 @@ with tabs[1]:
             st.markdown('''
             <div style="text-align: center; padding: 1rem;">
                 <h3 style="margin-bottom:0.5rem; color:#0f172a;">🚨 실전 모의고사</h3>
-                <p style="color: #64748b; font-size:0.9rem;">20문항 (객관식 18, 주관식 2) | 제한 시간 40분</p>
+                <p style="color: #64748b; font-size:0.9rem;">20문항 (객관식 20) | 제한 시간 40분</p>
             </div>
             ''', unsafe_allow_html=True)
             
