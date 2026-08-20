@@ -315,7 +315,9 @@ with tabs[2]:
         else:
             df_lb['date_str'] = "-"
             
-        df_lb['time_sec'] = df_lb.get('time_sec', 0).astype(int).astype(str) + "초"
+        if 'time_sec' not in df_lb.columns:
+            df_lb['time_sec'] = 0
+        df_lb['time_sec'] = df_lb['time_sec'].fillna(0).astype(int).astype(str) + "초"
         
         display_df = df_lb[['display_name', 'score', 'time_sec', 'date_str']]
         display_df.columns = ['유저 닉네임', '획득 점수 (점)', '소요 시간', '달성일']
