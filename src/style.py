@@ -213,9 +213,9 @@ div[role="radiogroup"] > label > div:nth-child(2) {{ font-family: 'JetBrains Mon
 }}
 
 /* 글로벌 가로 스크롤 완전 차단 (데스크탑 와이드 모니터 이슈 방어) */
-html, body, [data-testid="stAppViewContainer"], .main, .stApp {
+html, body, [data-testid="stAppViewContainer"], .main, .stApp {{
     overflow-x: hidden !important;
-}
+}}
 </style>
 """
  
