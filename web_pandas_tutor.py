@@ -30,7 +30,7 @@ st.markdown(f'''
 
 # 상단 글로벌 모드 스위처
 # 심플한 토글 스위치로 모드 변경 (st.radio 충돌 원천 차단)
-is_comp_mode = st.toggle("🔥 종합 마스터 모드 활성화", value=(st.session_state.current_strategy == "comprehensive"))
+is_comp_mode = st.toggle("🔥 심화 마스터 버전", value=(st.session_state.current_strategy == "comprehensive"))
 selected_mode = "comprehensive" if is_comp_mode else "bootcamp_day1_4"
 
 if st.session_state.current_strategy != selected_mode:

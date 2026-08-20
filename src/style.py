@@ -62,11 +62,20 @@ div[data-testid="stVerticalBlock"] {{ gap: 1rem !important; }}
 .header-title {{ margin: 0 !important; font-size: 1.6rem !important; font-weight: 800 !important; color: #0f172a; line-height: 1.2 !important; }}
 .header-subtitle {{ font-size: 0.9rem; font-weight: 500; color: #64748b; line-height: 1.4 !important; max-width: 80%; }}
 
-/* 글로벌 스위처 (Toggle) 중앙 정렬 */
+/* 글로벌 스위처 (Toggle) 좌우 텍스트 추가 및 중앙 정렬 */
 div[data-testid="stToggle"] {{
-    display: flex !important; justify-content: center !important; margin-bottom: 1rem !important;
+    display: flex !important; justify-content: center !important; align-items: center !important; margin-bottom: 1rem !important;
 }}
-div[data-testid="stToggle"] label {{ color: {active_color} !important; font-weight: 700 !important; }}
+div[data-testid="stToggle"]::before {{
+    content: "🌱 베이직 버전";
+    margin-right: 0.8rem;
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: #64748b;
+}}
+div[data-testid="stToggle"] label {{ 
+    color: {active_color} !important; font-weight: 700 !important; font-size: 1.05rem !important; 
+}}
 
 /* -------------------------------------------------------------
    TAB BAR (PC: Floating, Mobile: Docked)
@@ -181,7 +190,9 @@ div[role="radiogroup"] > label > div:nth-child(2) {{ font-family: 'JetBrains Mon
     .header-title {{ font-size: 1.1rem !important; }}
     .header-subtitle {{ display: none !important; }}
     
-    div[data-testid="stToggle"] {{ margin-bottom: 0.5rem !important; justify-content: flex-start !important; }}
+    div[data-testid="stToggle"] {{ margin-bottom: 0.5rem !important; justify-content: center !important; }}
+    div[data-testid="stToggle"]::before {{ font-size: 0.95rem; }}
+    div[data-testid="stToggle"] label {{ font-size: 0.95rem !important; }}
     
     [data-testid="stVerticalBlockBorderWrapper"], .stForm {{ padding: 1rem 1rem !important; border-radius: 16px !important; margin-bottom: 0.5rem !important; }}
     
