@@ -866,8 +866,10 @@ def generate_exam_quizzes(strategy_id='bootcamp_day1_4'):
     quizzes = []
     
     def add_questions(pool, count):
-        for _ in range(count):
-            f = random.choice(pool)
+        # 중복 출제를 막기 위해 비복원 추출(random.sample) 사용
+        actual_count = min(count, len(pool))
+        selected_funcs = random.sample(pool, actual_count)
+        for f in selected_funcs:
             q = f()
             q['type'] = 'radio'
             opts = [q['expected']] + q['wrongs'][:3]
