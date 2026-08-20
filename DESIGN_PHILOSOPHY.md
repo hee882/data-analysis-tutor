@@ -69,6 +69,10 @@
 3. **실무 장애(Troubleshooting) 시나리오:**
    * 대용량 파일 MemoryError ➡️ `chunksize` 파라미터 활용
    * 공공데이터 인코딩 에러 ➡️ `encoding='cp949'`
+4. **시각화 및 데이터 탐색(EDA) 개념적(Conceptual) 시나리오:**
+   * 단순히 코드를 외우는 것을 넘어, "어떤 데이터 조합에서 어떤 차트를 그려야 하는가?"와 같은 기획적이고 분석적인 의사결정 능력을 묻습니다.
+   * "범주형(Categorical) + 수치형(Numerical) 데이터 분포 비교" ➡️ `sns.boxplot()` 또는 `sns.barplot()`
+   * "다중 수치형 데이터 간의 상관관계 조망" ➡️ `sns.pairplot()` 또는 `sns.scatterplot()`
 
 ### 💀 매력적인 오답 (Distractors) 생성 가이드라인
 객관식 보기 생성 시, 반드시 실무자들이 코딩할 때 **가장 흔히 저지르는 문법적 실수**를 유도해야 합니다.
