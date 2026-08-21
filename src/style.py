@@ -512,12 +512,13 @@ html, body, [data-testid="stAppViewContainer"], .main, .stApp, #root {{
     flex-direction: column;
 }}
 [data-testid="column"] > [data-testid="stVerticalBlock"] > .element-container > .stMarkdown,
-[data-testid="column"] > [data-testid="stVerticalBlock"] > .element-container > .stMarkdown > div {{
+[data-testid="column"] > [data-testid="stVerticalBlock"] > .element-container > .stMarkdown > div,
+[data-testid="column"] > [data-testid="stVerticalBlock"] > .element-container > .stMarkdown > div > p,
+[data-testid="column"] > [data-testid="stVerticalBlock"] > .element-container > .stMarkdown > div > div {{
     flex: 1;
     display: flex;
     flex-direction: column;
 }}
-
 </style>
 
 
